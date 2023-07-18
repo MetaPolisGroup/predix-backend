@@ -1,0 +1,1 @@
+{"version":3,"file":"cash-history.provider.js","sourceRoot":"","sources":["../../../src/core/provider/cash-history.provider.ts"],"names":[],"mappings":";;;AACA,uEAAkE;AAErD,QAAA,oBAAoB,GAAG;IAClC;QACE,OAAO,EAAE,oBAAoB;QAC7B,UAAU,EAAE,CAAC,UAAsB,EAAE,EAAE,CAAC,UAAU,CAAC,KAAK,CAAC,aAAa,EAAE,uCAAiB,CAAC;QAC1F,MAAM,EAAE,CAAC,qBAAqB,CAAC;KAChC;CACF,CAAC"}

@@ -3,7 +3,7 @@ import { Types } from "mongoose";
 import { User } from "./user.schema";
 import { Product } from "./product.schema";
 
-@Schema()
+@Schema({ timestamps: true })
 export class PointHistory extends Document {
   @Prop({ required: true, type: Types.ObjectId, ref: User.name })
   user: User;
