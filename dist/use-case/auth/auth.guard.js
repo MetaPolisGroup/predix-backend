@@ -13,7 +13,7 @@ exports.AuthGuard = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const auth_service_1 = require("./auth.service");
-let AuthGuard = class AuthGuard {
+let AuthGuard = exports.AuthGuard = class AuthGuard {
     constructor(jwt, authService) {
         this.jwt = jwt;
         this.authService = authService;
@@ -22,9 +22,8 @@ let AuthGuard = class AuthGuard {
         const req = context.switchToHttp().getRequest();
     }
 };
-AuthGuard = __decorate([
+exports.AuthGuard = AuthGuard = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [jwt_1.JwtService, auth_service_1.AuthService])
 ], AuthGuard);
-exports.AuthGuard = AuthGuard;
 //# sourceMappingURL=auth.guard.js.map

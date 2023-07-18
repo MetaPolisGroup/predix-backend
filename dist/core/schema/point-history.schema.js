@@ -13,7 +13,7 @@ exports.PointHistorySchema = exports.PointHistory = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const user_schema_1 = require("./user.schema");
-let PointHistory = class PointHistory extends Document {
+let PointHistory = exports.PointHistory = class PointHistory extends Document {
 };
 __decorate([
     (0, mongoose_1.Prop)({ required: true, type: mongoose_2.Types.ObjectId, ref: user_schema_1.User.name }),
@@ -39,9 +39,8 @@ __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", Number)
 ], PointHistory.prototype, "update_at", void 0);
-PointHistory = __decorate([
+exports.PointHistory = PointHistory = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], PointHistory);
-exports.PointHistory = PointHistory;
 exports.PointHistorySchema = mongoose_1.SchemaFactory.createForClass(PointHistory);
 //# sourceMappingURL=point-history.schema.js.map

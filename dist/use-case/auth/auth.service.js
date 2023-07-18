@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
-let AuthService = class AuthService {
+let AuthService = exports.AuthService = class AuthService {
     constructor(jwt) {
         this.jwt = jwt;
     }
@@ -46,9 +46,8 @@ let AuthService = class AuthService {
         return this.jwt.sign(token);
     }
 };
-AuthService = __decorate([
+exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [jwt_1.JwtService])
 ], AuthService);
-exports.AuthService = AuthService;
 //# sourceMappingURL=auth.service.js.map

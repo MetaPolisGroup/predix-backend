@@ -17,7 +17,7 @@ const ticketRepo_extend_1 = require("./ticket/ticketRepo-extend");
 const firebase_storage_generic_1 = require("./storage/firebase-storage-generic");
 const configuration_1 = require("src/configuration");
 const service_account_1 = require("./service-account");
-let FirestoreDataServices = class FirestoreDataServices {
+let FirestoreDataServices = exports.FirestoreDataServices = class FirestoreDataServices {
     constructor() { }
     onApplicationBootstrap() {
         const app = admin.initializeApp({
@@ -68,9 +68,8 @@ let FirestoreDataServices = class FirestoreDataServices {
         this.raceVirtualGameRepo = new firestore_generic_repository_1.FirestoreGenericRepository(firestore, configuration_1.default.FIREBASE.COLLECTIONS.BETS);
     }
 };
-FirestoreDataServices = __decorate([
+exports.FirestoreDataServices = FirestoreDataServices = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [])
 ], FirestoreDataServices);
-exports.FirestoreDataServices = FirestoreDataServices;
 //# sourceMappingURL=firestore-dataservices.js.map

@@ -14,9 +14,9 @@ const user_module_1 = require("./use-case/user/user.module");
 const auth_module_1 = require("./use-case/auth/auth.module");
 const mongoose_1 = require("@nestjs/mongoose");
 const config_1 = require("@nestjs/config");
-let AppModule = class AppModule {
+let AppModule = exports.AppModule = class AppModule {
 };
-AppModule = __decorate([
+exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
             config_1.ConfigModule.forRoot({ envFilePath: ".env", isGlobal: true }),
@@ -28,5 +28,4 @@ AppModule = __decorate([
         providers: [app_service_1.AppService],
     })
 ], AppModule);
-exports.AppModule = AppModule;
 //# sourceMappingURL=app.module.js.map

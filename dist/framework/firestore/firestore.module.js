@@ -10,9 +10,9 @@ exports.FirestoreModule = void 0;
 const common_1 = require("@nestjs/common");
 const data_service_abstract_1 = require("src/core/abstracts/data-services/data-service.abstract");
 const firestore_dataservices_1 = require("./firestore-dataservices");
-let FirestoreModule = class FirestoreModule {
+let FirestoreModule = exports.FirestoreModule = class FirestoreModule {
 };
-FirestoreModule = __decorate([
+exports.FirestoreModule = FirestoreModule = __decorate([
     (0, common_1.Module)({
         providers: [
             {
@@ -23,5 +23,4 @@ FirestoreModule = __decorate([
         exports: [data_service_abstract_1.IDataServices],
     })
 ], FirestoreModule);
-exports.FirestoreModule = FirestoreModule;
 //# sourceMappingURL=firestore.module.js.map

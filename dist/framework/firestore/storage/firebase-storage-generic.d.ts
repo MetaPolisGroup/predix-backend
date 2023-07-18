@@ -1,3 +1,4 @@
+/// <reference types="multer" />
 import { Bucket } from '@google-cloud/storage';
 import { IFirebaseGenericStorage } from 'src/core/abstracts/data-services/storage/generic-storage.abstract';
 export declare class FirebaseGenericStorage implements IFirebaseGenericStorage {

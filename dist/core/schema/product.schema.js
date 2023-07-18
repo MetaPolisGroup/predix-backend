@@ -11,7 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductSchema = exports.Product = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
-let Product = class Product extends Document {
+let Product = exports.Product = class Product extends Document {
 };
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
@@ -33,9 +33,8 @@ __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", Number)
 ], Product.prototype, "update_at", void 0);
-Product = __decorate([
+exports.Product = Product = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Product);
-exports.Product = Product;
 exports.ProductSchema = mongoose_1.SchemaFactory.createForClass(Product);
 //# sourceMappingURL=product.schema.js.map

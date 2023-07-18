@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PredictionGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
-let PredictionGateway = class PredictionGateway {
+let PredictionGateway = exports.PredictionGateway = class PredictionGateway {
     listenForMessages(data) {
         this.server.sockets.emit("receive_message", data);
     }
@@ -31,8 +31,7 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], PredictionGateway.prototype, "listenForMessages", null);
-PredictionGateway = __decorate([
+exports.PredictionGateway = PredictionGateway = __decorate([
     (0, websockets_1.WebSocketGateway)()
 ], PredictionGateway);
-exports.PredictionGateway = PredictionGateway;
 //# sourceMappingURL=prediction.gateway.js.map

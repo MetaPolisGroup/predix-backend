@@ -16,7 +16,7 @@ exports.UserController = void 0;
 const common_1 = require("@nestjs/common");
 const user_schema_1 = require("../core/schema/user.schema");
 const user_service_1 = require("../use-case/user/user.service");
-let UserController = class UserController {
+let UserController = exports.UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
     }
@@ -32,9 +32,8 @@ __decorate([
     __metadata("design:paramtypes", [user_schema_1.User, Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "create", null);
-UserController = __decorate([
+exports.UserController = UserController = __decorate([
     (0, common_1.Controller)("user"),
     __metadata("design:paramtypes", [user_service_1.UserService])
 ], UserController);
-exports.UserController = UserController;
 //# sourceMappingURL=user.controller.js.map

@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserSchema = exports.User = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
-let User = class User extends mongoose_2.Document {
+let User = exports.User = class User extends mongoose_2.Document {
 };
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
@@ -50,9 +50,8 @@ __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", Number)
 ], User.prototype, "updated_at", void 0);
-User = __decorate([
+exports.User = User = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], User);
-exports.User = User;
 exports.UserSchema = mongoose_1.SchemaFactory.createForClass(User);
 //# sourceMappingURL=user.schema.js.map

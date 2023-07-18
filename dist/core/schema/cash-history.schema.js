@@ -14,7 +14,7 @@ const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const user_schema_1 = require("./user.schema");
 const product_schema_1 = require("./product.schema");
-let CashHistory = class CashHistory extends Document {
+let CashHistory = exports.CashHistory = class CashHistory extends Document {
 };
 __decorate([
     (0, mongoose_1.Prop)({ required: true, type: mongoose_2.Types.ObjectId, ref: user_schema_1.User.name }),
@@ -48,9 +48,8 @@ __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", Number)
 ], CashHistory.prototype, "update_at", void 0);
-CashHistory = __decorate([
+exports.CashHistory = CashHistory = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], CashHistory);
-exports.CashHistory = CashHistory;
 exports.CashHistorySchema = mongoose_1.SchemaFactory.createForClass(CashHistory);
 //# sourceMappingURL=cash-history.schema.js.map

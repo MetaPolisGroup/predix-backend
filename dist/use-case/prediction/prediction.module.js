@@ -8,9 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PredictionModule = void 0;
 const common_1 = require("@nestjs/common");
-let PredictionModule = class PredictionModule {
+let PredictionModule = exports.PredictionModule = class PredictionModule {
 };
-PredictionModule = __decorate([
+exports.PredictionModule = PredictionModule = __decorate([
     (0, common_1.Module)({
         providers: [],
         controllers: [],
@@ -18,5 +18,4 @@ PredictionModule = __decorate([
         exports: [],
     })
 ], PredictionModule);
-exports.PredictionModule = PredictionModule;
 //# sourceMappingURL=prediction.module.js.map

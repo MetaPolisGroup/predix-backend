@@ -9,14 +9,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataServicesModule = void 0;
 const common_1 = require("@nestjs/common");
 const firestore_module_1 = require("src/frameworks/firestore/firestore.module");
-let DataServicesModule = class DataServicesModule {
+let DataServicesModule = exports.DataServicesModule = class DataServicesModule {
 };
-DataServicesModule = __decorate([
+exports.DataServicesModule = DataServicesModule = __decorate([
     (0, common_1.Global)(),
     (0, common_1.Module)({
         imports: [firestore_module_1.FirestoreModule],
         exports: [firestore_module_1.FirestoreModule],
     })
 ], DataServicesModule);
-exports.DataServicesModule = DataServicesModule;
 //# sourceMappingURL=data-services.module.js.map

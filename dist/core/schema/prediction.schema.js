@@ -11,7 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PredictionSchema = exports.Prediction = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
-let Prediction = class Prediction extends Document {
+let Prediction = exports.Prediction = class Prediction extends Document {
 };
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
@@ -29,9 +29,8 @@ __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Prediction.prototype, "status", void 0);
-Prediction = __decorate([
+exports.Prediction = Prediction = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Prediction);
-exports.Prediction = Prediction;
 exports.PredictionSchema = mongoose_1.SchemaFactory.createForClass(Prediction);
 //# sourceMappingURL=prediction.schema.js.map

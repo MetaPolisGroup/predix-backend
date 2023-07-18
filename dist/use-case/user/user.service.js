@@ -11,13 +11,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const user_schema_1 = require("../../core/schema/user.schema");
-let UserService = class UserService {
+let UserService = exports.UserService = class UserService {
     constructor(user) {
         this.user = user;
     }
@@ -28,10 +29,9 @@ let UserService = class UserService {
         return this.user.create(data);
     }
 };
-UserService = __decorate([
+exports.UserService = UserService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(user_schema_1.User.name)),
-    __metadata("design:paramtypes", [mongoose_2.default.Model])
+    __metadata("design:paramtypes", [typeof (_a = typeof mongoose_2.default !== "undefined" && mongoose_2.default.Model) === "function" ? _a : Object])
 ], UserService);
-exports.UserService = UserService;
 //# sourceMappingURL=user.service.js.map
