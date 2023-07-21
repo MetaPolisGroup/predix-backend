@@ -24,6 +24,7 @@ module.exports = {
       'error',
       {
         endOfLine: 'auto',
+        singleQuote: true,
       },
     ],
     '@typescript-eslint/ban-types': 'error',
@@ -42,7 +43,7 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-empty-function': 'off',
-    '@typescript-eslint/no-unused-vars': 'error',
+    '@typescript-eslint/no-unused-vars': 'off',
     'lines-between-class-members': ['error', 'always'],
   },
 };

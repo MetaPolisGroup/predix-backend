@@ -14,6 +14,7 @@ const common_1 = require("@nestjs/common");
 const admin = require("firebase-admin");
 const service_account_1 = require("./service-account");
 const configuration_1 = require("../../configuration");
+const firestore_generic_repository_1 = require("./firestore-generic-repository");
 let FirestoreDataServices = exports.FirestoreDataServices = class FirestoreDataServices {
     constructor() { }
     onApplicationBootstrap() {
@@ -25,6 +26,11 @@ let FirestoreDataServices = exports.FirestoreDataServices = class FirestoreDataS
         firestore.settings({ ignoreUndefinedProperties: true });
         const bucket = app.storage().bucket();
         this.firestore = firestore;
+        this.userRepo = new firestore_generic_repository_1.FirestoreGenericRepository(firestore, configuration_1.default.FIREBASE.COLLECTIONS.USERS);
+        this.cashHistoryRepoRepo = new firestore_generic_repository_1.FirestoreGenericRepository(firestore, configuration_1.default.FIREBASE.COLLECTIONS.CASH_HISTORIES);
+        this.pointHistoryRepo = new firestore_generic_repository_1.FirestoreGenericRepository(firestore, configuration_1.default.FIREBASE.COLLECTIONS.POINT_HISTORIES);
+        this.predictionRepo = new firestore_generic_repository_1.FirestoreGenericRepository(firestore, configuration_1.default.FIREBASE.COLLECTIONS.PREDICTIONS);
+        this.productRepo = new firestore_generic_repository_1.FirestoreGenericRepository(firestore, configuration_1.default.FIREBASE.COLLECTIONS.PRODUCTS);
     }
 };
 exports.FirestoreDataServices = FirestoreDataServices = __decorate([

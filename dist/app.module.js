@@ -12,18 +12,13 @@ const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const user_module_1 = require("./use-case/user/user.module");
 const auth_module_1 = require("./use-case/auth/auth.module");
-const mongoose_1 = require("@nestjs/mongoose");
 const config_1 = require("@nestjs/config");
+const data_services_module_1 = require("./service/data-service/data-services.module");
 let AppModule = exports.AppModule = class AppModule {
 };
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [
-            config_1.ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
-            user_module_1.UserModule,
-            auth_module_1.AuthModule,
-            mongoose_1.MongooseModule.forRoot(process.env.MONGO_DB_HOST, {}),
-        ],
+        imports: [config_1.ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }), user_module_1.UserModule, auth_module_1.AuthModule, data_services_module_1.DataServicesModule],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })

@@ -8,29 +8,48 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
 const common_1 = require("@nestjs/common");
-const mongoose_1 = require("@nestjs/mongoose");
-const mongoose_2 = require("mongoose");
-const user_schema_1 = require("../../core/schema/user.schema");
+const configuration_1 = require("../../configuration");
+const data_service_abstract_1 = require("../../core/abstract/data-services/data-service.abstract");
 let UserService = exports.UserService = class UserService {
-    constructor(user) {
-        this.user = user;
+    constructor(db) {
+        this.db = db;
     }
-    async create(data, req) {
-        data.ip = req.ip;
-        data.created_at = new Date().getTime();
-        data.updated_at = new Date().getTime();
-        return this.user.create(data);
+    async create(dto, req) {
+        const user_tree_belong = await this.partnerTree(dto.recommend_id);
+        const user = {
+            id: dto.account_id,
+            email: '',
+            point: 0,
+            user_tree_belong,
+            ip: req.ip,
+            type: configuration_1.default.USER.TYPE.NORMAL,
+            created_at: new Date().getTime(),
+            updated_at: new Date().getTime(),
+            nickname: dto.account_id,
+        };
+        return this.db.userRepo.createDocumentData(user);
+    }
+    async partnerTree(recommend_id) {
+        const partner_tree = [];
+        const recommender = await this.db.userRepo.getDocumentData(recommend_id);
+        if (!recommender) {
+            return [];
+        }
+        partner_tree.push(recommend_id);
+        if (recommender.user_tree_belong) {
+            for (let i = 0; i < recommender.user_tree_belong.length; i++) {
+                if (i < 2 && recommender.user_tree_belong[i]) {
+                    partner_tree.push(recommender.user_tree_belong[i]);
+                }
+            }
+        }
     }
 };
 exports.UserService = UserService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, mongoose_1.InjectModel)(user_schema_1.User.name)),
-    __metadata("design:paramtypes", [mongoose_2.default.Model])
+    __metadata("design:paramtypes", [data_service_abstract_1.IDataServices])
 ], UserService);
 //# sourceMappingURL=user.service.js.map

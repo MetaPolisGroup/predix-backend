@@ -17,25 +17,24 @@ let AuthService = exports.AuthService = class AuthService {
         this.jwt = jwt;
     }
     async validateToken(req) {
-        const token = req.headers["authorization"];
+        const token = req.headers['authorization'];
         const verify = await this.jwt.verifyAsync(token);
         if (verify) {
             let user;
             if (user) {
                 if (user.id == verify.id && user.nickname == verify.nickname) {
-                    delete user.password;
                     return true;
                 }
                 else {
-                    throw new common_1.UnauthorizedException("Token is wrong");
+                    throw new common_1.UnauthorizedException('Token is wrong');
                 }
             }
             else {
-                throw new common_1.UnauthorizedException("Token is wrong");
+                throw new common_1.UnauthorizedException('Token is wrong');
             }
         }
         else {
-            throw new common_1.UnauthorizedException("Token is wrong");
+            throw new common_1.UnauthorizedException('Token is wrong');
         }
     }
     generateAccessTokenUser(id, nickname) {
