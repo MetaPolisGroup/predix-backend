@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { IDataServices } from 'src/core/abstracts/data-services/data-service.abstract';
 import { FirestoreDataServices } from './firestore-dataservices';
+import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 
 @Module({
   providers: [

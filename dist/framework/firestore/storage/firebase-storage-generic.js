@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FirebaseGenericStorage = void 0;
-const configuration_1 = require("src/configuration");
+const configuration_1 = require("../../../configuration");
 class FirebaseGenericStorage {
     constructor(bucket, path) {
         this.bucket = bucket;

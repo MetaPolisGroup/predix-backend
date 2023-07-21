@@ -8,7 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataServicesModule = void 0;
 const common_1 = require("@nestjs/common");
-const firestore_module_1 = require("src/frameworks/firestore/firestore.module");
+const firestore_module_1 = require("../../framework/firestore/firestore.module");
 let DataServicesModule = exports.DataServicesModule = class DataServicesModule {
 };
 exports.DataServicesModule = DataServicesModule = __decorate([

@@ -1,7 +1,6 @@
 import { CollectionReference, DocumentData, Firestore, WhereFilterOp } from '@google-cloud/firestore';
 import { collectionsName } from 'src/configuration/type/firebase/firebase.type';
-import { IGenericRepository } from 'src/core/abstracts/data-services/generic-repository.abstract';
-import { DocumentChange, DocumentChangeOrigin } from 'src/core/abstracts/data-services/snapshot/Query.abstract';
+import { IGenericRepository } from 'src/core/abstract/data-services/generic-repository.abstract';
 export declare class FirestoreGenericRepository<T extends DocumentData> implements IGenericRepository<T> {
     readonly firestore: Firestore;
     readonly collectionName: collectionsName;
@@ -31,17 +30,6 @@ export declare class FirestoreGenericRepository<T extends DocumentData> implemen
         operator: WhereFilterOp;
         value: any;
     }[]): void;
-    listenToChangesWithConditions(conditions: {
-        field: string;
-        operator: WhereFilterOp;
-        value: any;
-    }[], callback: (changes: DocumentChange<T>[]) => Promise<void>): void;
-    listenToChangesWithConditionsOrigin(conditions: {
-        field: string;
-        operator: WhereFilterOp;
-        value: any;
-    }[], callback: (changes: DocumentChangeOrigin<T>[]) => Promise<void>): Promise<void>;
-    listenToChangesOnCollection(callback: (changes: DocumentChange<T>[]) => Promise<void>): void;
     getCollectionDataByConditionsAndOrderBy(conditions: {
         field: string;
         operator: WhereFilterOp;

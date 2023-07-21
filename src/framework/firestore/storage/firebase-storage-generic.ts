@@ -1,6 +1,6 @@
 import { Bucket } from '@google-cloud/storage';
 import constant from 'src/configuration';
-import { IFirebaseGenericStorage } from 'src/core/abstracts/data-services/storage/generic-storage.abstract';
+import { IFirebaseGenericStorage } from 'src/core/abstract/data-services/storage/generic-storage.abstract';
 
 export class FirebaseGenericStorage implements IFirebaseGenericStorage {
   private readonly bucket: Bucket;

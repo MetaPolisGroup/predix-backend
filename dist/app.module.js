@@ -19,7 +19,7 @@ let AppModule = exports.AppModule = class AppModule {
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            config_1.ConfigModule.forRoot({ envFilePath: ".env", isGlobal: true }),
+            config_1.ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
             user_module_1.UserModule,
             auth_module_1.AuthModule,
             mongoose_1.MongooseModule.forRoot(process.env.MONGO_DB_HOST, {}),

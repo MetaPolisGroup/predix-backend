@@ -8,8 +8,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FirestoreModule = void 0;
 const common_1 = require("@nestjs/common");
-const data_service_abstract_1 = require("src/core/abstracts/data-services/data-service.abstract");
 const firestore_dataservices_1 = require("./firestore-dataservices");
+const data_service_abstract_1 = require("../../core/abstract/data-services/data-service.abstract");
 let FirestoreModule = exports.FirestoreModule = class FirestoreModule {
 };
 exports.FirestoreModule = FirestoreModule = __decorate([

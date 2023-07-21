@@ -1,5 +1,4 @@
 import { WhereFilterOp } from 'src/configuration/type/other.type';
-import { DocumentChange } from './snapshot/Query.abstract';
 export declare abstract class IGenericRepository<T> {
     abstract getCollectionData(): Promise<T[]>;
     abstract getFirstValueCollectionData(): Promise<T>;
@@ -24,17 +23,6 @@ export declare abstract class IGenericRepository<T> {
         operator: WhereFilterOp;
         value: any;
     }[]): any;
-    abstract listenToChangesWithConditions(conditions: {
-        field: string;
-        operator: WhereFilterOp;
-        value: any;
-    }[], callback: (changes: DocumentChange<T>[]) => Promise<void>): void;
-    abstract listenToChangesWithConditionsOrigin(conditions: {
-        field: string;
-        operator: WhereFilterOp;
-        value: any;
-    }[], callback: (changes: DocumentChange<T>[]) => Promise<void>): void;
-    abstract listenToChangesOnCollection(callback: (changes: DocumentChange<T>[]) => Promise<void>): void;
     abstract getCollectionDataByConditionsAndOrderBy(conditions: {
         field: string;
         operator: WhereFilterOp;

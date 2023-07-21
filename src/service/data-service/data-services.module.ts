@@ -1,5 +1,5 @@
 import { Global, Module } from '@nestjs/common';
-import { FirestoreModule } from 'src/frameworks/firestore/firestore.module';
+import { FirestoreModule } from 'src/framework/firestore/firestore.module';
 @Global()
 @Module({
   imports: [FirestoreModule],

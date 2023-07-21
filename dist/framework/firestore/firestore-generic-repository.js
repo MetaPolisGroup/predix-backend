@@ -14,7 +14,7 @@ class FirestoreGenericRepository {
         if (collectionSnapshot.empty) {
             return null;
         }
-        const data = collectionSnapshot.docs.map(doc => doc.data());
+        const data = collectionSnapshot.docs.map((doc) => doc.data());
         return data;
     }
     async getFirstValueCollectionData() {
@@ -22,7 +22,7 @@ class FirestoreGenericRepository {
         if (collectionSnapshot.empty) {
             return null;
         }
-        const data = collectionSnapshot.docs.map(doc => doc.data());
+        const data = collectionSnapshot.docs.map((doc) => doc.data());
         return data.length > 0 ? data[0] : null;
     }
     async getCollectionDataByConditions(conditions) {
@@ -34,7 +34,7 @@ class FirestoreGenericRepository {
         if (collectionSnapshot.empty) {
             return null;
         }
-        const data = collectionSnapshot.docs.map(doc => {
+        const data = collectionSnapshot.docs.map((doc) => {
             if (!doc.data().id) {
                 const documentData = doc.data();
                 documentData.id = doc.id;
@@ -53,7 +53,7 @@ class FirestoreGenericRepository {
         if (collectionSnapshot.empty) {
             return null;
         }
-        const data = collectionSnapshot.docs.map(doc => {
+        const data = collectionSnapshot.docs.map((doc) => {
             if (!doc.data().id) {
                 const documentData = doc.data();
                 documentData.id = doc.id;
@@ -83,7 +83,9 @@ class FirestoreGenericRepository {
     }
     async updateDocumentData(documentId, documentData) {
         const documentRef = this.collectionRef.doc(documentId);
-        await documentRef.update(documentData).then(() => (Object.assign({ id: documentId }, documentData)));
+        await documentRef
+            .update(documentData)
+            .then(() => (Object.assign({ id: documentId }, documentData)));
         const result = Object.assign({ id: documentId }, documentData);
         return result;
     }
@@ -103,79 +105,20 @@ class FirestoreGenericRepository {
         }
         query
             .get()
-            .then(snapshot => {
-            snapshot.forEach(doc => {
+            .then((snapshot) => {
+            snapshot.forEach((doc) => {
                 doc.ref
                     .delete()
                     .then(() => {
                     this.Logger.log(`Document with ID ${doc.id} successfully deleted`);
                 })
-                    .catch(error => {
+                    .catch((error) => {
                     this.Logger.error(`Error deleting document with ID ${doc.id}:`, error);
                 });
             });
         })
-            .catch(error => {
+            .catch((error) => {
             this.Logger.error('Error getting documents:', error);
-        });
-    }
-    listenToChangesWithConditions(conditions, callback) {
-        let query = this.collectionRef;
-        if (conditions) {
-            for (const condition of conditions) {
-                query = query.where(condition.field, condition.operator, condition.value);
-            }
-        }
-        if (!query) {
-            return null;
-        }
-        query.onSnapshot(async (s) => {
-            const result = s.docChanges().map(change => {
-                const data = {
-                    doc: change.doc.data(),
-                    newIndex: change.newIndex,
-                    oldIndex: change.oldIndex,
-                    type: change.type,
-                };
-                return data;
-            });
-            await callback(result);
-        });
-    }
-    listenToChangesWithConditionsOrigin(conditions, callback) {
-        let query = this.collectionRef;
-        if (conditions) {
-            for (const condition of conditions) {
-                query = query.where(condition.field, condition.operator, condition.value);
-            }
-        }
-        if (!query) {
-            return null;
-        }
-        query.onSnapshot(async (s) => {
-            const result = s.docs.map(change => {
-                const data = {
-                    doc: change.data(),
-                };
-                return data;
-            });
-            await callback(result);
-        });
-    }
-    listenToChangesOnCollection(callback) {
-        const query = this.collectionRef;
-        let result;
-        query.onSnapshot(async (s) => {
-            result = s.docChanges().map(change => {
-                const data = {
-                    doc: change.doc.data(),
-                    newIndex: change.newIndex,
-                    oldIndex: change.oldIndex,
-                    type: change.type,
-                };
-                return data;
-            });
-            await callback(result);
         });
     }
     async getCollectionDataByConditionsAndOrderBy(conditions, orderBys) {
@@ -190,7 +133,7 @@ class FirestoreGenericRepository {
         if (collectionSnapshot.empty) {
             return null;
         }
-        const data = collectionSnapshot.docs.map(doc => {
+        const data = collectionSnapshot.docs.map((doc) => {
             if (!doc.data().id) {
                 const documentData = doc.data();
                 documentData.id = doc.id;
@@ -208,7 +151,7 @@ class FirestoreGenericRepository {
             }
         }
         const querySnapshot = await query.get();
-        const data = querySnapshot.docs.map(doc => doc.data());
+        const data = querySnapshot.docs.map((doc) => doc.data());
         return data.length > 0 ? data[0] : null;
     }
 }
