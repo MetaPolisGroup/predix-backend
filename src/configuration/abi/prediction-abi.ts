@@ -4,8 +4,49 @@ const predictionAbi = `[
 	{
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "epoch",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "betBear",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "epoch",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "betBull",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "_oracleAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_tokenAddress",
 				"type": "address"
 			},
 			{
@@ -98,6 +139,19 @@ const predictionAbi = `[
 		"type": "event"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "epochs",
+				"type": "uint256[]"
+			}
+		],
+		"name": "claim",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -123,6 +177,13 @@ const predictionAbi = `[
 		"type": "event"
 	},
 	{
+		"inputs": [],
+		"name": "claimTreasury",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -146,6 +207,49 @@ const predictionAbi = `[
 		],
 		"name": "EndRound",
 		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint80",
+				"name": "currentRoundId",
+				"type": "uint80"
+			},
+			{
+				"internalType": "int256",
+				"name": "currentPrice",
+				"type": "int256"
+			}
+		],
+		"name": "executeRound",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint80",
+				"name": "currentRoundId",
+				"type": "uint80"
+			},
+			{
+				"internalType": "int256",
+				"name": "currentPrice",
+				"type": "int256"
+			}
+		],
+		"name": "genesisLockRound",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "genesisStartRound",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"anonymous": false,
@@ -301,6 +405,13 @@ const predictionAbi = `[
 		"type": "event"
 	},
 	{
+		"inputs": [],
+		"name": "pause",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -327,6 +438,31 @@ const predictionAbi = `[
 		"type": "event"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_token",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_amount",
+				"type": "uint256"
+			}
+		],
+		"name": "recoverToken",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -344,6 +480,102 @@ const predictionAbi = `[
 		],
 		"name": "RewardsCalculated",
 		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_adminAddress",
+				"type": "address"
+			}
+		],
+		"name": "setAdmin",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_bufferSeconds",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_intervalSeconds",
+				"type": "uint256"
+			}
+		],
+		"name": "setBufferAndIntervalSeconds",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_minBetAmount",
+				"type": "uint256"
+			}
+		],
+		"name": "setMinBetAmount",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_operatorAddress",
+				"type": "address"
+			}
+		],
+		"name": "setOperator",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_oracle",
+				"type": "address"
+			}
+		],
+		"name": "setOracle",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_oracleUpdateAllowance",
+				"type": "uint256"
+			}
+		],
+		"name": "setOracleUpdateAllowance",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_treasuryFee",
+				"type": "uint256"
+			}
+		],
+		"name": "setTreasuryFee",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"anonymous": false,
@@ -378,6 +610,19 @@ const predictionAbi = `[
 		"type": "event"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -389,6 +634,13 @@ const predictionAbi = `[
 		],
 		"name": "TreasuryClaim",
 		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "unpause",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"anonymous": false,
@@ -417,17 +669,30 @@ const predictionAbi = `[
 		"type": "event"
 	},
 	{
-		"inputs": [],
-		"name": "MAX_TREASURY_FEE",
-		"outputs": [
+		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "",
+				"name": "amount_",
 				"type": "uint256"
 			}
 		],
-		"stateMutability": "view",
+		"name": "withdraw",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "value",
+				"type": "uint256"
+			}
+		],
+		"name": "Withdrawn",
+		"type": "event"
 	},
 	{
 		"inputs": [],
@@ -440,32 +705,6 @@ const predictionAbi = `[
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "epoch",
-				"type": "uint256"
-			}
-		],
-		"name": "betBear",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "epoch",
-				"type": "uint256"
-			}
-		],
-		"name": "betBull",
-		"outputs": [],
-		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
@@ -482,23 +721,21 @@ const predictionAbi = `[
 		"type": "function"
 	},
 	{
-		"inputs": [
+		"inputs": [],
+		"name": "checker",
+		"outputs": [
 			{
-				"internalType": "uint256[]",
-				"name": "epochs",
-				"type": "uint256[]"
+				"internalType": "bool",
+				"name": "canExec",
+				"type": "bool"
+			},
+			{
+				"internalType": "bytes",
+				"name": "execPayload",
+				"type": "bytes"
 			}
 		],
-		"name": "claim",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "claimTreasury",
-		"outputs": [],
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -539,24 +776,6 @@ const predictionAbi = `[
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "uint80",
-				"name": "currentRoundId",
-				"type": "uint80"
-			},
-			{
-				"internalType": "int256",
-				"name": "currentPrice",
-				"type": "int256"
-			}
-		],
-		"name": "executeRound",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"inputs": [],
 		"name": "genesisLockOnce",
 		"outputs": [
@@ -570,24 +789,6 @@ const predictionAbi = `[
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "uint80",
-				"name": "currentRoundId",
-				"type": "uint80"
-			},
-			{
-				"internalType": "int256",
-				"name": "currentPrice",
-				"type": "int256"
-			}
-		],
-		"name": "genesisLockRound",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"inputs": [],
 		"name": "genesisStartOnce",
 		"outputs": [
@@ -598,13 +799,6 @@ const predictionAbi = `[
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "genesisStartRound",
-		"outputs": [],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -741,6 +935,19 @@ const predictionAbi = `[
 	},
 	{
 		"inputs": [],
+		"name": "MAX_TREASURY_FEE",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "minBetAmount",
 		"outputs": [
 			{
@@ -819,13 +1026,6 @@ const predictionAbi = `[
 	},
 	{
 		"inputs": [],
-		"name": "pause",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
 		"name": "paused",
 		"outputs": [
 			{
@@ -835,24 +1035,6 @@ const predictionAbi = `[
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_token",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_amount",
-				"type": "uint256"
-			}
-		],
-		"name": "recoverToken",
-		"outputs": [],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -877,13 +1059,6 @@ const predictionAbi = `[
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "renounceOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -961,112 +1136,16 @@ const predictionAbi = `[
 		"type": "function"
 	},
 	{
-		"inputs": [
+		"inputs": [],
+		"name": "tokenAddress",
+		"outputs": [
 			{
 				"internalType": "address",
-				"name": "_adminAddress",
+				"name": "",
 				"type": "address"
 			}
 		],
-		"name": "setAdmin",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_bufferSeconds",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_intervalSeconds",
-				"type": "uint256"
-			}
-		],
-		"name": "setBufferAndIntervalSeconds",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_minBetAmount",
-				"type": "uint256"
-			}
-		],
-		"name": "setMinBetAmount",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_operatorAddress",
-				"type": "address"
-			}
-		],
-		"name": "setOperator",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_oracle",
-				"type": "address"
-			}
-		],
-		"name": "setOracle",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_oracleUpdateAllowance",
-				"type": "uint256"
-			}
-		],
-		"name": "setOracleUpdateAllowance",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_treasuryFee",
-				"type": "uint256"
-			}
-		],
-		"name": "setTreasuryFee",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -1093,13 +1172,6 @@ const predictionAbi = `[
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "unpause",
-		"outputs": [],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
