@@ -1,1 +1,0 @@
-{"version":3,"file":"point-history.provider.js","sourceRoot":"","sources":["../../../src/core/provider/point-history.provider.ts"],"names":[],"mappings":";;;AAEA,yEAAoE;AAEvD,QAAA,qBAAqB,GAAG;IACnC;QACE,OAAO,EAAE,qBAAqB;QAC9B,UAAU,EAAE,CAAC,UAAsB,EAAE,EAAE,CAAC,UAAU,CAAC,KAAK,CAAC,cAAc,EAAE,yCAAkB,CAAC;QAC5F,MAAM,EAAE,CAAC,qBAAqB,CAAC;KAChC;CACF,CAAC"}
