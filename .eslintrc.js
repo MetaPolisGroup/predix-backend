@@ -27,9 +27,9 @@ module.exports = {
       },
     ],
     '@typescript-eslint/ban-types': 'error',
-    '@typescript-eslint/explicit-function-return-type': 'warn',
+    '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-misused-promises': [
-      'warn',
+      'off',
       {
         checksConditionals: false,
       },

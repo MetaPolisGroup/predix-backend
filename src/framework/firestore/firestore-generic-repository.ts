@@ -1,29 +1,15 @@
-import {
-  CollectionReference,
-  DocumentData,
-  Firestore,
-  Query,
-  UpdateData,
-  WhereFilterOp,
-} from '@google-cloud/firestore';
+import { CollectionReference, DocumentData, Firestore, Query, UpdateData, WhereFilterOp } from '@google-cloud/firestore';
 import { Logger } from '@nestjs/common';
 import { collectionsName } from 'src/configuration/type/firebase/firebase.type';
 import { IGenericRepository } from 'src/core/abstract/data-services/generic-repository.abstract';
 
-export class FirestoreGenericRepository<T extends DocumentData>
-  implements IGenericRepository<T>
-{
+export class FirestoreGenericRepository<T extends DocumentData> implements IGenericRepository<T> {
   readonly collectionRef: CollectionReference<T>;
 
   private Logger: Logger;
 
-  constructor(
-    readonly firestore: Firestore,
-    readonly collectionName: collectionsName,
-  ) {
-    this.collectionRef = this.firestore.collection(
-      this.collectionName,
-    ) as CollectionReference<T>;
+  constructor(readonly firestore: Firestore, readonly collectionName: collectionsName) {
+    this.collectionRef = this.firestore.collection(this.collectionName) as CollectionReference<T>;
     this.Logger = new Logger(FirestoreGenericRepository.name);
   }
 
@@ -34,7 +20,7 @@ export class FirestoreGenericRepository<T extends DocumentData>
       return null;
     }
 
-    const data = collectionSnapshot.docs.map((doc) => doc.data());
+    const data = collectionSnapshot.docs.map(doc => doc.data());
 
     return data;
   }
@@ -46,7 +32,7 @@ export class FirestoreGenericRepository<T extends DocumentData>
       return null;
     }
 
-    const data = collectionSnapshot.docs.map((doc) => doc.data());
+    const data = collectionSnapshot.docs.map(doc => doc.data());
 
     return data.length > 0 ? data[0] : null;
   }
@@ -68,7 +54,7 @@ export class FirestoreGenericRepository<T extends DocumentData>
       return null;
     }
 
-    const data = collectionSnapshot.docs.map((doc) => {
+    const data = collectionSnapshot.docs.map(doc => {
       if (!doc.data().id) {
         const documentData = doc.data();
         documentData.id = doc.id;
@@ -97,7 +83,7 @@ export class FirestoreGenericRepository<T extends DocumentData>
       return null;
     }
 
-    const data = collectionSnapshot.docs.map((doc) => {
+    const data = collectionSnapshot.docs.map(doc => {
       if (!doc.data().id) {
         const documentData = doc.data();
         documentData.id = doc.id;
@@ -136,17 +122,12 @@ export class FirestoreGenericRepository<T extends DocumentData>
   async updateDocumentData(documentId: string, documentData: T): Promise<T> {
     const documentRef = this.collectionRef.doc(documentId);
 
-    await documentRef
-      .update(documentData as UpdateData<T>)
-      .then(() => ({ id: documentId, ...documentData } as T));
+    await documentRef.update(documentData as UpdateData<T>).then(() => ({ id: documentId, ...documentData } as T));
     const result: T = { id: documentId, ...documentData };
     return result;
   }
 
-  async upsertDocumentData(
-    documentId: string,
-    documentData: T | object,
-  ): Promise<T> {
+  async upsertDocumentData(documentId: string, documentData: T | object): Promise<T> {
     const documentRef = this.collectionRef.doc(documentId);
     await documentRef.set(documentData, { merge: true });
 
@@ -158,9 +139,7 @@ export class FirestoreGenericRepository<T extends DocumentData>
     await documentRef.delete();
   }
 
-  deleteDocumentByConditions(
-    conditions: { field: string; operator: WhereFilterOp; value: any }[],
-  ): void {
+  deleteDocumentByConditions(conditions: { field: string; operator: WhereFilterOp; value: any }[]): void {
     let query: Query<DocumentData> = this.collectionRef;
     for (const condition of conditions) {
       query = query.where(condition.field, condition.operator, condition.value);
@@ -168,24 +147,19 @@ export class FirestoreGenericRepository<T extends DocumentData>
 
     query
       .get()
-      .then((snapshot) => {
-        snapshot.forEach((doc) => {
+      .then(snapshot => {
+        snapshot.forEach(doc => {
           doc.ref
             .delete()
             .then(() => {
-              this.Logger.log(
-                `Document with ID ${doc.id} successfully deleted`,
-              );
+              this.Logger.log(`Document with ID ${doc.id} successfully deleted`);
             })
-            .catch((error) => {
-              this.Logger.error(
-                `Error deleting document with ID ${doc.id}:`,
-                error,
-              );
+            .catch(error => {
+              this.Logger.error(`Error deleting document with ID ${doc.id}:`, error);
             });
         });
       })
-      .catch((error) => {
+      .catch(error => {
         this.Logger.error('Error getting documents:', error);
       });
   }
@@ -215,7 +189,7 @@ export class FirestoreGenericRepository<T extends DocumentData>
       return null;
     }
 
-    const data = collectionSnapshot.docs.map((doc) => {
+    const data = collectionSnapshot.docs.map(doc => {
       if (!doc.data().id) {
         const documentData = doc.data();
         documentData.id = doc.id;
@@ -242,7 +216,7 @@ export class FirestoreGenericRepository<T extends DocumentData>
     }
 
     const querySnapshot = await query.get();
-    const data = querySnapshot.docs.map((doc) => doc.data()) as T[];
+    const data = querySnapshot.docs.map(doc => doc.data()) as T[];
     return data.length > 0 ? data[0] : null;
   }
 }

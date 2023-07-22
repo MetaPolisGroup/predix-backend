@@ -6,13 +6,9 @@ export abstract class IGenericRepository<T> {
 
   abstract getFirstValueCollectionData(): Promise<T>;
 
-  abstract getCollectionDataByConditions(
-    conditions: { field: string; operator: WhereFilterOp; value: any }[],
-  ): Promise<T[]>;
+  abstract getCollectionDataByConditions(conditions: { field: string; operator: WhereFilterOp; value: any }[]): Promise<T[]>;
 
-  abstract getFirstValueCollectionDataByConditions(
-    conditions: { field: string; operator: WhereFilterOp; value: any }[],
-  ): Promise<T>;
+  abstract getFirstValueCollectionDataByConditions(conditions: { field: string; operator: WhereFilterOp; value: any }[]): Promise<T>;
 
   abstract getDocumentData(documentId: string): Promise<T>;
 
@@ -22,16 +18,11 @@ export abstract class IGenericRepository<T> {
 
   abstract updateDocumentData(documentId: string, documentData: T): Promise<T>;
 
-  abstract upsertDocumentData(
-    documentId: string,
-    documentData: T | object,
-  ): Promise<T>;
+  abstract upsertDocumentData(documentId: string, documentData: T | object): Promise<T>;
 
   abstract deleteDocumentData(documentId: string);
 
-  abstract deleteDocumentByConditions(
-    conditions: { field: string; operator: WhereFilterOp; value: any }[],
-  );
+  abstract deleteDocumentByConditions(conditions: { field: string; operator: WhereFilterOp; value: any }[]);
 
   abstract getCollectionDataByConditionsAndOrderBy(
     conditions: { field: string; operator: WhereFilterOp; value: any }[],
