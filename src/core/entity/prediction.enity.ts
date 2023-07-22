@@ -1,9 +1,29 @@
 export class Prediction {
-  name: string;
+  epoch: string;
 
-  price_start: string;
+  startTimestamp: number;
 
-  price_end: string;
+  lockTimestamp: number;
 
-  status: string;
+  closeTimestamp: number;
+
+  lockOracleId: bigint;
+
+  closeOracleId: bigint;
+
+  lockPrice: bigint;
+
+  closePrice: bigint;
+
+  totalAmount: bigint;
+
+  bullAmount: bigint;
+
+  bearAmount: bigint;
+
+  closed: boolean;
+
+  locked: boolean;
+
+  delele: boolean;
 }

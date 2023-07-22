@@ -11,7 +11,6 @@ export class AuthService {
 
   async validateToken(req: Request) {
     const token = req.headers['authorization'] as string;
-    const token = req.headers['authorization'] as string;
     const verify = await this.jwt.verifyAsync<IUserToken>(token);
     if (verify) {
       let user: User;
@@ -21,14 +20,11 @@ export class AuthService {
           return true;
         } else {
           throw new UnauthorizedException('Token is wrong');
-          throw new UnauthorizedException('Token is wrong');
         }
       } else {
         throw new UnauthorizedException('Token is wrong');
-        throw new UnauthorizedException('Token is wrong');
       }
     } else {
-      throw new UnauthorizedException('Token is wrong');
       throw new UnauthorizedException('Token is wrong');
     }
   }
