@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './use-case/user/user.module';
 import { AuthModule } from './use-case/auth/auth.module';
-import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { PredictionModule } from './use-case/event listener/event-listener.module';
 import { ContractFactoryModule } from './service/contract-factory/contract-factory.module';

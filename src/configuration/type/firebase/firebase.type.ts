@@ -1,1 +1,1 @@
-export type collectionsName = 'users' | 'bets' | 'rounds';
+export type collectionsName = 'users' | 'predictions' | 'products' | 'point_histories' | 'cash_histories';

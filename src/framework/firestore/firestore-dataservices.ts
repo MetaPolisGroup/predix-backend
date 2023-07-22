@@ -4,23 +4,31 @@ import { Bucket } from '@google-cloud/storage';
 import { serviceAccount } from './service-account';
 import constant from 'src/configuration';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
-import { Bet } from 'src/core/interface/bet/bet.entity';
-import { Round } from 'src/core/interface/round/round.entity';
+import { User } from 'src/core/entity/user.enity';
 import { FirestoreGenericRepository } from './firestore-generic-repository';
-import { User } from 'src/core/interface/user/user.interface';
+import { CashHistory } from 'src/core/entity/cash-history.enity';
+import { PointHistory } from 'src/core/entity/point-history.enity';
+import { Prediction } from 'src/core/entity/prediction.enity';
+import { Product } from 'src/core/entity/product.entiy';
+import { IGenericRepository } from 'src/core/abstract/data-services/generic-repository.abstract';
 
 @Injectable()
 export class FirestoreDataServices implements IDataServices, OnApplicationBootstrap {
   //Firestore
   firestore: admin.firestore.Firestore;
 
-  betRepo: FirestoreGenericRepository<Bet>;
-
-  roundRepo: FirestoreGenericRepository<Round>;
-
   userRepo: FirestoreGenericRepository<User>;
 
+  cashHistoryRepoRepo: FirestoreGenericRepository<CashHistory>;
+
+  pointHistoryRepo: FirestoreGenericRepository<PointHistory>;
+
+  predictionRepo: FirestoreGenericRepository<Prediction>;
+
+  productRepo: FirestoreGenericRepository<Product>;
+
   constructor() {}
+  cashHistoryRepo: IGenericRepository<CashHistory>;
 
   onApplicationBootstrap(): void {
     const app = admin.initializeApp(
@@ -37,9 +45,14 @@ export class FirestoreDataServices implements IDataServices, OnApplicationBootst
     //Firestore
     this.firestore = firestore;
 
-    //Repos
-    this.betRepo = new FirestoreGenericRepository(firestore, 'bets');
-    this.roundRepo = new FirestoreGenericRepository(firestore, 'rounds');
-    this.userRepo = new FirestoreGenericRepository(firestore, 'users');
+    this.userRepo = new FirestoreGenericRepository<User>(firestore, constant.FIREBASE.COLLECTIONS.USERS);
+
+    this.cashHistoryRepoRepo = new FirestoreGenericRepository<CashHistory>(firestore, constant.FIREBASE.COLLECTIONS.CASH_HISTORIES);
+
+    this.pointHistoryRepo = new FirestoreGenericRepository<PointHistory>(firestore, constant.FIREBASE.COLLECTIONS.POINT_HISTORIES);
+
+    this.predictionRepo = new FirestoreGenericRepository<Prediction>(firestore, constant.FIREBASE.COLLECTIONS.PREDICTIONS);
+
+    this.productRepo = new FirestoreGenericRepository<Product>(firestore, constant.FIREBASE.COLLECTIONS.PRODUCTS);
   }
 }

@@ -1,16 +1,22 @@
-import { Bet } from 'src/core/interface/bet/bet.entity';
+import { User } from 'src/core/entity/user.enity';
 import { IGenericRepository } from './generic-repository.abstract';
-import { Round } from 'src/core/interface/round/round.entity';
-import { User } from 'src/core/interface/user/user.interface';
+import { CashHistory } from 'src/core/entity/cash-history.enity';
+import { Prediction } from 'src/core/entity/prediction.enity';
+import { PointHistory } from 'src/core/entity/point-history.enity';
+import { Product } from 'src/core/entity/product.entiy';
 
 export abstract class IDataServices {
   // Firestore
 
   abstract firestore: any;
 
-  abstract betRepo: IGenericRepository<Bet>;
-
-  abstract roundRepo: IGenericRepository<Round>;
-
   abstract userRepo: IGenericRepository<User>;
+
+  abstract cashHistoryRepo: IGenericRepository<CashHistory>;
+
+  abstract pointHistoryRepo: IGenericRepository<PointHistory>;
+
+  abstract predictionRepo: IGenericRepository<Prediction>;
+
+  abstract productRepo: IGenericRepository<Product>;
 }

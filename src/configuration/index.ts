@@ -4,6 +4,7 @@ import { ChainType } from './chain';
 import { collectionNames } from './constant';
 import { Path } from './constant/storage';
 import provider from './provider';
+import { userType } from './constant/user';
 
 const CURRENT_NETWORK = ChainType.BSCTESTNET;
 const constant = {
@@ -12,6 +13,9 @@ const constant = {
     NAME: 'FirestoreDataservices',
     COLLECTIONS: collectionNames,
   },
+  REVENUE_SHARE: 5,
+  REVENUE_SHARE_USER: 0,
+  COMMISSIONS: 0,
   STORAGE: {
     ACTION: 'read' as 'read' | 'write' | 'delete' | 'resumable',
     EXPIRED_DATE: {
@@ -29,5 +33,8 @@ const constant = {
     PREDICTION: predictionABI[CURRENT_NETWORK],
   },
   PROVIDER: provider(CURRENT_NETWORK),
+  USER: {
+    TYPE: userType,
+  },
 };
 export default constant;
