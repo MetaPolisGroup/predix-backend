@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './use-case/user/user.module';
@@ -17,7 +16,6 @@ import { ScheduleModule } from '@nestjs/schedule';
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     UserModule,
     AuthModule,
-    MongooseModule.forRoot(process.env.MONGO_DB_HOST, {}),
     PredictionModule,
     ContractFactoryModule,
     ScheduleModule.forRoot(),

@@ -29,7 +29,7 @@ export class EventBetListener implements OnApplicationBootstrap {
 
       await this.db.betRepo.createDocumentData(bet);
 
-      const round = await this.db.roundRepo.getFirstValueCollectionDataByConditions([
+      const round = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
         {
           field: 'epoch',
           operator: '==',
@@ -40,13 +40,13 @@ export class EventBetListener implements OnApplicationBootstrap {
       round.totalAmount += amount;
       round.bearAmount += amount;
 
-      await this.db.roundRepo.upsertDocumentData(round.epoch, round);
+      await this.db.predictionRepo.upsertDocumentData(round.epoch, round);
     });
   }
 
   async listenBetBull() {
     await this.factory.predictionContract.on('BetBull', async (sender: string, epoch: bigint, amount: bigint) => {
-      const round = await this.db.roundRepo.getFirstValueCollectionDataByConditions([
+      const round = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
         {
           field: 'epoch',
           operator: '==',
@@ -57,7 +57,7 @@ export class EventBetListener implements OnApplicationBootstrap {
       round.totalAmount += amount;
       round.bullAmount += amount;
 
-      await this.db.roundRepo.upsertDocumentData(round.epoch, round);
+      await this.db.predictionRepo.upsertDocumentData(round.epoch, round);
 
       const bet: Bet = {
         amount,

@@ -11,6 +11,7 @@ import { PointHistory } from 'src/core/entity/point-history.enity';
 import { Prediction } from 'src/core/entity/prediction.enity';
 import { Product } from 'src/core/entity/product.entiy';
 import { IGenericRepository } from 'src/core/abstract/data-services/generic-repository.abstract';
+import { Bet } from 'src/core/interface/bet/bet.entity';
 
 @Injectable()
 export class FirestoreDataServices implements IDataServices, OnApplicationBootstrap {
@@ -18,6 +19,8 @@ export class FirestoreDataServices implements IDataServices, OnApplicationBootst
   firestore: admin.firestore.Firestore;
 
   userRepo: FirestoreGenericRepository<User>;
+
+  betRepo: FirestoreGenericRepository<Bet>;
 
   cashHistoryRepoRepo: FirestoreGenericRepository<CashHistory>;
 
@@ -27,8 +30,9 @@ export class FirestoreDataServices implements IDataServices, OnApplicationBootst
 
   productRepo: FirestoreGenericRepository<Product>;
 
-  constructor() {}
   cashHistoryRepo: IGenericRepository<CashHistory>;
+
+  constructor() {}
 
   onApplicationBootstrap(): void {
     const app = admin.initializeApp(
@@ -52,6 +56,8 @@ export class FirestoreDataServices implements IDataServices, OnApplicationBootst
     this.pointHistoryRepo = new FirestoreGenericRepository<PointHistory>(firestore, constant.FIREBASE.COLLECTIONS.POINT_HISTORIES);
 
     this.predictionRepo = new FirestoreGenericRepository<Prediction>(firestore, constant.FIREBASE.COLLECTIONS.PREDICTIONS);
+
+    this.betRepo = new FirestoreGenericRepository<Bet>(firestore, constant.FIREBASE.COLLECTIONS.BETS);
 
     this.productRepo = new FirestoreGenericRepository<Product>(firestore, constant.FIREBASE.COLLECTIONS.PRODUCTS);
   }

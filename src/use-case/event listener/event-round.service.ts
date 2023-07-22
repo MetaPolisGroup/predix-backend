@@ -32,13 +32,13 @@ export class EventRoundListener implements OnApplicationBootstrap {
         delele: false,
       };
 
-      await this.db.roundRepo.upsertDocumentData(epoch.toString(), round);
+      await this.db.predictionRepo.upsertDocumentData(epoch.toString(), round);
     });
   }
 
   async listenRoundLock() {
     await this.factory.predictionContract.on('LockRound', async (epoch: bigint, roundId: bigint, price: bigint) => {
-      await this.db.roundRepo.upsertDocumentData(epoch.toString(), {
+      await this.db.predictionRepo.upsertDocumentData(epoch.toString(), {
         lockOracleId: roundId,
         lockPrice: price,
         lockTimestamp: new Date().getTime(),
@@ -49,14 +49,14 @@ export class EventRoundListener implements OnApplicationBootstrap {
 
   async listenRoundEnd() {
     await this.factory.predictionContract.on('EndRound', async (epoch: bigint, roundId: bigint, price: bigint) => {
-      await this.db.roundRepo.upsertDocumentData(epoch.toString(), {
+      await this.db.predictionRepo.upsertDocumentData(epoch.toString(), {
         closeOracleId: roundId,
         closePrice: price,
         closeTimestamp: new Date().getTime(),
         closed: true,
       });
 
-      const round = await this.db.roundRepo.getFirstValueCollectionDataByConditions([
+      const round = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
         {
           field: 'epoch',
           operator: '==',

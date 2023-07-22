@@ -6,4 +6,5 @@ export const collectionNames = {
   PREDICTIONS: 'predictions' as collectionsName,
   POINT_HISTORIES: 'point_histories' as collectionsName,
   CASH_HISTORIES: 'cash_histories' as collectionsName,
+  BETS: 'bets' as collectionsName,
 };
