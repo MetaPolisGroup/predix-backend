@@ -11,11 +11,11 @@ export class Bet {
 
   claimed: boolean;
 
-  refund: bigint;
+  refund: number;
 
-  amount: bigint;
+  amount: number;
 
-  claimed_amount: bigint;
+  claimed_amount: number;
 
   round: Round;
 

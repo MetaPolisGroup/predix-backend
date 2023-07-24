@@ -7,19 +7,19 @@ export class Round {
 
   closeTimestamp: number;
 
-  lockOracleId: bigint;
+  lockOracleId: number;
 
-  closeOracleId: bigint;
+  closeOracleId: number;
 
-  lockPrice: bigint;
+  lockPrice: number;
 
-  closePrice: bigint;
+  closePrice: number;
 
-  totalAmount: bigint;
+  totalAmount: number;
 
-  bullAmount: bigint;
+  bullAmount: number;
 
-  bearAmount: bigint;
+  bearAmount: number;
 
   closed: boolean;
 

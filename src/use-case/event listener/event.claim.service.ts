@@ -25,7 +25,7 @@ export class EventClaimListener implements OnApplicationBootstrap {
         },
       ]);
 
-      await this.db.betRepo.upsertDocumentData(bet.id, { claimed: true, claimed_amount: amount });
+      await this.db.betRepo.upsertDocumentData(bet.id, { claimed: true, claimed_amount: parseInt(amount.toString()) });
     });
   }
 }

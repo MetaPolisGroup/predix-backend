@@ -24,13 +24,13 @@ export class EventRoundListener implements OnApplicationBootstrap {
       const now = Math.round(new Date().getTime() / 1000);
       const round: Round = {
         epoch: epoch.toString(),
-        closeOracleId: BigInt(0),
-        lockOracleId: BigInt(0),
-        bearAmount: BigInt(0),
-        bullAmount: BigInt(0),
-        totalAmount: BigInt(0),
-        closePrice: BigInt(0),
-        lockPrice: BigInt(0),
+        closeOracleId: 0,
+        lockOracleId: 0,
+        bearAmount: 0,
+        bullAmount: 0,
+        totalAmount: 0,
+        closePrice: 0,
+        lockPrice: 0,
         startTimestamp: now,
         closeTimestamp: now + 300 * 2,
         lockTimestamp: now + 300,
@@ -49,7 +49,7 @@ export class EventRoundListener implements OnApplicationBootstrap {
     await this.factory.predictionContract.on('LockRound', async (epoch: bigint, roundId: bigint, price: bigint) => {
       await this.db.predictionRepo.upsertDocumentData(epoch.toString(), {
         lockOracleId: roundId,
-        lockPrice: price,
+        lockPrice: parseInt(price.toString()),
         lockTimestamp: Math.round(new Date().getTime() / 1000),
         locked: true,
       });
@@ -61,7 +61,7 @@ export class EventRoundListener implements OnApplicationBootstrap {
     await this.factory.predictionContract.on('EndRound', async (epoch: bigint, roundId: bigint, price: bigint) => {
       await this.db.predictionRepo.upsertDocumentData(epoch.toString(), {
         closeOracleId: roundId,
-        closePrice: price,
+        closePrice: parseInt(price.toString()),
         closeTimestamp: Math.round(new Date().getTime() / 1000),
         closed: true,
       });
@@ -91,8 +91,6 @@ export class EventRoundListener implements OnApplicationBootstrap {
       }
 
       setTimeout(async () => {
-        console.log('ok');
-
         await this.executeRound();
       }, 300000);
 
