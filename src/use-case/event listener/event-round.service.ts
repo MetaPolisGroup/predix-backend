@@ -124,7 +124,12 @@ export class EventRoundListener implements OnApplicationBootstrap {
       maxFeePerGas: gasPrice.maxFeePerGas,
       maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
     });
-
-    this.Logger.log(`New round executed !`);
+    const executeRound = await constant.PROVIDER.waitForTransaction(executeRoundTx.hash as string);
+    if (executeRound.status === 1) {
+      this.Logger.log(`New round execut successfully!`);
+    } else {
+      await this.executeRound();
+      this.Logger.log(`New round executed failed! retry...`);
+    }
   }
 }
