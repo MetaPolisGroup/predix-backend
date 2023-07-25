@@ -47,7 +47,7 @@ export class PredictionService implements OnApplicationBootstrap {
       },
     ]);
 
-    if (availableRound && !this.cronJobs[availableRound.epoch].running) {
+    if (availableRound && !this.cronJobs[availableRound.epoch]) {
       if (availableRound.lockTimestamp + 999 < parseInt((new Date().getTime() / 1000).toString())) {
         this.logger.error('Round exceed buffer time !');
         await this.setCronjob();
