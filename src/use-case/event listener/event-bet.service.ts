@@ -10,6 +10,7 @@ export class EventBetListener implements OnApplicationBootstrap {
     if (constant.ENABLE) {
       await this.listenBetBear();
       await this.listenBetBull();
+      await this.listenCutBetUser();
     }
   }
 
@@ -40,7 +41,7 @@ export class EventBetListener implements OnApplicationBootstrap {
         winning_amount: parseInt(amount.toString()) - (round.totalAmount * 5) / 100,
         refund: 0,
         claimed_amount: 0,
-        round: null,
+        round,
         user_address: sender,
       };
 
@@ -74,7 +75,7 @@ export class EventBetListener implements OnApplicationBootstrap {
         winning_amount: parseInt(amount.toString()) - (round.totalAmount * 5) / 100,
         refund: 0,
         claimed_amount: 0,
-        round: null,
+        round,
         user_address: sender,
       };
 
