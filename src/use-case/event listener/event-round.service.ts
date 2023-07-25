@@ -6,6 +6,7 @@ import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/cont
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 import { Position } from 'src/core/entity/bet.entity';
 import { Prediction } from 'src/core/entity/prediction.enity';
+import { PredictionService } from '../prediction/prediction.service';
 
 @Injectable()
 export class EventRoundListener implements OnApplicationBootstrap {
@@ -21,7 +22,11 @@ export class EventRoundListener implements OnApplicationBootstrap {
     this.Logger = new Logger(EventRoundListener.name);
   }
 
-  constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) {}
+  constructor(
+    private readonly prediction: PredictionService,
+    private readonly factory: ContractFactoryAbstract,
+    private readonly db: IDataServices,
+  ) {}
 
   async listenRoundStart() {
     await this.factory.predictionContract.on('StartRound', async (epoch: bigint) => {
@@ -105,6 +110,7 @@ export class EventRoundListener implements OnApplicationBootstrap {
           });
         }
       }
+      await this.prediction.setCronjob();
 
       this.Logger.log(`Round ${epoch.toString()} has ended !`);
     });
