@@ -21,6 +21,7 @@ import { PredictionModule } from './use-case/prediction/prediction.module';
     PredictionModule,
     ContractFactoryModule,
     TaskModule,
+    EventListenerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
