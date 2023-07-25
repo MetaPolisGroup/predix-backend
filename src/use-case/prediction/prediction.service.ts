@@ -53,7 +53,7 @@ export class PredictionService implements OnApplicationBootstrap {
         this.logger.error('Round exceed buffer time !');
         await this.setCronjob();
       } else {
-        if ((availableRound.startTimestamp + 300) * 1000 < now) {
+        if (availableRound.startTimestamp + 300 < now) {
           await this.executeRound();
         } else {
           const date = new Date((availableRound.startTimestamp + 300) * 1000);
