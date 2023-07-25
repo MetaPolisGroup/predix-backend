@@ -46,16 +46,21 @@ export class PredictionService implements OnApplicationBootstrap {
         value: false,
       },
     ]);
+    const now = parseInt((new Date().getTime() / 1000).toString());
 
     if (availableRound && !this.cronJobs[availableRound.epoch]) {
-      if (availableRound.lockTimestamp + 999 < parseInt((new Date().getTime() / 1000).toString())) {
+      if (availableRound.lockTimestamp + 999 < now) {
         this.logger.error('Round exceed buffer time !');
         await this.setCronjob();
       } else {
-        const date = new Date((availableRound.startTimestamp + 300) * 1000);
-        this.createCronJob(date, availableRound.epoch, async () => {
+        if ((availableRound.startTimestamp + 300) * 1000 < now) {
           await this.executeRound();
-        });
+        } else {
+          const date = new Date((availableRound.startTimestamp + 300) * 1000);
+          this.createCronJob(date, availableRound.epoch, async () => {
+            await this.executeRound();
+          });
+        }
       }
     }
   }
