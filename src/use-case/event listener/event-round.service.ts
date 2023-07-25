@@ -4,16 +4,20 @@ import { ethers } from 'ethers';
 import constant from 'src/configuration';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
-import { Round } from 'src/core/interface/round/round.entity';
+import { Position } from 'src/core/entity/bet.entity';
+import { Prediction } from 'src/core/entity/prediction.enity';
 
 @Injectable()
 export class EventRoundListener implements OnApplicationBootstrap {
   private Logger: Logger;
 
   async onApplicationBootstrap() {
-    await this.listenRoundStart();
-    await this.listenRoundLock();
-    await this.listenRoundEnd();
+    if (constant.ENABLE) {
+      await this.listenRoundStart();
+      await this.listenRoundLock();
+      await this.listenRoundEnd();
+      await this.listenCutBetRound();
+    }
     this.Logger = new Logger(EventRoundListener.name);
   }
 
@@ -22,7 +26,7 @@ export class EventRoundListener implements OnApplicationBootstrap {
   async listenRoundStart() {
     await this.factory.predictionContract.on('StartRound', async (epoch: bigint) => {
       const now = Math.round(new Date().getTime() / 1000);
-      const round: Round = {
+      const round: Prediction = {
         epoch: epoch.toString(),
         closeOracleId: 0,
         lockOracleId: 0,
@@ -82,52 +86,38 @@ export class EventRoundListener implements OnApplicationBootstrap {
         },
       ]);
 
+      const calculateResult = (): Position => {
+        const r = round.closePrice - round.lockPrice;
+        if (r > 0) {
+          return 'UP';
+        } else if (r < 0) {
+          return 'DOWN';
+        } else {
+          return null;
+        }
+      };
+
       if (bets) {
         for (const bet of bets) {
           await this.db.betRepo.upsertDocumentData(bet.id, {
             round,
+            status: calculateResult() ? (bet.position === calculateResult() ? 'Win' : 'Lose') : 'Refund',
           });
         }
       }
-
-      setTimeout(async () => {
-        await this.executeRound();
-      }, 300000);
 
       this.Logger.log(`Round ${epoch.toString()} has ended !`);
     });
   }
 
-  async executeRound() {
-    const priceRandom = [
-      24399280000, 24400000000, 24397541869, 24397644724, 24394974000, 24394703900, 24394904985, 24398765000, 24398850000, 24397123000,
-      24397240000, 24395230000, 24395100000, 24395185000,
-    ];
+  async listenCutBetRound() {
+    await this.factory.predictionContract.on('CutBet', async (epoch: bigint, amount: bigint) => {
+      await this.db.predictionRepo.upsertDocumentData(epoch.toString(), {
+        bearAmount: parseInt(amount.toString()),
+        totalAmount: parseInt(amount.toString()) * 2,
+      });
 
-    const randomElement = priceRandom[Math.floor(Math.random() * priceRandom.length)];
-
-    const wallet = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY, constant.PROVIDER);
-
-    const predictionContract = new ethers.Contract(constant.ADDRESS.PREDICTION, constant.ABI.PREDICTION, wallet);
-
-    const gasLimit = await predictionContract.executeRound.estimateGas(1, randomElement);
-    const gasPrice = await constant.PROVIDER.getFeeData();
-
-    console.log({ gasLimit });
-    console.log({ gasPrice });
-
-    const executeRoundTx = await predictionContract.executeRound(1, randomElement, {
-      gasLimit,
-      gasPrice: gasPrice.gasPrice,
-      maxFeePerGas: gasPrice.maxFeePerGas,
-      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
+      this.Logger.log(`Cut bet round ${epoch.toString()} !`);
     });
-    const executeRound = await constant.PROVIDER.waitForTransaction(executeRoundTx.hash as string);
-    if (executeRound.status === 1) {
-      this.Logger.log(`New round execut successfully!`);
-    } else {
-      await this.executeRound();
-      this.Logger.log(`New round executed failed! retry...`);
-    }
   }
 }
