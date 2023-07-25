@@ -1,4 +1,4 @@
-import { Round } from '../round/round.entity';
+import { Prediction } from './prediction.enity';
 
 export class Bet {
   id?: string;
@@ -17,7 +17,9 @@ export class Bet {
 
   claimed_amount: number;
 
-  round: Round;
+  status: 'Win' | 'Lose' | 'Refund' | 'Waiting';
+
+  round: Prediction;
 
   created_at: number;
 

@@ -2,7 +2,7 @@ import { JsonRpcProvider, ethers } from 'ethers';
 import { ChainType } from './chain';
 
 // 2. Define network configurations
-const providerRPC = {
+export const providerRPC = {
   [ChainType.BSCTESTNET]: {
     name: 'bscTestnet',
     rpc: 'https://data-seed-prebsc-1-s1.binance.org:8545/',

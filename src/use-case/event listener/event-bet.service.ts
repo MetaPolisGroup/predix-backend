@@ -1,13 +1,16 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import constant from 'src/configuration';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
-import { Bet } from 'src/core/interface/bet/bet.entity';
+import { Bet } from 'src/core/entity/bet.entity';
 
 @Injectable()
 export class EventBetListener implements OnApplicationBootstrap {
   async onApplicationBootstrap() {
-    await this.listenBetBear();
-    await this.listenBetBull();
+    if (constant.ENABLE) {
+      await this.listenBetBear();
+      await this.listenBetBull();
+    }
   }
 
   constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) {}
@@ -21,6 +24,7 @@ export class EventBetListener implements OnApplicationBootstrap {
         delete: false,
         epoch: epoch.toString(),
         position: 'DOWN',
+        status: 'Waiting',
         refund: 0,
         claimed_amount: 0,
         round: null,
@@ -66,6 +70,7 @@ export class EventBetListener implements OnApplicationBootstrap {
         delete: false,
         epoch: epoch.toString(),
         position: 'UP',
+        status: 'Waiting',
         refund: 0,
         claimed_amount: 0,
         round: null,
@@ -74,5 +79,30 @@ export class EventBetListener implements OnApplicationBootstrap {
 
       await this.db.betRepo.createDocumentData(bet);
     });
+  }
+
+  async listenCutBetUser() {
+    await this.factory.predictionContract.on(
+      'CutBetUser',
+      async (epoch: bigint, sender: string, betAmount: bigint, refundAmount: bigint) => {
+        const bet = await this.db.betRepo.getFirstValueCollectionDataByConditions([
+          {
+            field: 'epoch',
+            operator: '==',
+            value: epoch.toString(),
+          },
+          {
+            field: 'user_address',
+            operator: '==',
+            value: sender,
+          },
+        ]);
+
+        bet.amount = parseInt(betAmount.toString());
+        bet.refund = parseInt(refundAmount.toString());
+
+        await this.db.betRepo.upsertDocumentData(bet.id, bet);
+      },
+    );
   }
 }

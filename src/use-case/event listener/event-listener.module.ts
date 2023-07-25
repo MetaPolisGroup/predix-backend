@@ -9,4 +9,4 @@ import { EventClaimListener } from './event.claim.service';
   imports: [],
   exports: [],
 })
-export class PredictionModule {}
+export class EventListenerModule {}

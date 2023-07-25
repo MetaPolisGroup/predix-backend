@@ -1,11 +1,14 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import constant from 'src/configuration';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 
 @Injectable()
 export class EventClaimListener implements OnApplicationBootstrap {
   async onApplicationBootstrap() {
-    await this.listenClaim();
+    if (constant.ENABLE) {
+      await this.listenClaim();
+    }
   }
 
   constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) {}

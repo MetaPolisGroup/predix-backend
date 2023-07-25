@@ -18,4 +18,9 @@ export class User {
   type: UserType;
 }
 
+export interface IUserToken {
+  nickname: string;
+  id: string;
+}
+
 export type UserType = 'Admin' | 'Normal';
