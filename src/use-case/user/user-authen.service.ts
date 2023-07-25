@@ -21,6 +21,7 @@ export class UserAuthenService {
       id: dto.account_id,
       password,
       user_address: dto.user_address,
+      leaderboard: null,
       email: '',
       point: 0,
       user_tree_belong,
