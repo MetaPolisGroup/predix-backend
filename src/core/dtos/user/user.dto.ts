@@ -8,5 +8,5 @@ export class CreateUserDto {
   password: string;
 
   @IsOptional()
-  wallet_id: string;
+  user_address: string;
 }
