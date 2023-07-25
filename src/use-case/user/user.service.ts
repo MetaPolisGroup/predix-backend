@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { hash, hashSync } from 'bcrypt';
 import { Request } from 'express';
 import constant from 'src/configuration';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
@@ -9,10 +10,17 @@ import { User } from 'src/core/entity/user.enity';
 export class UserService {
   constructor(private readonly db: IDataServices) {}
 
-  async create(dto: CreateUserDto, req: Request): Promise<User> {
-    const user_tree_belong = await this.partnerTree(dto.recommend_id);
+  async create(dto: CreateUserDto, req: Request, recommend_id?: string): Promise<User> {
+    let user_tree_belong = [];
+
+    if (recommend_id) {
+      user_tree_belong = await this.partnerTree(recommend_id);
+    }
+    const password = hashSync(dto.password, 10);
     const user: User = {
       id: dto.account_id,
+      password,
+      wallet_id: dto.wallet_id,
       email: '',
       point: 0,
       user_tree_belong,
@@ -22,7 +30,7 @@ export class UserService {
       updated_at: new Date().getTime(),
       nickname: dto.account_id,
     };
-    return this.db.userRepo.createDocumentData(user);
+    return this.db.userRepo.upsertDocumentData(user.id, user);
   }
 
   async partnerTree(recommend_id: string) {
@@ -39,5 +47,6 @@ export class UserService {
         }
       }
     }
+    return partner_tree;
   }
 }

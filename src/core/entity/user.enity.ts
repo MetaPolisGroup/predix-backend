@@ -1,6 +1,10 @@
 export class User {
   id?: string;
 
+  password: string;
+
+  wallet_id?: string;
+
   point: number;
 
   email: string;
