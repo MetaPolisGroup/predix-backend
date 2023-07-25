@@ -3,7 +3,7 @@ export class User {
 
   password: string;
 
-  wallet_id?: string;
+  user_address?: string;
 
   point: number;
 
@@ -12,6 +12,8 @@ export class User {
   ip: string;
 
   nickname?: string;
+
+  leaderboard: LeaderBoard;
 
   user_tree_belong?: string[];
 
@@ -23,3 +25,17 @@ export class User {
 }
 
 export type UserType = 'Admin' | 'Normal';
+
+export class LeaderBoard {
+  round_played: number;
+
+  round_winning: number;
+
+  round_losing: number;
+
+  net_winnings: number;
+
+  total_bnb: number;
+
+  win_rate: number;
+}
