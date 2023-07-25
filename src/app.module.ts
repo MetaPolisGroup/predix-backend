@@ -10,6 +10,7 @@ import { DataServicesModule } from './service/data-service/data-services.module'
 import { TaskModule } from './use-case/task/task.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { PredictionModule } from './use-case/prediction/prediction.module';
+import { ChartModule } from './use-case/chart/chart.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { PredictionModule } from './use-case/prediction/prediction.module';
     ContractFactoryModule,
     TaskModule,
     EventListenerModule,
+    ChartModule,
   ],
   controllers: [AppController],
   providers: [AppService],

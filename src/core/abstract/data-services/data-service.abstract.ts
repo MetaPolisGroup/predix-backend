@@ -6,6 +6,7 @@ import { PointHistory } from 'src/core/entity/point-history.enity';
 import { Product } from 'src/core/entity/product.entiy';
 import { Bet } from 'src/core/entity/bet.entity';
 import { Chainlink } from 'src/core/entity/chainlink.entity';
+import { Chart } from 'src/core/entity/chart.entity';
 
 export abstract class IDataServices {
   // Firestore
@@ -15,6 +16,8 @@ export abstract class IDataServices {
   abstract userRepo: IGenericRepository<User>;
 
   abstract betRepo: IGenericRepository<Bet>;
+
+  abstract chartRepo: IGenericRepository<Chart>;
 
   abstract cashHistoryRepo: IGenericRepository<CashHistory>;
 
