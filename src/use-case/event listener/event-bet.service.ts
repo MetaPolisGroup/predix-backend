@@ -17,22 +17,6 @@ export class EventBetListener implements OnApplicationBootstrap {
 
   async listenBetBear() {
     await this.factory.predictionContract.on('BetBear', async (sender: string, epoch: bigint, amount: bigint) => {
-      const bet: Bet = {
-        amount: parseInt(amount.toString()),
-        claimed: false,
-        created_at: new Date().getTime(),
-        delete: false,
-        epoch: epoch.toString(),
-        position: 'DOWN',
-        status: 'Waiting',
-        refund: 0,
-        claimed_amount: 0,
-        round: null,
-        user_address: sender,
-      };
-
-      await this.db.betRepo.createDocumentData(bet);
-
       const round = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
         {
           field: 'epoch',
@@ -45,6 +29,22 @@ export class EventBetListener implements OnApplicationBootstrap {
       round.bearAmount += parseInt(amount.toString());
 
       await this.db.predictionRepo.upsertDocumentData(round.epoch, round);
+      const bet: Bet = {
+        amount: parseInt(amount.toString()),
+        claimed: false,
+        created_at: new Date().getTime(),
+        delete: false,
+        epoch: epoch.toString(),
+        position: 'DOWN',
+        status: 'Waiting',
+        winning_amount: parseInt(amount.toString()) - (round.totalAmount * 5) / 100,
+        refund: 0,
+        claimed_amount: 0,
+        round: null,
+        user_address: sender,
+      };
+
+      await this.db.betRepo.createDocumentData(bet);
     });
   }
 
@@ -71,6 +71,7 @@ export class EventBetListener implements OnApplicationBootstrap {
         epoch: epoch.toString(),
         position: 'UP',
         status: 'Waiting',
+        winning_amount: parseInt(amount.toString()) - (round.totalAmount * 5) / 100,
         refund: 0,
         claimed_amount: 0,
         round: null,

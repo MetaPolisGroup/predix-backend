@@ -13,11 +13,13 @@ export class Bet {
 
   refund: number;
 
+  winning_amount: number;
+
   amount: number;
 
   claimed_amount: number;
 
-  status: 'Win' | 'Lose' | 'Refund' | 'Waiting';
+  status: 'Win' | 'Lose' | 'Refund' | 'Waiting' | 'Live';
 
   round: Prediction;
 

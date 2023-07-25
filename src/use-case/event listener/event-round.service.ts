@@ -62,6 +62,31 @@ export class EventRoundListener implements OnApplicationBootstrap {
         lockTimestamp: Math.round(new Date().getTime() / 1000),
         locked: true,
       });
+
+      const round = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
+        {
+          field: 'epoch',
+          operator: '==',
+          value: epoch.toString(),
+        },
+      ]);
+
+      const bets = await this.db.betRepo.getCollectionDataByConditions([
+        {
+          field: 'epoch',
+          operator: '==',
+          value: epoch.toString(),
+        },
+      ]);
+
+      if (bets) {
+        for (const bet of bets) {
+          await this.db.betRepo.upsertDocumentData(bet.id, {
+            round,
+            status: 'Live',
+          });
+        }
+      }
       this.Logger.log(`Round ${epoch.toString()} has locked !`);
     });
   }
