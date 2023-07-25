@@ -11,10 +11,10 @@ export class UserService {
       ]);
       if (user) {
         user.leaderboard.round_played += 1;
-        if (betslip.status === 'Winning') {
+        if (betslip.status === 'Win') {
           user.leaderboard.round_winning += 1;
           user.leaderboard.net_winnings += betslip.amount;
-        } else if (betslip.status === 'Losing') {
+        } else if (betslip.status === 'Lose') {
           user.leaderboard.round_losing += 1;
           user.leaderboard.net_winnings -= betslip.amount;
         }
