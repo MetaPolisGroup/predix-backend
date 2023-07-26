@@ -13,6 +13,7 @@ import { Product } from 'src/core/entity/product.entiy';
 import { IGenericRepository } from 'src/core/abstract/data-services/generic-repository.abstract';
 import { Bet } from 'src/core/entity/bet.entity';
 import { Chainlink } from 'src/core/entity/chainlink.entity';
+import { Leaderboard } from 'src/core/entity/leaderboard.entity';
 import { Chart } from 'src/core/entity/chart.entity';
 
 @Injectable()
@@ -37,6 +38,8 @@ export class FirestoreDataServices implements IDataServices, OnApplicationBootst
   cashHistoryRepo: FirestoreGenericRepository<CashHistory>;
 
   chainlinkRepo: FirestoreGenericRepository<Chainlink>;
+
+  leaderboardRepo: FirestoreGenericRepository<Leaderboard>;
 
   constructor() {}
 
@@ -70,5 +73,7 @@ export class FirestoreDataServices implements IDataServices, OnApplicationBootst
     this.chartRepo = new FirestoreGenericRepository<Chart>(firestore, constant.FIREBASE.COLLECTIONS.CHARTS);
 
     this.chainlinkRepo = new FirestoreGenericRepository<Chainlink>(firestore, constant.FIREBASE.COLLECTIONS.CHAINLINKS);
+
+    this.leaderboardRepo = new FirestoreGenericRepository<Leaderboard>(firestore, constant.FIREBASE.COLLECTIONS.LEADERBOARD);
   }
 }

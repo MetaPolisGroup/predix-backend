@@ -2,6 +2,7 @@ import { CollectionReference, DocumentData, Firestore, Query, UpdateData, WhereF
 import { Logger } from '@nestjs/common';
 import { collectionsName } from 'src/configuration/type/firebase/firebase.type';
 import { IGenericRepository } from 'src/core/abstract/data-services/generic-repository.abstract';
+import { DocumentChange, DocumentChangeOrigin } from 'src/core/abstract/data-services/snapshot/Query.abstract';
 
 export class FirestoreGenericRepository<T extends DocumentData> implements IGenericRepository<T> {
   readonly collectionRef: CollectionReference<T>;
@@ -13,47 +14,7 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
     this.Logger = new Logger(FirestoreGenericRepository.name);
   }
 
-  async getCollectionData(): Promise<T[]> {
-    const collectionSnapshot = await this.collectionRef.get();
-
-    if (collectionSnapshot.empty) {
-      return null;
-    }
-
-    const data = collectionSnapshot.docs.map(doc => doc.data());
-
-    return data;
-  }
-
-  async getFirstValueCollectionData(): Promise<T> {
-    const collectionSnapshot = await this.collectionRef.get();
-
-    if (collectionSnapshot.empty) {
-      return null;
-    }
-
-    const data = collectionSnapshot.docs.map(doc => doc.data());
-
-    return data.length > 0 ? data[0] : null;
-  }
-
-  async getCollectionDataByConditions(
-    conditions: {
-      field: string;
-      operator: WhereFilterOp;
-      value: any;
-    }[],
-  ): Promise<T[]> {
-    let query: Query<DocumentData> = this.collectionRef;
-    for (const condition of conditions) {
-      query = query.where(condition.field, condition.operator, condition.value);
-    }
-    const collectionSnapshot = await query.get();
-
-    if (collectionSnapshot.empty) {
-      return null;
-    }
-
+  private fixDataFromCollection(collectionSnapshot: DocumentData): T[] {
     const data = collectionSnapshot.docs.map(doc => {
       if (!doc.data().id) {
         const documentData = doc.data();
@@ -64,46 +25,6 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
     }) as T[];
 
     return data;
-  }
-
-  async getFirstValueCollectionDataByConditions(
-    conditions: {
-      field: string;
-      operator: WhereFilterOp;
-      value: any;
-    }[],
-  ): Promise<T> {
-    let query: Query<DocumentData> = this.collectionRef;
-    for (const condition of conditions) {
-      query = query.where(condition.field, condition.operator, condition.value);
-    }
-    const collectionSnapshot = await query.get();
-
-    if (collectionSnapshot.empty) {
-      return null;
-    }
-
-    const data = collectionSnapshot.docs.map(doc => {
-      if (!doc.data().id) {
-        const documentData = doc.data();
-        documentData.id = doc.id;
-        return documentData;
-      }
-      return doc.data();
-    }) as T[];
-
-    return data.length > 0 ? data[0] : null;
-  }
-
-  async getDocumentData(documentId: string): Promise<T> {
-    const documentRef = this.collectionRef.doc(documentId);
-    const documentSnapshot = await documentRef.get();
-
-    if (!documentSnapshot.exists) {
-      return null;
-    }
-
-    return documentSnapshot.data();
   }
 
   getDocumentRef(documentId: string): any {
@@ -112,6 +33,102 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
     return documentRef;
   }
 
+
+
+  // Get
+  async getCollectionData(): Promise<T[]> {
+    const collectionSnapshot = await this.collectionRef.get();
+    if (collectionSnapshot.empty) {
+      return null;
+    }
+
+    const data = this.fixDataFromCollection(collectionSnapshot as DocumentData);
+
+    return data;
+  }
+
+  async getCollectionDataByConditions(
+    conditions: { field: string; operator: WhereFilterOp; value: any; }[],
+  ): Promise<T[]> {
+
+    let query: Query<DocumentData> = this.collectionRef;
+
+    for (const condition of conditions) {
+      query = query.where(condition.field, condition.operator, condition.value);
+    }
+
+    const collectionSnapshot = await query.get();
+    if (collectionSnapshot.empty) {
+      return null;
+    }
+
+    const data = this.fixDataFromCollection(collectionSnapshot);
+
+    return data;
+  }
+
+  async getFirstValueCollectionDataByConditions(
+    conditions: { field: string; operator: WhereFilterOp; value: any; }[],
+  ): Promise<T> {
+
+    const data = await this.getCollectionDataByConditions(conditions);
+    if (data) {
+      return data.length > 0 ? data[0] : null;
+    }
+
+    return null;
+  }
+
+  async getCollectionDataByConditionsAndOrderBy(
+    conditions: { field: string; operator: WhereFilterOp; value: any; }[],
+    orderBys: { field: string; option?: 'asc' | 'desc'; }[],
+  ): Promise<T[]> {
+
+    let query: Query<DocumentData> = this.collectionRef;
+    
+    for (const condition of conditions) {
+      query = query.where(condition.field, condition.operator, condition.value);
+    }
+    for (const orderBy of orderBys) {
+      query = query.orderBy(orderBy.field, orderBy.option);
+    }
+
+    const collectionSnapshot = await query.get();
+    if (collectionSnapshot.empty) {
+      return null;
+    }
+
+    const data = this.fixDataFromCollection(collectionSnapshot);
+
+    return data;
+  }
+
+  async getFirstValueCollectionDataByConditionsAndOrderBy(
+    conditions: { field: string; operator: WhereFilterOp; value: any; }[],
+    orderBy: { field: string; option?: 'asc' | 'desc'; }[],
+  ): Promise<T> {
+
+    const data = await this.getCollectionDataByConditionsAndOrderBy(conditions, orderBy);
+    if (data) {
+      return data.length > 0 ? data[0] : null;
+    }
+
+    return null;
+  }
+
+  async getDocumentData(documentId: string): Promise<T> {
+    const documentRef = this.collectionRef.doc(documentId);
+    const documentSnapshot = await documentRef.get();
+    if (!documentSnapshot.exists) {
+      return null;
+    }
+
+    return documentSnapshot.data();
+  }
+
+  
+
+  // Create
   async createDocumentData(documentData: T): Promise<T> {
     const documentRef = this.collectionRef.doc();
     const id = documentRef.id;
@@ -119,10 +136,14 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
     return documentRef.set(document).then(() => document as T);
   }
 
+
+
+  // Update & Upsert
   async updateDocumentData(documentId: string, documentData: T): Promise<T> {
     const documentRef = this.collectionRef.doc(documentId);
-
-    await documentRef.update(documentData as UpdateData<T>).then(() => ({ id: documentId, ...documentData } as T));
+    await documentRef
+      .update(documentData as UpdateData<T>)
+      .then(() => ({ id: documentId, ...documentData } as T));
     const result: T = { id: documentId, ...documentData };
     return result;
   }
@@ -130,16 +151,21 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
   async upsertDocumentData(documentId: string, documentData: T | object): Promise<T> {
     const documentRef = this.collectionRef.doc(documentId);
     await documentRef.set(documentData, { merge: true });
-
     return documentData as T;
   }
 
+
+
+  // Delete
   async deleteDocumentData(documentId: string): Promise<void> {
     const documentRef = this.collectionRef.doc(documentId);
     await documentRef.delete();
   }
 
-  deleteDocumentByConditions(conditions: { field: string; operator: WhereFilterOp; value: any }[]): void {
+  deleteDocumentByConditions(
+    conditions: { field: string; operator: WhereFilterOp; value: any; }[]
+  ): void {
+
     let query: Query<DocumentData> = this.collectionRef;
     for (const condition of conditions) {
       query = query.where(condition.field, condition.operator, condition.value);
@@ -164,59 +190,84 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
       });
   }
 
-  async getCollectionDataByConditionsAndOrderBy(
-    conditions: {
-      field: string;
-      operator: WhereFilterOp;
-      value: any;
-    }[],
-    orderBys: {
-      field: string;
-      option?: 'asc' | 'desc';
-    }[],
-  ): Promise<T[]> {
-    let query: Query<DocumentData> = this.collectionRef;
 
-    for (const condition of conditions) {
-      query = query.where(condition.field, condition.operator, condition.value);
-    }
-    for (const orderBy of orderBys) {
-      query = query.orderBy(orderBy.field, orderBy.option);
-    }
 
-    const collectionSnapshot = await query.get();
-    if (collectionSnapshot.empty) {
+  // Listen
+  listenToChangesWithConditions(
+    conditions: { field: string; operator: WhereFilterOp; value: any; }[],
+    callback: (changes: DocumentChange<T>[]) => Promise<void>,
+  ): void {
+
+    let query: Query<T> = this.collectionRef;
+    if (conditions) {
+      for (const condition of conditions) {
+        query = query.where(condition.field, condition.operator, condition.value);
+      }
+    }
+    if (!query) {
       return null;
     }
 
-    const data = collectionSnapshot.docs.map(doc => {
-      if (!doc.data().id) {
-        const documentData = doc.data();
-        documentData.id = doc.id;
-        return documentData;
-      }
-      return doc.data();
-    }) as T[];
+    query.onSnapshot(async s => {
+      const result = s.docChanges().map(change => {
+        const data: DocumentChange<T> = {
+          doc: change.doc.data(),
+          newIndex: change.newIndex,
+          oldIndex: change.oldIndex,
+          type: change.type,
+        };
 
-    return data;
+        return data;
+      });
+
+      await callback(result);
+    });
   }
 
-  async getCollectionDataFirstValueAndOrderBy(
-    orderBy: {
-      field: string;
-      option?: 'asc' | 'desc';
-    }[],
-  ): Promise<T> {
-    let query: Query<DocumentData> = this.collectionRef;
+  listenToChangesWithConditionsOrigin(
+    conditions: { field: string; operator: WhereFilterOp; value: any; }[],
+    callback: (changes: DocumentChangeOrigin<T>[]) => Promise<void>,
+  ): Promise<void> {
 
-    if (orderBy) {
-      for (const ob of orderBy) {
-        query = query.orderBy(ob.field, ob?.option);
+    let query: Query<T> = this.collectionRef;
+    if (conditions) {
+      for (const condition of conditions) {
+        query = query.where(condition.field, condition.operator, condition.value);
       }
     }
+    if (!query) {
+      return null;
+    }
 
-    const querySnapshot = await query.get();
-    const data = querySnapshot.docs.map(doc => doc.data()) as T[];
-    return data.length > 0 ? data[0] : null;
+    query.onSnapshot(async s => {
+      const result = s.docs.map(change => {
+        const data: DocumentChangeOrigin<T> = {
+          doc: change.data(),
+        };
+
+        return data;
+      });
+      await callback(result);
+    });
+  }
+
+  listenToChangesOnCollection(
+    callback: (changes: DocumentChange<T>[]) => Promise<void>
+  ): void {
+    
+    const query: Query<T> = this.collectionRef;
+    let result: DocumentChange<T>[];
+    query.onSnapshot(async s => {
+      result = s.docChanges().map(change => {
+        const data: DocumentChange<T> = {
+          doc: change.doc.data(),
+          newIndex: change.newIndex,
+          oldIndex: change.oldIndex,
+          type: change.type,
+        };
+        return data;
+      });
+      await callback(result);
+    });
   }
 }
