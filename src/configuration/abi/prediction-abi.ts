@@ -132,6 +132,25 @@ const predictionAbi = `[
 		"inputs": [
 			{
 				"indexed": true,
+				"internalType": "address",
+				"name": "sender",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "CommissionClaim",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
 				"internalType": "uint256",
 				"name": "epoch",
 				"type": "uint256"
@@ -171,6 +190,12 @@ const predictionAbi = `[
 				"indexed": false,
 				"internalType": "uint256",
 				"name": "refundAmount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "totalBetRound",
 				"type": "uint256"
 			}
 		],
@@ -389,25 +414,6 @@ const predictionAbi = `[
 				"internalType": "uint256",
 				"name": "epoch",
 				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "treasuryAmount",
-				"type": "uint256"
-			}
-		],
-		"name": "RewardsCalculated",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "uint256",
-				"name": "epoch",
-				"type": "uint256"
 			}
 		],
 		"name": "StartRound",
@@ -430,19 +436,6 @@ const predictionAbi = `[
 			}
 		],
 		"name": "TokenRecovery",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "TreasuryClaim",
 		"type": "event"
 	},
 	{
@@ -595,8 +588,19 @@ const predictionAbi = `[
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "claimTreasury",
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_amount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bytes",
+				"name": "_signature",
+				"type": "bytes"
+			}
+		],
+		"name": "claimCommission",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
