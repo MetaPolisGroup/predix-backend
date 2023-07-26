@@ -30,6 +30,7 @@ export class PredictionService implements OnApplicationBootstrap {
     });
 
     if (this.cronJobs[id] && this.cronJobs[id].running) {
+      this.logger.log(`Cronjob for round ${id} have already set !`);
       return;
     }
 

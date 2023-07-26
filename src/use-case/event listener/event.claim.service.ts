@@ -1,17 +1,22 @@
-import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { ethers } from 'ethers';
 import constant from 'src/configuration';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 
 @Injectable()
 export class EventClaimListener implements OnApplicationBootstrap {
+  private logger: Logger;
+
   async onApplicationBootstrap() {
     if (constant.ENABLE) {
       await this.listenClaim();
     }
   }
 
-  constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) {}
+  constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) {
+    this.logger = new Logger(EventClaimListener.name);
+  }
 
   async listenClaim() {
     await this.factory.predictionContract.on('Claim', async (sender: string, epoch: bigint, amount: bigint) => {
@@ -29,6 +34,8 @@ export class EventClaimListener implements OnApplicationBootstrap {
       ]);
 
       await this.db.betRepo.upsertDocumentData(bet.id, { claimed: true, claimed_amount: parseInt(amount.toString()) });
+
+      this.logger.log(`${sender} claim ${ethers.formatEther(amount)} !`);
     });
   }
 }
