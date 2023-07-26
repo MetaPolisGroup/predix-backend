@@ -16,10 +16,8 @@ export class UserAuthenService {
     if (recommend_id) {
       user_tree_belong = await this.partnerTree(recommend_id);
     }
-    const password = hashSync(dto.password, 10);
     const user: User = {
-      id: dto.account_id,
-      password,
+      id: dto.user_address,
       user_address: dto.user_address,
       leaderboard: null,
       email: '',
@@ -29,7 +27,7 @@ export class UserAuthenService {
       type: constant.USER.TYPE.NORMAL,
       created_at: new Date().getTime(),
       updated_at: new Date().getTime(),
-      nickname: dto.account_id,
+      nickname: dto.nickname ? dto.nickname : dto.user_address,
     };
     return this.db.userRepo.upsertDocumentData(user.id, user);
   }

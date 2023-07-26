@@ -9,7 +9,7 @@ import { UserService } from 'src/use-case/user/user.service';
 export class UserController {
   constructor(private readonly userAuthService: UserAuthenService, private readonly userService: UserService) {}
 
-  @Post('/create/: id')
+  @Post('/create/:id')
   async createByRef(@Body() dto: CreateUserDto, @Param('id') id: string, @Req() req: Request) {
     return await this.userAuthService.create(dto, req, id);
   }

@@ -1,8 +1,6 @@
 export class User {
   id?: string;
 
-  password: string;
-
   user_address?: string;
 
   point: number;
