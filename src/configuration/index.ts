@@ -9,7 +9,7 @@ import { LeaderBoard } from './constant/leaderboard';
 
 const CURRENT_NETWORK = ChainType.BSCTESTNET;
 const constant = {
-  ENABLE: false,
+  ENABLE: process.env.CONSTANT_ENABLE,
   STORAGE_PATH: Path,
   FIREBASE: {
     NAME: 'FirestoreDataservices',
