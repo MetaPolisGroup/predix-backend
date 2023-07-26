@@ -67,18 +67,6 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
     return data;
   }
 
-  async getFirstValueCollectionDataByConditions(
-    conditions: { field: string; operator: WhereFilterOp; value: any; }[],
-  ): Promise<T> {
-
-    const data = await this.getCollectionDataByConditions(conditions);
-    if (data) {
-      return data.length > 0 ? data[0] : null;
-    }
-
-    return null;
-  }
-
   async getCollectionDataByConditionsAndOrderBy(
     conditions: { field: string; operator: WhereFilterOp; value: any; }[],
     orderBys: { field: string; option?: 'asc' | 'desc'; }[],
@@ -101,19 +89,6 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
     const data = this.fixDataFromCollection(collectionSnapshot);
 
     return data;
-  }
-
-  async getFirstValueCollectionDataByConditionsAndOrderBy(
-    conditions: { field: string; operator: WhereFilterOp; value: any; }[],
-    orderBy: { field: string; option?: 'asc' | 'desc'; }[],
-  ): Promise<T> {
-
-    const data = await this.getCollectionDataByConditionsAndOrderBy(conditions, orderBy);
-    if (data) {
-      return data.length > 0 ? data[0] : null;
-    }
-
-    return null;
   }
 
   async getCollectionDataByConditionsOrderByStartAfterAndLimit(
@@ -153,6 +128,31 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
 
     return data;
   }
+
+  async getFirstValueCollectionDataByConditions(
+    conditions: { field: string; operator: WhereFilterOp; value: any; }[],
+  ): Promise<T> {
+
+    const data = await this.getCollectionDataByConditions(conditions);
+    if (data) {
+      return data.length > 0 ? data[0] : null;
+    }
+
+    return null;
+  }
+
+  async getFirstValueCollectionDataByConditionsAndOrderBy(
+    conditions: { field: string; operator: WhereFilterOp; value: any; }[],
+    orderBy: { field: string; option?: 'asc' | 'desc'; }[],
+  ): Promise<T> {
+
+    const data = await this.getCollectionDataByConditionsAndOrderBy(conditions, orderBy);
+    if (data) {
+      return data.length > 0 ? data[0] : null;
+    }
+
+    return null;
+  }  
 
   async getDocumentData(documentId: string): Promise<T> {
     const documentRef = this.collectionRef.doc(documentId);
