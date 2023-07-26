@@ -1,7 +1,8 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import constant from 'src/configuration';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 
+@Injectable()
 export class UserHandleMoney {
   constructor(private readonly db: IDataServices) {}
 

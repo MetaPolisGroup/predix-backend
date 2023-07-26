@@ -6,6 +6,7 @@ import { PointHistory } from 'src/core/entity/point-history.enity';
 import { Product } from 'src/core/entity/product.entiy';
 import { Bet } from 'src/core/entity/bet.entity';
 import { Chainlink } from 'src/core/entity/chainlink.entity';
+import { Leaderboard } from 'src/core/entity/leaderboard.entity';
 
 export abstract class IDataServices {
   // Firestore
@@ -25,4 +26,6 @@ export abstract class IDataServices {
   abstract productRepo: IGenericRepository<Product>;
 
   abstract chainlinkRepo: IGenericRepository<Chainlink>;
+
+  abstract leaderboardRepo: IGenericRepository<Leaderboard>;
 }
