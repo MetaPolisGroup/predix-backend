@@ -102,6 +102,8 @@ export class EventBetListener implements OnApplicationBootstrap {
         bet.amount = parseInt(betAmount.toString());
         bet.refund = parseInt(refundAmount.toString());
         bet.winning_amount = parseInt(betAmount.toString()) - (parseInt(totalBetRound.toString()) * 5) / 100;
+
+        await this.db.betRepo.upsertDocumentData(bet.id, bet);
       },
     );
   }
