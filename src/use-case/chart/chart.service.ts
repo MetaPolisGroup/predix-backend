@@ -17,22 +17,24 @@ export class ChartService implements OnApplicationBootstrap {
 
   @Cron('*/20 * * * * *')
   async updatePriceFromChainlink() {
-    const p = new ethers.JsonRpcProvider(providerRPC['bsc'].rpc, {
-      chainId: providerRPC['bsc'].chainId,
-      name: providerRPC['bsc'].name,
-    });
-    const aggregatorContract = new ethers.Contract(constant.ADDRESS.AGGREGATOR, constant.ABI.AGGREGATOR, p);
+    if (constant.ENABLE) {
+      const p = new ethers.JsonRpcProvider(providerRPC['bsc'].rpc, {
+        chainId: providerRPC['bsc'].chainId,
+        name: providerRPC['bsc'].name,
+      });
+      const aggregatorContract = new ethers.Contract(constant.ADDRESS.AGGREGATOR, constant.ABI.AGGREGATOR, p);
 
-    const d = await aggregatorContract.latestRoundData();
+      const d = await aggregatorContract.latestRoundData();
 
-    if (d) {
-      const chart: Chart = {
-        created_at: parseInt(d[2].toString()),
-        delete: false,
-        price: parseInt(d[1].toString()),
-      };
+      if (d) {
+        const chart: Chart = {
+          created_at: parseInt(d[2].toString()),
+          delete: false,
+          price: parseInt(d[1].toString()),
+        };
 
-      await this.db.chartRepo.createDocumentData(chart);
+        await this.db.chartRepo.createDocumentData(chart);
+      }
     }
   }
 }
