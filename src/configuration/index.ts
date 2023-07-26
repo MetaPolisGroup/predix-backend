@@ -8,7 +8,7 @@ import { userType } from './constant/user';
 
 const CURRENT_NETWORK = ChainType.BSCTESTNET;
 const constant = {
-  ENABLE: false,
+  ENABLE: true,
   STORAGE_PATH: Path,
   FIREBASE: {
     NAME: 'FirestoreDataservices',

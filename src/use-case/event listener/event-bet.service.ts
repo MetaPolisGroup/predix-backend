@@ -86,7 +86,7 @@ export class EventBetListener implements OnApplicationBootstrap {
   async listenCutBetUser() {
     await this.factory.predictionContract.on(
       'CutBetUser',
-      async (epoch: bigint, sender: string, betAmount: bigint, refundAmount: bigint) => {
+      async (epoch: bigint, sender: string, betAmount: bigint, refundAmount: bigint, totalBetRound: bigint) => {
         const bet = await this.db.betRepo.getFirstValueCollectionDataByConditions([
           {
             field: 'epoch',
@@ -99,9 +99,9 @@ export class EventBetListener implements OnApplicationBootstrap {
             value: sender,
           },
         ]);
-
         bet.amount = parseInt(betAmount.toString());
         bet.refund = parseInt(refundAmount.toString());
+        bet.winning_amount = parseInt(betAmount.toString()) - (parseInt(totalBetRound.toString()) * 5) / 100;
 
         await this.db.betRepo.upsertDocumentData(bet.id, bet);
       },
