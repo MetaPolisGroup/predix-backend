@@ -22,6 +22,13 @@ export abstract class IGenericRepository<T> {
     orderBy: { field: string; option?: 'asc' | 'desc'; }[],
   ): Promise<T>;
 
+  abstract getCollectionDataByConditionsOrderByStartAfterAndLimit(
+    conditions: { field: string; operator: WhereFilterOp; value: any }[],
+    orderBy: { field: string; option: 'asc' | 'desc'; }[],
+    startAfter: T,
+    limit: number,
+  ): Promise<T[]>;
+
   abstract getDocumentData(documentId: string): Promise<T>;
 
   abstract getDocumentRef(documentId: string): any;

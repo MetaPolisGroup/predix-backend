@@ -26,15 +26,15 @@ export class LeaderboardService {
   }
 
   async winRate() {
-    const users = await this.db.userRepo.getCollectionDataByConditions([{ field: 'leaderboard.win_rate', operator: '' }]);
+    // const users = await this.db.userRepo.getCollectionDataByConditions([{ field: 'leaderboard.win_rate', operator: '' }]);
     const user_lists = [];
-    for (const user of users) {
-      const leaderboard = {
-        user_id: user.id,
-        leaderboard: user.leaderboard,
-      };
-      user_lists.push(leaderboard);
-    }
+    // for (const user of users) {
+    //   const leaderboard = {
+    //     user_id: user.id,
+    //     leaderboard: user.leaderboard,
+    //   };
+    //   user_lists.push(leaderboard);
+    // }
 
     await this.db.leaderboardRepo.upsertDocumentData('Total BNB', {
       user_lists,

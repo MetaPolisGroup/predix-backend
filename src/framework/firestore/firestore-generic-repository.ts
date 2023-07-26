@@ -116,6 +116,44 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
     return null;
   }
 
+  async getCollectionDataByConditionsOrderByStartAfterAndLimit(
+    conditions: { field: string; operator: WhereFilterOp; value: any; }[],
+    orderBys: { field: string; option?: 'asc' | 'desc'; }[],
+    startAfter: T,
+    limit: number,
+  ): Promise<T[]> {
+
+    let query: Query<DocumentData> = this.collectionRef;
+    
+    for (const condition of conditions) {
+      query = query.where(condition.field, condition.operator, condition.value);
+    }
+    for (const orderBy of orderBys) {
+      query = query.orderBy(orderBy.field, orderBy.option);
+    }
+
+    let tmp;
+    if (startAfter) {
+      tmp = await this.collectionRef.doc(startAfter.id).get();
+    }
+
+    const collectionSnapshot = startAfter 
+      ? await query
+        .startAfter(tmp)
+        .limit(limit)
+        .get()
+      : await query
+        .limit(limit)
+        .get();
+    if (collectionSnapshot.empty) {
+      return null;
+    }
+
+    const data = this.fixDataFromCollection(collectionSnapshot);
+
+    return data;
+  }
+
   async getDocumentData(documentId: string): Promise<T> {
     const documentRef = this.collectionRef.doc(documentId);
     const documentSnapshot = await documentRef.get();
