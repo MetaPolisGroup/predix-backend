@@ -5,6 +5,7 @@ import { collectionNames } from './constant';
 import { Path } from './constant/storage';
 import provider from './provider';
 import { userType } from './constant/user';
+import { LeaderBoard } from './constant/leaderboard';
 
 const CURRENT_NETWORK = ChainType.BSCTESTNET;
 const constant = {
@@ -40,5 +41,6 @@ const constant = {
   USER: {
     TYPE: userType,
   },
+  LEADERBOARD: LeaderBoard,
 };
 export default constant;

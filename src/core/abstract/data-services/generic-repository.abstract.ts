@@ -4,27 +4,23 @@ import { DocumentChange } from './snapshot/Query.abstract';
 export abstract class IGenericRepository<T> {
   abstract getCollectionData(): Promise<T[]>;
 
-  abstract getCollectionDataByConditions(
-    conditions: { field: string; operator: WhereFilterOp; value: any }[]
-  ): Promise<T[]>;
+  abstract getCollectionDataByConditions(conditions: { field: string; operator: WhereFilterOp; value: any }[]): Promise<T[]>;
 
-  abstract getFirstValueCollectionDataByConditions(
-    conditions: { field: string; operator: WhereFilterOp; value: any }[]
-  ): Promise<T>;
+  abstract getFirstValueCollectionDataByConditions(conditions: { field: string; operator: WhereFilterOp; value: any }[]): Promise<T>;
 
   abstract getCollectionDataByConditionsAndOrderBy(
     conditions: { field: string; operator: WhereFilterOp; value: any }[],
-    orderBy: { field: string; option: 'asc' | 'desc'; }[],
+    orderBy: { field: string; option: 'asc' | 'desc' }[],
   ): Promise<T[]>;
 
   abstract getFirstValueCollectionDataByConditionsAndOrderBy(
     conditions: { field: string; operator: WhereFilterOp; value: any }[],
-    orderBy: { field: string; option?: 'asc' | 'desc'; }[],
+    orderBy: { field: string; option?: 'asc' | 'desc' }[],
   ): Promise<T>;
 
   abstract getCollectionDataByConditionsOrderByStartAfterAndLimit(
     conditions: { field: string; operator: WhereFilterOp; value: any }[],
-    orderBy: { field: string; option: 'asc' | 'desc'; }[],
+    orderBy: { field: string; option: 'asc' | 'desc' }[],
     startAfter: T,
     limit: number,
   ): Promise<T[]>;
@@ -41,9 +37,7 @@ export abstract class IGenericRepository<T> {
 
   abstract deleteDocumentData(documentId: string): Promise<void>;
 
-  abstract deleteDocumentByConditions(
-    conditions: { field: string; operator: WhereFilterOp; value: any }[]
-  ): void;
+  abstract deleteDocumentByConditions(conditions: { field: string; operator: WhereFilterOp; value: any }[]): void;
 
   abstract listenToChangesWithConditions(
     conditions: {
@@ -51,7 +45,7 @@ export abstract class IGenericRepository<T> {
       operator: WhereFilterOp;
       value: any;
     }[],
-    callback: (changes: DocumentChange<T>[]) => Promise<void>
+    callback: (changes: DocumentChange<T>[]) => Promise<void>,
   ): void;
 
   abstract listenToChangesWithConditionsOrigin(
@@ -60,10 +54,8 @@ export abstract class IGenericRepository<T> {
       operator: WhereFilterOp;
       value: any;
     }[],
-    callback: (changes: DocumentChange<T>[]) => Promise<void>
+    callback: (changes: DocumentChange<T>[]) => Promise<void>,
   ): void;
 
-  abstract listenToChangesOnCollection(
-    callback: (changes: DocumentChange<T>[]) => Promise<void>
-  ): void;
+  abstract listenToChangesOnCollection(callback: (changes: DocumentChange<T>[]) => Promise<void>): void;
 }

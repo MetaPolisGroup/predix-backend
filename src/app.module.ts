@@ -11,6 +11,7 @@ import { TaskModule } from './use-case/task/task.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { PredictionModule } from './use-case/prediction/prediction.module';
 import { ChartModule } from './use-case/chart/chart.module';
+import { LeaderboardModule } from './use-case/leaderboard/leaderboard.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ChartModule } from './use-case/chart/chart.module';
     TaskModule,
     EventListenerModule,
     ChartModule,
+    LeaderboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],
