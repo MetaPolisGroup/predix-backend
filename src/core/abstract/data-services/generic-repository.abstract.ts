@@ -4,11 +4,23 @@ import { DocumentChange } from './snapshot/Query.abstract';
 export abstract class IGenericRepository<T> {
   abstract getCollectionData(): Promise<T[]>;
 
-  abstract getFirstValueCollectionData(): Promise<T>;
+  abstract getCollectionDataByConditions(
+    conditions: { field: string; operator: WhereFilterOp; value: any }[]
+  ): Promise<T[]>;
 
-  abstract getCollectionDataByConditions(conditions: { field: string; operator: WhereFilterOp; value: any }[]): Promise<T[]>;
+  abstract getFirstValueCollectionDataByConditions(
+    conditions: { field: string; operator: WhereFilterOp; value: any }[]
+  ): Promise<T>;
 
-  abstract getFirstValueCollectionDataByConditions(conditions: { field: string; operator: WhereFilterOp; value: any }[]): Promise<T>;
+  abstract getCollectionDataByConditionsAndOrderBy(
+    conditions: { field: string; operator: WhereFilterOp; value: any }[],
+    orderBy: { field: string; option: 'asc' | 'desc'; }[],
+  ): Promise<T[]>;
+
+  abstract getFirstValueCollectionDataByConditionsAndOrderBy(
+    conditions: { field: string; operator: WhereFilterOp; value: any }[],
+    orderBy: { field: string; option?: 'asc' | 'desc'; }[],
+  ): Promise<T>;
 
   abstract getDocumentData(documentId: string): Promise<T>;
 
@@ -20,23 +32,31 @@ export abstract class IGenericRepository<T> {
 
   abstract upsertDocumentData(documentId: string, documentData: T | object): Promise<T>;
 
-  abstract deleteDocumentData(documentId: string);
+  abstract deleteDocumentData(documentId: string): Promise<void>;
 
-  abstract deleteDocumentByConditions(conditions: { field: string; operator: WhereFilterOp; value: any }[]);
+  abstract deleteDocumentByConditions(
+    conditions: { field: string; operator: WhereFilterOp; value: any }[]
+  ): void;
 
-  abstract getCollectionDataByConditionsAndOrderBy(
-    conditions: { field: string; operator: WhereFilterOp; value: any }[],
-    orderBy: {
+  abstract listenToChangesWithConditions(
+    conditions: {
       field: string;
-      option: 'asc' | 'desc';
+      operator: WhereFilterOp;
+      value: any;
     }[],
-  ): // startAfterDoc?: T
-  Promise<T[]>;
+    callback: (changes: DocumentChange<T>[]) => Promise<void>
+  ): void;
 
-  abstract getCollectionDataFirstValueAndOrderBy(
-    orderBy: {
+  abstract listenToChangesWithConditionsOrigin(
+    conditions: {
       field: string;
-      option?: 'asc' | 'desc';
+      operator: WhereFilterOp;
+      value: any;
     }[],
-  ): Promise<T>;
+    callback: (changes: DocumentChange<T>[]) => Promise<void>
+  ): void;
+
+  abstract listenToChangesOnCollection(
+    callback: (changes: DocumentChange<T>[]) => Promise<void>
+  ): void;
 }
