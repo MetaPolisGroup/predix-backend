@@ -25,40 +25,40 @@ export class LeaderboardService {
     }
   }
 
-  async winRate() {
-    const users = await this.db.userRepo.getCollectionDataByConditions([{ field: 'leaderboard.win_rate', operator: '' }]);
-    const user_lists = [];
-    for (const user of users) {
-      const leaderboard = {
-        user_id: user.id,
-        leaderboard: user.leaderboard,
-      };
-      user_lists.push(leaderboard);
-    }
+  // async winRate() {
+  //   const users = await this.db.userRepo.getCollectionDataByConditions([{ field: 'leaderboard.win_rate', operator: '' }]);
+  //   const user_lists = [];
+  //   for (const user of users) {
+  //     const leaderboard = {
+  //       user_id: user.id,
+  //       leaderboard: user.leaderboard,
+  //     };
+  //     user_lists.push(leaderboard);
+  //   }
 
-    await this.db.leaderboardRepo.upsertDocumentData('Total BNB', {
-      user_lists,
-      type: 'Total BNB',
-      id: 'Total BNB',
-      updated_at: new Date().getTime(),
-    });
-    await this.db.leaderboardRepo.upsertDocumentData('Win Rate', {
-      user_lists,
-      type: 'Win Rate',
-      id: 'Win Rate',
-      updated_at: new Date().getTime(),
-    });
-    await this.db.leaderboardRepo.upsertDocumentData('Round Played', {
-      user_lists,
-      type: 'Round Played',
-      id: 'Round Played',
-      updated_at: new Date().getTime(),
-    });
-    await this.db.leaderboardRepo.upsertDocumentData('Net Winnings', {
-      user_lists,
-      type: 'Net Winnings',
-      id: 'Net Winnings',
-      updated_at: new Date().getTime(),
-    });
-  }
+  //   await this.db.leaderboardRepo.upsertDocumentData('Total BNB', {
+  //     user_lists,
+  //     type: 'Total BNB',
+  //     id: 'Total BNB',
+  //     updated_at: new Date().getTime(),
+  //   });
+  //   await this.db.leaderboardRepo.upsertDocumentData('Win Rate', {
+  //     user_lists,
+  //     type: 'Win Rate',
+  //     id: 'Win Rate',
+  //     updated_at: new Date().getTime(),
+  //   });
+  //   await this.db.leaderboardRepo.upsertDocumentData('Round Played', {
+  //     user_lists,
+  //     type: 'Round Played',
+  //     id: 'Round Played',
+  //     updated_at: new Date().getTime(),
+  //   });
+  //   await this.db.leaderboardRepo.upsertDocumentData('Net Winnings', {
+  //     user_lists,
+  //     type: 'Net Winnings',
+  //     id: 'Net Winnings',
+  //     updated_at: new Date().getTime(),
+  //   });
+  // }
 }
