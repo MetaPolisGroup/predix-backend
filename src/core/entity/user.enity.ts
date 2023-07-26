@@ -13,7 +13,7 @@ export class User {
 
   nickname?: string;
 
-  leaderboard: LeaderBoard;
+  leaderboard?: LeaderBoardUser;
 
   user_tree_belong?: string[];
 
@@ -31,12 +31,10 @@ export interface IUserToken {
 
 export type UserType = 'Admin' | 'Normal';
 
-export class LeaderBoard {
+export class LeaderBoardUser {
   round_played: number;
 
   round_winning: number;
-
-  round_losing: number;
 
   net_winnings: number;
 
