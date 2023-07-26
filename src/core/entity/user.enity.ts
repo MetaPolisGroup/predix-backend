@@ -5,8 +5,6 @@ export class User {
 
   point: number;
 
-  email: string;
-
   ip: string;
 
   nickname?: string;
@@ -20,6 +18,8 @@ export class User {
   updated_at: number;
 
   type: UserType;
+
+  ref: string;
 }
 
 export interface IUserToken {
@@ -35,8 +35,6 @@ export class LeaderBoardUser {
   round_winning: number;
 
   net_winnings: number;
-
-  total_bnb: number;
 
   win_rate: number;
 }

@@ -19,15 +19,20 @@ export class UserAuthenService {
     const user: User = {
       id: dto.user_address,
       user_address: dto.user_address,
-      leaderboard: null,
-      email: '',
+      leaderboard: {
+        round_played: 0,
+        round_winning: 0,
+        net_winnings: 0,
+        win_rate: 0
+      },
       point: 0,
       user_tree_belong,
       ip: req.ip,
       type: constant.USER.TYPE.NORMAL,
       created_at: new Date().getTime(),
       updated_at: new Date().getTime(),
-      nickname: dto.nickname ? dto.nickname : dto.user_address,
+      nickname: dto.nickname ?? dto.user_address,
+      ref: ''
     };
     return this.db.userRepo.upsertDocumentData(user.id, user);
   }
