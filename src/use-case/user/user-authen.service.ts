@@ -12,7 +12,10 @@ export class UserAuthenService {
 
   async create(dto: CreateUserDto, req: Request, recommend_id?: string): Promise<User> {
     let user_tree_belong = [];
-
+    const checkUser = await this.db.userRepo.getDocumentData(dto.user_address);
+    if (checkUser) {
+      return checkUser;
+    }
     if (recommend_id) {
       user_tree_belong = await this.partnerTree(recommend_id);
     }
@@ -23,7 +26,7 @@ export class UserAuthenService {
         round_played: 0,
         round_winning: 0,
         net_winnings: 0,
-        win_rate: 0
+        win_rate: 0,
       },
       point: 0,
       user_tree_belong,
@@ -32,7 +35,7 @@ export class UserAuthenService {
       created_at: new Date().getTime(),
       updated_at: new Date().getTime(),
       nickname: dto.nickname ?? dto.user_address,
-      ref: ''
+      ref: `${process.env.SERVER}/user/create/?id=${dto.user_address}`,
     };
     return this.db.userRepo.upsertDocumentData(user.id, user);
   }
