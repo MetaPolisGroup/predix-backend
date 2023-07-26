@@ -9,4 +9,5 @@ export const collectionNames = {
   BETS: 'bets' as collectionsName,
   CHAINLINKS: 'chainlink' as collectionsName,
   LEADERBOARD: 'leaderboard' as collectionsName,
+  CHARTS: 'charts' as collectionsName,
 };

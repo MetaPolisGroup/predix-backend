@@ -6,4 +6,5 @@ export type collectionsName =
   | 'cash_histories'
   | 'bets'
   | 'chainlink'
+  | 'charts'
   | 'leaderboard';

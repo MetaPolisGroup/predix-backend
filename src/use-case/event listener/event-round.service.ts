@@ -145,6 +145,7 @@ export class EventRoundListener implements OnApplicationBootstrap {
     await this.factory.predictionContract.on('CutBet', async (epoch: bigint, amount: bigint) => {
       await this.db.predictionRepo.upsertDocumentData(epoch.toString(), {
         bearAmount: parseInt(amount.toString()),
+        bullAmount: parseInt(amount.toString()),
         totalAmount: parseInt(amount.toString()) * 2,
       });
 

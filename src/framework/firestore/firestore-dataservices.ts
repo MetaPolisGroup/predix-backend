@@ -14,6 +14,7 @@ import { IGenericRepository } from 'src/core/abstract/data-services/generic-repo
 import { Bet } from 'src/core/entity/bet.entity';
 import { Chainlink } from 'src/core/entity/chainlink.entity';
 import { Leaderboard } from 'src/core/entity/leaderboard.entity';
+import { Chart } from 'src/core/entity/chart.entity';
 
 @Injectable()
 export class FirestoreDataServices implements IDataServices, OnApplicationBootstrap {
@@ -23,6 +24,8 @@ export class FirestoreDataServices implements IDataServices, OnApplicationBootst
   userRepo: FirestoreGenericRepository<User>;
 
   betRepo: FirestoreGenericRepository<Bet>;
+
+  chartRepo: FirestoreGenericRepository<Chart>;
 
   cashHistoryRepoRepo: FirestoreGenericRepository<CashHistory>;
 
@@ -66,6 +69,8 @@ export class FirestoreDataServices implements IDataServices, OnApplicationBootst
     this.betRepo = new FirestoreGenericRepository<Bet>(firestore, constant.FIREBASE.COLLECTIONS.BETS);
 
     this.productRepo = new FirestoreGenericRepository<Product>(firestore, constant.FIREBASE.COLLECTIONS.PRODUCTS);
+
+    this.chartRepo = new FirestoreGenericRepository<Chart>(firestore, constant.FIREBASE.COLLECTIONS.CHARTS);
 
     this.chainlinkRepo = new FirestoreGenericRepository<Chainlink>(firestore, constant.FIREBASE.COLLECTIONS.CHAINLINKS);
 
