@@ -36,6 +36,8 @@ export class PredictionService implements OnApplicationBootstrap {
     this.cronJobs[id] = cronjob;
 
     cronjob.start();
+
+    this.logger.log(`Cronjob for round ${id} have been set !`);
   }
 
   async setCronjob() {
