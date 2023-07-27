@@ -84,7 +84,9 @@ export class PredictionService implements OnApplicationBootstrap {
 
   @Cron('*/30 * * * * *')
   async setCronjobAutomatically() {
-    await this.setCronjob();
+    if (process.env.CONSTAN_ENABLE === 'True') {
+      await this.setCronjob();
+    }
   }
 
   async executeRound() {

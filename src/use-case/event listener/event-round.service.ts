@@ -140,7 +140,7 @@ export class EventRoundListener implements OnApplicationBootstrap {
             status: calculateResult() ? (bet.position === calculateResult() ? 'Win' : 'Lose') : 'Refund',
           });
 
-          await this.handleMoney.handlePoint(bet.amount, bet.user_address);
+          // await this.handleMoney.handlePoint(bet.amount, bet.user_address);
         }
       }
       await this.prediction.setCronjob();
