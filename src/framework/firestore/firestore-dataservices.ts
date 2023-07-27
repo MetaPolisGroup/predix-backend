@@ -15,6 +15,7 @@ import { Bet } from 'src/core/entity/bet.entity';
 import { Chainlink } from 'src/core/entity/chainlink.entity';
 import { Leaderboard } from 'src/core/entity/leaderboard.entity';
 import { Chart } from 'src/core/entity/chart.entity';
+import { Preferences } from 'src/core/entity/preferences.entity';
 
 @Injectable()
 export class FirestoreDataServices implements IDataServices, OnApplicationBootstrap {
@@ -24,6 +25,8 @@ export class FirestoreDataServices implements IDataServices, OnApplicationBootst
   userRepo: FirestoreGenericRepository<User>;
 
   betRepo: FirestoreGenericRepository<Bet>;
+
+  preferenceRepo: FirestoreGenericRepository<Preferences>;
 
   chartRepo: FirestoreGenericRepository<Chart>;
 
@@ -75,5 +78,7 @@ export class FirestoreDataServices implements IDataServices, OnApplicationBootst
     this.chainlinkRepo = new FirestoreGenericRepository<Chainlink>(firestore, constant.FIREBASE.COLLECTIONS.CHAINLINKS);
 
     this.leaderboardRepo = new FirestoreGenericRepository<Leaderboard>(firestore, constant.FIREBASE.COLLECTIONS.LEADERBOARD);
+
+    this.preferenceRepo = new FirestoreGenericRepository<Preferences>(firestore, constant.FIREBASE.COLLECTIONS.PREFERENCES);
   }
 }

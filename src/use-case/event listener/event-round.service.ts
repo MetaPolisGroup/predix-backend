@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, OnApplicationBootstrap } from '@nestjs/common';
 import { ethers } from 'ethers';
 import constant from 'src/configuration';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
@@ -100,6 +100,18 @@ export class EventRoundListener implements OnApplicationBootstrap {
         closed: true,
       });
 
+      const bets = await this.db.betRepo.getCollectionDataByConditions([
+        {
+          field: 'epoch',
+          operator: '==',
+          value: parseInt(epoch.toString()),
+        },
+      ]);
+
+      if (!bets) {
+        this.Logger.error(`Bets of round ${epoch.toString()} not found, can't update result!`);
+      }
+
       const round = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
         {
           field: 'epoch',
@@ -108,13 +120,9 @@ export class EventRoundListener implements OnApplicationBootstrap {
         },
       ]);
 
-      const bets = await this.db.betRepo.getCollectionDataByConditions([
-        {
-          field: 'epoch',
-          operator: '==',
-          value: parseInt(epoch.toString()),
-        },
-      ]);
+      if (!round) {
+        this.Logger.error(`Round ${epoch.toString()} not found, can't update bet result!`);
+      }
 
       const calculateResult = (): Position => {
         const r = round.closePrice - round.lockPrice;
@@ -130,7 +138,7 @@ export class EventRoundListener implements OnApplicationBootstrap {
       if (bets) {
         for (const bet of bets) {
           await this.db.betRepo.upsertDocumentData(bet.id, {
-            round,
+            round: round ? round : null,
             status: calculateResult() ? (bet.position === calculateResult() ? 'Win' : 'Lose') : 'Refund',
           });
         }

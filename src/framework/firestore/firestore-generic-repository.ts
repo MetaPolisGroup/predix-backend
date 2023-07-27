@@ -33,8 +33,6 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
     return documentRef;
   }
 
-
-
   // Get
   async getCollectionData(): Promise<T[]> {
     const collectionSnapshot = await this.collectionRef.get();
@@ -47,10 +45,7 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
     return data;
   }
 
-  async getCollectionDataByConditions(
-    conditions: { field: string; operator: WhereFilterOp; value: any; }[],
-  ): Promise<T[]> {
-
+  async getCollectionDataByConditions(conditions: { field: string; operator: WhereFilterOp; value: any }[]): Promise<T[]> {
     let query: Query<DocumentData> = this.collectionRef;
 
     for (const condition of conditions) {
@@ -67,13 +62,34 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
     return data;
   }
 
-  async getCollectionDataByConditionsAndOrderBy(
-    conditions: { field: string; operator: WhereFilterOp; value: any; }[],
-    orderBys: { field: string; option?: 'asc' | 'desc'; }[],
-  ): Promise<T[]> {
+  async getFirstValueCollectionData(): Promise<T> {
+    const collectionSnapshot = await this.collectionRef.get();
+    if (collectionSnapshot.empty) {
+      return null;
+    }
 
+    const data = this.fixDataFromCollection(collectionSnapshot as DocumentData);
+
+    if (data) {
+      return data.length > 0 ? data[0] : null;
+    }
+  }
+
+  async getFirstValueCollectionDataByConditions(conditions: { field: string; operator: WhereFilterOp; value: any }[]): Promise<T> {
+    const data = await this.getCollectionDataByConditions(conditions);
+    if (data) {
+      return data.length > 0 ? data[0] : null;
+    }
+
+    return null;
+  }
+
+  async getCollectionDataByConditionsAndOrderBy(
+    conditions: { field: string; operator: WhereFilterOp; value: any }[],
+    orderBys: { field: string; option?: 'asc' | 'desc' }[],
+  ): Promise<T[]> {
     let query: Query<DocumentData> = this.collectionRef;
-    
+
     for (const condition of conditions) {
       query = query.where(condition.field, condition.operator, condition.value);
     }
@@ -92,14 +108,13 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
   }
 
   async getCollectionDataByConditionsOrderByStartAfterAndLimit(
-    conditions: { field: string; operator: WhereFilterOp; value: any; }[],
-    orderBys: { field: string; option?: 'asc' | 'desc'; }[],
+    conditions: { field: string; operator: WhereFilterOp; value: any }[],
+    orderBys: { field: string; option?: 'asc' | 'desc' }[],
     startAfter: T,
     limit: number,
   ): Promise<T[]> {
-
     let query: Query<DocumentData> = this.collectionRef;
-    
+
     for (const condition of conditions) {
       query = query.where(condition.field, condition.operator, condition.value);
     }
@@ -112,14 +127,7 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
       tmp = await this.collectionRef.doc(startAfter.id).get();
     }
 
-    const collectionSnapshot = startAfter 
-      ? await query
-        .startAfter(tmp)
-        .limit(limit)
-        .get()
-      : await query
-        .limit(limit)
-        .get();
+    const collectionSnapshot = startAfter ? await query.startAfter(tmp).limit(limit).get() : await query.limit(limit).get();
     if (collectionSnapshot.empty) {
       return null;
     }
@@ -129,30 +137,17 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
     return data;
   }
 
-  async getFirstValueCollectionDataByConditions(
-    conditions: { field: string; operator: WhereFilterOp; value: any; }[],
-  ): Promise<T> {
-
-    const data = await this.getCollectionDataByConditions(conditions);
-    if (data) {
-      return data.length > 0 ? data[0] : null;
-    }
-
-    return null;
-  }
-
   async getFirstValueCollectionDataByConditionsAndOrderBy(
-    conditions: { field: string; operator: WhereFilterOp; value: any; }[],
-    orderBy: { field: string; option?: 'asc' | 'desc'; }[],
+    conditions: { field: string; operator: WhereFilterOp; value: any }[],
+    orderBy: { field: string; option?: 'asc' | 'desc' }[],
   ): Promise<T> {
-
     const data = await this.getCollectionDataByConditionsAndOrderBy(conditions, orderBy);
     if (data) {
       return data.length > 0 ? data[0] : null;
     }
 
     return null;
-  }  
+  }
 
   async getDocumentData(documentId: string): Promise<T> {
     const documentRef = this.collectionRef.doc(documentId);
@@ -164,8 +159,6 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
     return documentSnapshot.data();
   }
 
-  
-
   // Create
   async createDocumentData(documentData: T): Promise<T> {
     const documentRef = this.collectionRef.doc();
@@ -174,14 +167,10 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
     return documentRef.set(document).then(() => document as T);
   }
 
-
-
   // Update & Upsert
   async updateDocumentData(documentId: string, documentData: T): Promise<T> {
     const documentRef = this.collectionRef.doc(documentId);
-    await documentRef
-      .update(documentData as UpdateData<T>)
-      .then(() => ({ id: documentId, ...documentData } as T));
+    await documentRef.update(documentData as UpdateData<T>).then(() => ({ id: documentId, ...documentData } as T));
     const result: T = { id: documentId, ...documentData };
     return result;
   }
@@ -192,18 +181,13 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
     return documentData as T;
   }
 
-
-
   // Delete
   async deleteDocumentData(documentId: string): Promise<void> {
     const documentRef = this.collectionRef.doc(documentId);
     await documentRef.delete();
   }
 
-  deleteDocumentByConditions(
-    conditions: { field: string; operator: WhereFilterOp; value: any; }[]
-  ): void {
-
+  deleteDocumentByConditions(conditions: { field: string; operator: WhereFilterOp; value: any }[]): void {
     let query: Query<DocumentData> = this.collectionRef;
     for (const condition of conditions) {
       query = query.where(condition.field, condition.operator, condition.value);
@@ -228,14 +212,11 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
       });
   }
 
-
-
   // Listen
   listenToChangesWithConditions(
-    conditions: { field: string; operator: WhereFilterOp; value: any; }[],
+    conditions: { field: string; operator: WhereFilterOp; value: any }[],
     callback: (changes: DocumentChange<T>[]) => Promise<void>,
   ): void {
-
     let query: Query<T> = this.collectionRef;
     if (conditions) {
       for (const condition of conditions) {
@@ -263,10 +244,9 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
   }
 
   listenToChangesWithConditionsOrigin(
-    conditions: { field: string; operator: WhereFilterOp; value: any; }[],
+    conditions: { field: string; operator: WhereFilterOp; value: any }[],
     callback: (changes: DocumentChangeOrigin<T>[]) => Promise<void>,
   ): Promise<void> {
-
     let query: Query<T> = this.collectionRef;
     if (conditions) {
       for (const condition of conditions) {
@@ -289,10 +269,7 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
     });
   }
 
-  listenToChangesOnCollection(
-    callback: (changes: DocumentChange<T>[]) => Promise<void>
-  ): void {
-    
+  listenToChangesOnCollection(callback: (changes: DocumentChange<T>[]) => Promise<void>): void {
     const query: Query<T> = this.collectionRef;
     let result: DocumentChange<T>[];
     query.onSnapshot(async s => {

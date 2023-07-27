@@ -18,6 +18,10 @@ export class EventBetListener implements OnApplicationBootstrap {
 
   async listenBetBear() {
     await this.factory.predictionContract.on('BetBear', async (sender: string, epoch: bigint, amount: bigint) => {
+      //Const
+      const betAmount = parseInt(amount.toString());
+
+      //Round
       const round = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
         {
           field: 'epoch',
@@ -26,19 +30,28 @@ export class EventBetListener implements OnApplicationBootstrap {
         },
       ]);
 
-      round.totalAmount += parseInt(amount.toString());
-      round.bearAmount += parseInt(amount.toString());
+      round.totalAmount += betAmount;
+      round.bearAmount += betAmount;
 
       await this.db.predictionRepo.upsertDocumentData(round.epoch.toString(), round);
+
+      //Preferences
+      const preferences = await this.db.preferenceRepo.getFirstValueCollectionData();
+      let winning_amount = betAmount;
+
+      if (preferences) {
+        winning_amount = (betAmount * (preferences.fee * 2)) / 10000;
+      }
+
       const bet: Bet = {
-        amount: parseInt(amount.toString()),
+        amount: betAmount,
         claimed: false,
         created_at: new Date().getTime(),
         delete: false,
         epoch: parseInt(epoch.toString()),
         position: 'DOWN',
         status: 'Waiting',
-        winning_amount: parseInt(amount.toString()) - (parseInt(amount.toString()) * (3 * 2)) / 100,
+        winning_amount,
         refund: 0,
         claimed_amount: 0,
         round,
@@ -51,6 +64,10 @@ export class EventBetListener implements OnApplicationBootstrap {
 
   async listenBetBull() {
     await this.factory.predictionContract.on('BetBull', async (sender: string, epoch: bigint, amount: bigint) => {
+      //Const
+      const betAmount = parseInt(amount.toString());
+
+      //Round
       const round = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
         {
           field: 'epoch',
@@ -59,20 +76,28 @@ export class EventBetListener implements OnApplicationBootstrap {
         },
       ]);
 
-      round.totalAmount += parseInt(amount.toString());
-      round.bullAmount += parseInt(amount.toString());
+      round.totalAmount += betAmount;
+      round.bullAmount += betAmount;
 
       await this.db.predictionRepo.upsertDocumentData(round.epoch.toString(), round);
 
+      //Preferences
+      const preferences = await this.db.preferenceRepo.getFirstValueCollectionData();
+      let winning_amount = betAmount;
+
+      if (preferences) {
+        winning_amount = betAmount - (betAmount * (preferences.fee * 2)) / 10000;
+      }
+
       const bet: Bet = {
-        amount: parseInt(amount.toString()),
+        amount: betAmount,
         claimed: false,
         created_at: new Date().getTime(),
         delete: false,
         epoch: parseInt(epoch.toString()),
         position: 'UP',
         status: 'Waiting',
-        winning_amount: parseInt(amount.toString()) - (parseInt(amount.toString()) * (3 * 2)) / 100,
+        winning_amount,
         refund: 0,
         claimed_amount: 0,
         round,
@@ -87,6 +112,11 @@ export class EventBetListener implements OnApplicationBootstrap {
     await this.factory.predictionContract.on(
       'CutBetUser',
       async (epoch: bigint, sender: string, betAmount: bigint, refundAmount: bigint, totalBetRound: bigint) => {
+        //Const
+        const amount = parseInt(betAmount.toString());
+        const refund = parseInt(refundAmount.toString());
+
+        //Bet
         const bet = await this.db.betRepo.getFirstValueCollectionDataByConditions([
           {
             field: 'epoch',
@@ -100,9 +130,14 @@ export class EventBetListener implements OnApplicationBootstrap {
           },
         ]);
 
-        bet.amount = parseInt(betAmount.toString());
-        bet.refund = parseInt(refundAmount.toString());
-        bet.winning_amount = parseInt(betAmount.toString()) - (parseInt(betAmount.toString()) * (3 * 2)) / 100;
+        //Preferences
+        const preferences = await this.db.preferenceRepo.getFirstValueCollectionData();
+
+        bet.amount = amount;
+        bet.refund = refund;
+        if (preferences) {
+          bet.winning_amount = amount - (amount * (preferences.fee * 2)) / 10000;
+        }
 
         await this.db.betRepo.upsertDocumentData(bet.id, bet);
       },

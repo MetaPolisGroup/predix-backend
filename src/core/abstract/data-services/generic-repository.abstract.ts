@@ -4,6 +4,8 @@ import { DocumentChange } from './snapshot/Query.abstract';
 export abstract class IGenericRepository<T> {
   abstract getCollectionData(): Promise<T[]>;
 
+  abstract getFirstValueCollectionData(): Promise<T>;
+
   abstract getCollectionDataByConditions(conditions: { field: string; operator: WhereFilterOp; value: any }[]): Promise<T[]>;
 
   abstract getFirstValueCollectionDataByConditions(conditions: { field: string; operator: WhereFilterOp; value: any }[]): Promise<T>;

@@ -13,6 +13,10 @@ const constant = {
   FIREBASE: {
     NAME: 'FirestoreDataservices',
     COLLECTIONS: collectionNames,
+    DOCUMENT: {
+      PREFERENCE: 'A3KoWYY5TAIkcb8E6gZF',
+      CHAINLINK: 'yxyBQpwTC7EyziO7NDia',
+    },
   },
   REVENUE_SHARE: 5,
   REVENUE_SHARE_USER: 0,

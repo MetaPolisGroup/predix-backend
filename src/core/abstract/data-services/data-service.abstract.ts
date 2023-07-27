@@ -8,6 +8,7 @@ import { Bet } from 'src/core/entity/bet.entity';
 import { Chainlink } from 'src/core/entity/chainlink.entity';
 import { Leaderboard } from 'src/core/entity/leaderboard.entity';
 import { Chart } from 'src/core/entity/chart.entity';
+import { Preferences } from 'src/core/entity/preferences.entity';
 
 export abstract class IDataServices {
   // Firestore
@@ -17,6 +18,8 @@ export abstract class IDataServices {
   abstract userRepo: IGenericRepository<User>;
 
   abstract betRepo: IGenericRepository<Bet>;
+
+  abstract preferenceRepo: IGenericRepository<Preferences>;
 
   abstract chartRepo: IGenericRepository<Chart>;
 

@@ -7,4 +7,5 @@ export type collectionsName =
   | 'bets'
   | 'chainlink'
   | 'charts'
+  | 'preferences'
   | 'leaderboard';
