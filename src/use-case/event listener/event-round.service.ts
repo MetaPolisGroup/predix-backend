@@ -67,7 +67,7 @@ export class EventRoundListener implements OnApplicationBootstrap {
         {
           field: 'epoch',
           operator: '==',
-          value: epoch.toString(),
+          value: parseInt(epoch.toString()),
         },
       ]);
 
@@ -104,7 +104,7 @@ export class EventRoundListener implements OnApplicationBootstrap {
         {
           field: 'epoch',
           operator: '==',
-          value: epoch.toString(),
+          value: parseInt(epoch.toString()),
         },
       ]);
 

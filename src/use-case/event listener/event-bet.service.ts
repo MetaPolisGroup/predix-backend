@@ -7,8 +7,8 @@ import { Bet } from 'src/core/entity/bet.entity';
 @Injectable()
 export class EventBetListener implements OnApplicationBootstrap {
   async onApplicationBootstrap() {
+    await this.listenBetBear();
     if (process.env.CONSTANT_ENABLE === 'True') {
-      await this.listenBetBear();
       await this.listenBetBull();
       await this.listenCutBetUser();
     }
@@ -22,7 +22,7 @@ export class EventBetListener implements OnApplicationBootstrap {
         {
           field: 'epoch',
           operator: '==',
-          value: epoch.toString(),
+          value: parseInt(epoch.toString()),
         },
       ]);
 
@@ -55,7 +55,7 @@ export class EventBetListener implements OnApplicationBootstrap {
         {
           field: 'epoch',
           operator: '==',
-          value: epoch.toString(),
+          value: parseInt(epoch.toString()),
         },
       ]);
 
@@ -91,7 +91,7 @@ export class EventBetListener implements OnApplicationBootstrap {
           {
             field: 'epoch',
             operator: '==',
-            value: epoch.toString(),
+            value: parseInt(epoch.toString()),
           },
           {
             field: 'user_address',
