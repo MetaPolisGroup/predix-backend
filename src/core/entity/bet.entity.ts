@@ -3,7 +3,7 @@ import { Prediction } from './prediction.enity';
 export class Bet {
   id?: string;
 
-  epoch: string;
+  epoch: number;
 
   position: Position;
 

@@ -24,7 +24,7 @@ export class EventClaimListener implements OnApplicationBootstrap {
         {
           field: 'epoch',
           operator: '==',
-          value: epoch.toString(),
+          value: parseInt(epoch.toString()),
         },
         {
           field: 'user_address',
