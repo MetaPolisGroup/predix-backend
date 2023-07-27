@@ -35,7 +35,7 @@ export class UserAuthenService {
       created_at: new Date().getTime(),
       updated_at: new Date().getTime(),
       nickname: dto.nickname ?? dto.user_address,
-      ref: `${process.env.SERVER}/user/create/?id=${dto.user_address}`,
+      ref: `${process.env.SERVER}/?id=${dto.user_address}`,
     };
     return this.db.userRepo.upsertDocumentData(user.id, user);
   }
