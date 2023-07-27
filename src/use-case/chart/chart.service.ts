@@ -17,7 +17,7 @@ export class ChartService implements OnApplicationBootstrap {
 
   @Cron('*/20 * * * * *')
   async updatePriceFromChainlink() {
-    if (constant.ENABLE) {
+    if (process.env.CONSTANT_ENABLE === 'True') {
       const p = new ethers.JsonRpcProvider(providerRPC['bsc'].rpc, {
         chainId: providerRPC['bsc'].chainId,
         name: providerRPC['bsc'].name,

@@ -13,7 +13,7 @@ export class EventRoundListener implements OnApplicationBootstrap {
   private Logger: Logger;
 
   async onApplicationBootstrap() {
-    if (constant.ENABLE) {
+    if (process.env.CONSTANT_ENABLE === 'True') {
       await this.listenRoundStart();
       await this.listenRoundLock();
       await this.listenRoundEnd();

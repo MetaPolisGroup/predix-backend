@@ -7,7 +7,7 @@ import { Bet } from 'src/core/entity/bet.entity';
 @Injectable()
 export class EventBetListener implements OnApplicationBootstrap {
   async onApplicationBootstrap() {
-    if (constant.ENABLE) {
+    if (process.env.CONSTANT_ENABLE === 'True') {
       await this.listenBetBear();
       await this.listenBetBull();
       await this.listenCutBetUser();

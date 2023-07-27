@@ -15,7 +15,7 @@ export class PredictionService implements OnApplicationBootstrap {
   private logger: Logger;
 
   async onApplicationBootstrap() {
-    if (constant.ENABLE) {
+    if (process.env.CONSTANT_ENABLE === 'True') {
       await this.setCronjob();
     }
   }
