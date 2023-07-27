@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { ethers } from 'ethers';
@@ -10,6 +10,8 @@ import { IDataServices } from 'src/core/abstract/data-services/data-service.abst
 
 @Injectable()
 export class ChainlinkService {
+  private logger: Logger;
+
   constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) {}
 
   @Cron('*/5 * * * * *')
@@ -21,12 +23,19 @@ export class ChainlinkService {
       });
       const aggregatorContract = new ethers.Contract(constant.ADDRESS.AGGREGATOR, constant.ABI.AGGREGATOR, p);
 
-      const d = await aggregatorContract.latestRoundData();
-
-      await this.db.chainlinkRepo.upsertDocumentData('yxyBQpwTC7EyziO7NDia', {
-        price: d[1].toString(),
-        updated_at: new Date().getTime(),
-      });
+      if (aggregatorContract) {
+        const d = await aggregatorContract.latestRoundData();
+        if (d) {
+          await this.db.chainlinkRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.CHAINLINK, {
+            price: d[1].toString(),
+            updated_at: new Date().getTime(),
+          });
+        } else {
+          this.logger.warn('No chainlink data !');
+        }
+      } else {
+        this.logger.error('Failed to create Aggregator contract !');
+      }
     }
   }
 }

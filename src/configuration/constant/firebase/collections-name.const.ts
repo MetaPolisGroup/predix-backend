@@ -8,6 +8,7 @@ export const collectionNames = {
   CASH_HISTORIES: 'cash_histories' as collectionsName,
   BETS: 'bets' as collectionsName,
   CHAINLINKS: 'chainlink' as collectionsName,
+  PREFERENCES: 'preferences' as collectionsName,
   LEADERBOARD: 'leaderboard' as collectionsName,
   CHARTS: 'charts' as collectionsName,
 };

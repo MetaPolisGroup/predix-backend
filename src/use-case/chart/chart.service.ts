@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { ethers } from 'ethers';
 import constant from 'src/configuration';
@@ -11,6 +11,8 @@ import { Chart } from 'src/core/entity/chart.entity';
 
 @Injectable()
 export class ChartService implements OnApplicationBootstrap {
+  private logger: Logger;
+
   async onApplicationBootstrap() {}
 
   constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) {}
@@ -24,16 +26,21 @@ export class ChartService implements OnApplicationBootstrap {
       });
       const aggregatorContract = new ethers.Contract(constant.ADDRESS.AGGREGATOR, constant.ABI.AGGREGATOR, p);
 
-      const d = await aggregatorContract.latestRoundData();
+      if (aggregatorContract) {
+        const d = await aggregatorContract.latestRoundData();
+        if (d) {
+          const chart: Chart = {
+            created_at: parseInt(d[2].toString()),
+            delete: false,
+            price: parseInt(d[1].toString()),
+          };
 
-      if (d) {
-        const chart: Chart = {
-          created_at: parseInt(d[2].toString()),
-          delete: false,
-          price: parseInt(d[1].toString()),
-        };
-
-        await this.db.chartRepo.createDocumentData(chart);
+          await this.db.chartRepo.createDocumentData(chart);
+        } else {
+          this.logger.warn('No chainlink data !');
+        }
+      } else {
+        this.logger.error('Failed to create Aggregator contract !');
       }
     }
   }

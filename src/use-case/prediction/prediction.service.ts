@@ -58,16 +58,21 @@ export class PredictionService implements OnApplicationBootstrap {
       ],
     );
     const now = parseInt((new Date().getTime() / 1000).toString());
+    const preferences = await this.db.preferenceRepo.getFirstValueCollectionData();
 
-    if (availableRound && !this.cronJobs[availableRound.epoch]) {
-      if (availableRound.lockTimestamp + 999 < now) {
+    if (!preferences) {
+      this.logger.error(`Preferences not found when set cronjob`);
+    }
+
+    if (availableRound && !this.cronJobs[availableRound.epoch] && preferences) {
+      if (availableRound.lockTimestamp + preferences.buffer_seconds < now) {
         this.logger.error('Round exceed buffer time !');
         await this.setCronjob();
       } else {
-        if (availableRound.startTimestamp + 300 < now) {
+        if (availableRound.startTimestamp + preferences.interval_seconds < now) {
           await this.executeRound();
         } else {
-          const date = new Date((availableRound.startTimestamp + 300) * 1000);
+          const date = new Date((availableRound.startTimestamp + preferences.interval_seconds) * 1000);
           this.createCronJob(date, availableRound.epoch, async () => {
             await this.executeRound();
           });
@@ -89,22 +94,24 @@ export class PredictionService implements OnApplicationBootstrap {
 
     const predictionContract = new ethers.Contract(constant.ADDRESS.PREDICTION, constant.ABI.PREDICTION, wallet);
 
-    const gasLimit = await predictionContract.executeRound.estimateGas(chainLinkPrice[0], chainLinkPrice[1]);
-    const gasPrice = await constant.PROVIDER.getFeeData();
+    if (chainLinkPrice && predictionContract) {
+      const gasLimit = await predictionContract.executeRound.estimateGas(chainLinkPrice[0], chainLinkPrice[1]);
+      const gasPrice = await constant.PROVIDER.getFeeData();
 
-    const executeRoundTx = await predictionContract.executeRound(chainLinkPrice[0], chainLinkPrice[1], {
-      gasLimit,
-      gasPrice: gasPrice.gasPrice,
-      maxFeePerGas: gasPrice.maxFeePerGas,
-      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
-    });
+      const executeRoundTx = await predictionContract.executeRound(chainLinkPrice[0], chainLinkPrice[1], {
+        gasLimit,
+        gasPrice: gasPrice.gasPrice,
+        maxFeePerGas: gasPrice.maxFeePerGas,
+        maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
+      });
 
-    const executeRound = await constant.PROVIDER.waitForTransaction(executeRoundTx.hash as string);
-    if (executeRound.status === 1) {
-      this.logger.log(`New round execute successfully!`);
-    } else {
-      await this.executeRound();
-      this.logger.log(`New round executed failed! retry...`);
+      const executeRound = await constant.PROVIDER.waitForTransaction(executeRoundTx.hash as string);
+      if (executeRound.status === 1) {
+        this.logger.log(`New round execute successfully!`);
+      } else {
+        this.logger.log(`New round executed failed! retry...`);
+        await this.executeRound();
+      }
     }
   }
 }
