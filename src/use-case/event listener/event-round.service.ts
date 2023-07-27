@@ -32,7 +32,7 @@ export class EventRoundListener implements OnApplicationBootstrap {
     await this.factory.predictionContract.on('StartRound', async (epoch: bigint) => {
       const now = Math.round(new Date().getTime() / 1000);
       const round: Prediction = {
-        epoch: epoch.toString(),
+        epoch: parseInt(epoch.toString()),
         closeOracleId: 0,
         lockOracleId: 0,
         bearAmount: 0,

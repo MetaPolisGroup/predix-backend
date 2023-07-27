@@ -24,7 +24,7 @@ export class PredictionService implements OnApplicationBootstrap {
     this.logger = new Logger(PredictionService.name);
   }
 
-  createCronJob(date: Date, id: string, cb?: () => Promise<void>): void {
+  createCronJob(date: Date, id: number, cb?: () => Promise<void>): void {
     const cronjob = new CronJob(date, async function () {
       await cb?.();
     });
@@ -42,13 +42,21 @@ export class PredictionService implements OnApplicationBootstrap {
   }
 
   async setCronjob() {
-    const availableRound = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
-      {
-        field: 'locked',
-        operator: '==',
-        value: false,
-      },
-    ]);
+    const availableRound = await this.db.predictionRepo.getFirstValueCollectionDataByConditionsAndOrderBy(
+      [
+        {
+          field: 'locked',
+          operator: '==',
+          value: false,
+        },
+      ],
+      [
+        {
+          field: 'epoch',
+          option: 'desc',
+        },
+      ],
+    );
     const now = parseInt((new Date().getTime() / 1000).toString());
 
     if (availableRound && !this.cronJobs[availableRound.epoch]) {

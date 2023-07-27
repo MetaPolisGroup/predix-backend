@@ -1,5 +1,5 @@
 export class Prediction {
-  epoch: string;
+  epoch: number;
 
   startTimestamp: number;
 

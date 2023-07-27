@@ -29,7 +29,7 @@ export class EventBetListener implements OnApplicationBootstrap {
       round.totalAmount += parseInt(amount.toString());
       round.bearAmount += parseInt(amount.toString());
 
-      await this.db.predictionRepo.upsertDocumentData(round.epoch, round);
+      await this.db.predictionRepo.upsertDocumentData(round.epoch.toString(), round);
       const bet: Bet = {
         amount: parseInt(amount.toString()),
         claimed: false,
@@ -38,7 +38,7 @@ export class EventBetListener implements OnApplicationBootstrap {
         epoch: epoch.toString(),
         position: 'DOWN',
         status: 'Waiting',
-        winning_amount: parseInt(amount.toString()) - (round.totalAmount * 5) / 100,
+        winning_amount: parseInt(amount.toString()) - (parseInt(amount.toString()) * (3 * 2)) / 100,
         refund: 0,
         claimed_amount: 0,
         round,
@@ -62,7 +62,7 @@ export class EventBetListener implements OnApplicationBootstrap {
       round.totalAmount += parseInt(amount.toString());
       round.bullAmount += parseInt(amount.toString());
 
-      await this.db.predictionRepo.upsertDocumentData(round.epoch, round);
+      await this.db.predictionRepo.upsertDocumentData(round.epoch.toString(), round);
 
       const bet: Bet = {
         amount: parseInt(amount.toString()),
@@ -72,7 +72,7 @@ export class EventBetListener implements OnApplicationBootstrap {
         epoch: epoch.toString(),
         position: 'UP',
         status: 'Waiting',
-        winning_amount: parseInt(amount.toString()) - (round.totalAmount * 5) / 100,
+        winning_amount: parseInt(amount.toString()) - (parseInt(amount.toString()) * (3 * 2)) / 100,
         refund: 0,
         claimed_amount: 0,
         round,
@@ -99,9 +99,10 @@ export class EventBetListener implements OnApplicationBootstrap {
             value: sender,
           },
         ]);
+
         bet.amount = parseInt(betAmount.toString());
         bet.refund = parseInt(refundAmount.toString());
-        bet.winning_amount = parseInt(betAmount.toString()) - (parseInt(totalBetRound.toString()) * 5) / 100;
+        bet.winning_amount = parseInt(betAmount.toString()) - (parseInt(betAmount.toString()) * (3 * 2)) / 100;
 
         await this.db.betRepo.upsertDocumentData(bet.id, bet);
       },

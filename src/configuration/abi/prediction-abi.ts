@@ -273,7 +273,14 @@ const predictionAbi = `[
 				"internalType": "uint256",
 				"name": "bufferSeconds",
 				"type": "uint256"
-			},
+			}
+		],
+		"name": "NewBufferSeconds",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
 			{
 				"indexed": false,
 				"internalType": "uint256",
@@ -281,7 +288,7 @@ const predictionAbi = `[
 				"type": "uint256"
 			}
 		],
-		"name": "NewBufferAndIntervalSeconds",
+		"name": "NewIntervalSeconds",
 		"type": "event"
 	},
 	{
@@ -1083,14 +1090,22 @@ const predictionAbi = `[
 				"internalType": "uint256",
 				"name": "_bufferSeconds",
 				"type": "uint256"
-			},
+			}
+		],
+		"name": "setBufferSeconds",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
 			{
 				"internalType": "uint256",
 				"name": "_intervalSeconds",
 				"type": "uint256"
 			}
 		],
-		"name": "setBufferAndIntervalSeconds",
+		"name": "setIntervalSeconds",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
