@@ -7,6 +7,7 @@ import { IDataServices } from 'src/core/abstract/data-services/data-service.abst
 import { Position } from 'src/core/entity/bet.entity';
 import { Prediction } from 'src/core/entity/prediction.enity';
 import { PredictionService } from '../prediction/prediction.service';
+import { UserHandleMoney } from '../user/user-handle-money.service';
 
 @Injectable()
 export class EventRoundListener implements OnApplicationBootstrap {
@@ -26,6 +27,7 @@ export class EventRoundListener implements OnApplicationBootstrap {
     private readonly prediction: PredictionService,
     private readonly factory: ContractFactoryAbstract,
     private readonly db: IDataServices,
+    private readonly handleMoney: UserHandleMoney,
   ) {}
 
   async listenRoundStart() {
@@ -137,6 +139,8 @@ export class EventRoundListener implements OnApplicationBootstrap {
             round: round ? round : null,
             status: calculateResult() ? (bet.position === calculateResult() ? 'Win' : 'Lose') : 'Refund',
           });
+
+          await this.handleMoney.handlePoint(bet.amount, bet.user_address);
         }
       }
       await this.prediction.setCronjob();

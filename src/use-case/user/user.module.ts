@@ -8,6 +8,6 @@ import { UserHandleMoney } from './user-handle-money.service';
   controllers: [UserController],
   providers: [UserAuthenService, UserService, UserHandleMoney],
   imports: [],
-  exports: [UserAuthenService],
+  exports: [UserAuthenService, UserHandleMoney],
 })
 export class UserModule {}
