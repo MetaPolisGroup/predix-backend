@@ -10,7 +10,7 @@ export class UserController {
   constructor(private readonly userAuthService: UserAuthenService, private readonly userService: UserService) {}
 
   @Post('/create')
-  async createByRef(@Body() dto: CreateUserDto, @Query('id') id: string, @Req() req: Request) {
-    return await this.userAuthService.create(dto, req, id);
+  async createByRef(@Body() dto: CreateUserDto, @Req() req: Request) {
+    return await this.userAuthService.create(dto, req);
   }
 }

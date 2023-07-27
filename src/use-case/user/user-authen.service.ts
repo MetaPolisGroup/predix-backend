@@ -17,7 +17,7 @@ export class UserAuthenService {
       return checkUser;
     }
     if (recommend_id) {
-      user_tree_belong = await this.partnerTree(recommend_id);
+      user_tree_belong = await this.partnerTree(dto.recommend_id);
     }
     const user: User = {
       id: dto.user_address,

@@ -5,7 +5,11 @@ export class CreateUserDto {
   @IsString()
   user_address: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   nickname: string;
+
+  @IsOptional()
+  @IsString()
+  recommend_id: string;
 }
