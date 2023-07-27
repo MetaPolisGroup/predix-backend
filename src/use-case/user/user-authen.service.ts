@@ -10,13 +10,13 @@ import { User } from 'src/core/entity/user.enity';
 export class UserAuthenService {
   constructor(private readonly db: IDataServices) {}
 
-  async create(dto: CreateUserDto, req: Request, recommend_id?: string): Promise<User> {
+  async create(dto: CreateUserDto, req: Request): Promise<User> {
     let user_tree_belong = [];
     const checkUser = await this.db.userRepo.getDocumentData(dto.user_address);
     if (checkUser) {
       return checkUser;
     }
-    if (recommend_id) {
+    if (dto.recommend_id) {
       user_tree_belong = await this.partnerTree(dto.recommend_id);
     }
     const user: User = {
