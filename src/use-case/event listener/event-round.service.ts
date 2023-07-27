@@ -108,10 +108,6 @@ export class EventRoundListener implements OnApplicationBootstrap {
         },
       ]);
 
-      if (!bets) {
-        this.Logger.error(`Bets of round ${epoch.toString()} not found, can't update result!`);
-      }
-
       const round = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
         {
           field: 'epoch',
