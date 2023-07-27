@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { ethers } from 'ethers';
 import constant from 'src/configuration';
@@ -79,6 +80,11 @@ export class PredictionService implements OnApplicationBootstrap {
         }
       }
     }
+  }
+
+  @Cron('*/30 * * * * *')
+  async setCronjobAutomatically() {
+    await this.setCronjob();
   }
 
   async executeRound() {
