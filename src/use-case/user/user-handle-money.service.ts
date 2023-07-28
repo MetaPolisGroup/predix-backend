@@ -11,7 +11,7 @@ export class UserHandleMoney {
     let total_revenue_share = 3;
     let revenue_share = 0;
     if (!user) {
-      throw new BadRequestException('User not found');
+      return true;
     }
     for (let i = 0; i < user.user_tree_belong.length; i++) {
       const recommend_id = user.user_tree_belong[i];
