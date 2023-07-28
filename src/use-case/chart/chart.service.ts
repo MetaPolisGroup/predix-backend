@@ -17,7 +17,7 @@ export class ChartService implements OnApplicationBootstrap {
 
   constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) {}
 
-  @Cron('*/20 * * * * *')
+  @Cron('*/5 * * * * *')
   async updatePriceFromChainlink() {
     if (process.env.CONSTANT_ENABLE === 'True') {
       const p = new ethers.JsonRpcProvider(providerRPC['bsc'].rpc, {
