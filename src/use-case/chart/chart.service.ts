@@ -30,8 +30,8 @@ export class ChartService implements OnApplicationBootstrap {
         const d = await aggregatorContract.latestRoundData();
         if (d) {
           const chart: Chart = {
-            // created_at: parseInt(d[2].toString()),
-            created_at: new Date().getTime() / 1000,
+            created_at: parseInt(d[2].toString()),
+            // created_at: new Date().getTime() / 1000,
             delete: false,
             price: parseInt(d[1].toString()),
           };
