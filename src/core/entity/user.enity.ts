@@ -13,6 +13,8 @@ export class User {
 
   user_tree_belong?: string[];
 
+  user_tree_commissions?: string[];
+
   created_at: number;
 
   updated_at: number;
