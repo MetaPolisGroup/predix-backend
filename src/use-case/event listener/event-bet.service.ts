@@ -130,13 +130,30 @@ export class EventBetListener implements OnApplicationBootstrap {
           },
         ]);
 
+        if (!bet) {
+          return;
+        }
+
         //Preferences
         const preferences = await this.db.preferenceRepo.getFirstValueCollectionData();
 
         bet.amount = amount;
         bet.refund = refund;
-        if (preferences) {
+
+        // Calculate winning amount
+        if (amount > 0 && preferences) {
           bet.winning_amount = amount - (amount * (preferences.fee * 2)) / 10000;
+        }
+
+        // Refund bet to use if bet amount being cut all
+        else if (amount == 0) {
+          bet.winning_amount = 0;
+          bet.status === 'Refund';
+        }
+
+        // Set winning amount = amount bet if no preferences
+        else if (!preferences) {
+          bet.winning_amount = amount;
         }
 
         await this.db.betRepo.upsertDocumentData(bet.id, bet);
