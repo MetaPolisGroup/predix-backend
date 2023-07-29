@@ -62,7 +62,7 @@ export class PredictionService implements OnApplicationBootstrap {
     const now = parseInt((new Date().getTime() / 1000).toString());
     const preferences = await this.db.preferenceRepo.getFirstValueCollectionData();
 
-    if (availableRound && !this.cronJobs[availableRound.epoch] && preferences) {
+    if (availableRound && !this.cronJobs[availableRound?.epoch] && preferences) {
       // Log error when exceed buffer time
       if (availableRound.lockTimestamp + preferences.buffer_seconds < now) {
         this.logger.error('Round exceed buffer time !');
