@@ -36,7 +36,7 @@ export class ChartService implements OnApplicationBootstrap {
             price: parseInt(d[1].toString()),
           };
 
-          await this.db.chartRepo.createDocumentData(chart);
+          await this.db.chartRepo.upsertDocumentData(parseInt(d[2].toString()).toString(), chart);
         } else {
           this.logger.warn('No chainlink data !');
         }
