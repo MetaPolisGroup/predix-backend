@@ -38,7 +38,7 @@ export class UserAuthenService {
       created_at: new Date().getTime(),
       updated_at: new Date().getTime(),
       nickname: dto.nickname ?? dto.user_address,
-      ref: `${dto.user_address}`,
+      ref: `${dto.recommend_id}`,
     };
     return this.db.userRepo.upsertDocumentData(user.id, user);
   }
