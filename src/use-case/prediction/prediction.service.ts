@@ -91,7 +91,7 @@ export class PredictionService implements OnApplicationBootstrap {
       this.logger.error(`Preferences not found when set cronjob`);
     }
 
-    if (this.cronJobs[availableRound.epoch]) {
+    if (this.cronJobs[availableRound?.epoch]) {
       this.logger.log(`Cronjob for round ${availableRound.epoch} have already set !`);
     }
   }
