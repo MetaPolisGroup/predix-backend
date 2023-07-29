@@ -1,14 +1,20 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Req } from '@nestjs/common';
 import { AppService } from './app.service';
 import { IDataServices } from './core/abstract/data-services/data-service.abstract';
 import { ethers } from 'ethers';
 import constant from './configuration';
 import { User } from './core/entity/user.enity';
+import { UserAuthenService } from './use-case/user/user-authen.service';
+import { Request } from 'express';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService, private readonly db: IDataServices) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly db: IDataServices,
+    private readonly userService: UserAuthenService,
+  ) {}
 
   @Get()
   async getHello() {
@@ -24,7 +30,7 @@ export class AppController {
   @Get('fix-data')
   async testQueryFirestore() {
     const me: User = await this.db.userRepo.getDocumentData('0xf3284BBF9Ebc7C05d2750FbF1232903cA33BF22C');
-    
+
     const users = await this.db.userRepo.getCollectionDataByConditions([
       { field: 'user_tree_commissions', operator: 'array-contains', value: me.id },
     ]);
@@ -42,5 +48,14 @@ export class AppController {
     }
 
     return false;
+  }
+
+  @Get('/example-user')
+  async exampleUser(@Req() req: Request) {
+    const users = await this.db.userRepo.getCollectionData();
+    for (let i = 0; i < 1000; i++) {
+      const user = users[Math.floor(Math.random() * users.length)];
+      await this.userService.create({ user_address: `test${i}`, nickname: `test${i}`, recommend_id: user.id }, req);
+    }
   }
 }
