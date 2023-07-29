@@ -156,6 +156,7 @@ export class EventBetListener implements OnApplicationBootstrap {
           bet.winning_amount = amount;
         }
 
+        // Log
         await this.db.betRepo.upsertDocumentData(bet.id, bet);
       },
     );

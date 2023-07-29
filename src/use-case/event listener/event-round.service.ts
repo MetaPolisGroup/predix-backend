@@ -32,39 +32,39 @@ export class EventRoundListener implements OnApplicationBootstrap {
 
   async listenRoundStart() {
     await this.factory.predictionContract.on('StartRound', async (epoch: bigint) => {
+      // Consts
+      const preferences = await this.db.preferenceRepo.getFirstValueCollectionData();
       const now = Math.round(new Date().getTime() / 1000);
-      const round: Prediction = {
-        epoch: parseInt(epoch.toString()),
-        closeOracleId: 0,
-        lockOracleId: 0,
-        bearAmount: 0,
-        bullAmount: 0,
-        totalAmount: 0,
-        closePrice: 0,
-        lockPrice: 0,
-        startTimestamp: now,
-        closeTimestamp: now + 300 * 2,
-        lockTimestamp: now + 300,
-        closed: false,
-        locked: false,
-        delele: false,
-      };
 
-      await this.db.predictionRepo.upsertDocumentData(epoch.toString(), round);
+      // Update round
+      if (preferences) {
+        const round: Prediction = {
+          epoch: parseInt(epoch.toString()),
+          closeOracleId: 0,
+          lockOracleId: 0,
+          bearAmount: 0,
+          bullAmount: 0,
+          totalAmount: 0,
+          closePrice: 0,
+          lockPrice: 0,
+          startTimestamp: now,
+          closeTimestamp: now + preferences.interval_seconds * 2,
+          lockTimestamp: now + preferences.interval_seconds,
+          closed: false,
+          locked: false,
+          cancel: false,
+          delele: false,
+        };
+        await this.db.predictionRepo.upsertDocumentData(epoch.toString(), round);
+      }
 
+      // Log
       this.Logger.log(`Round ${epoch.toString()} has started !`);
     });
   }
 
   async listenRoundLock() {
     await this.factory.predictionContract.on('LockRound', async (epoch: bigint, roundId: bigint, price: bigint) => {
-      await this.db.predictionRepo.upsertDocumentData(epoch.toString(), {
-        lockOracleId: roundId,
-        lockPrice: parseInt(price.toString()),
-        lockTimestamp: Math.round(new Date().getTime() / 1000),
-        locked: true,
-      });
-
       const round = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
         {
           field: 'epoch',
@@ -73,6 +73,17 @@ export class EventRoundListener implements OnApplicationBootstrap {
         },
       ]);
 
+      // Update round
+      if (round) {
+        round.lockOracleId = parseInt(roundId.toString());
+        round.lockPrice = parseInt(price.toString());
+        round.lockTimestamp = Math.round(new Date().getTime() / 1000);
+        round.locked = true;
+
+        await this.db.predictionRepo.upsertDocumentData(round.epoch.toString(), round);
+      }
+
+      // Update bets
       const bets = await this.db.betRepo.getCollectionDataByConditions([
         {
           field: 'epoch',
@@ -81,35 +92,27 @@ export class EventRoundListener implements OnApplicationBootstrap {
         },
       ]);
 
+      // Change bets's status to live
       if (bets) {
         for (const bet of bets) {
           await this.db.betRepo.upsertDocumentData(bet.id, {
-            round,
+            round: round ? round : null,
             status: 'Live',
           });
         }
       }
+
+      // Log
       this.Logger.log(`Round ${epoch.toString()} has locked !`);
+
+      if (!round) {
+        this.Logger.error(`Round ${epoch.toString()} not found from DB when locked on chain !`);
+      }
     });
   }
 
   async listenRoundEnd() {
     await this.factory.predictionContract.on('EndRound', async (epoch: bigint, roundId: bigint, price: bigint) => {
-      await this.db.predictionRepo.upsertDocumentData(epoch.toString(), {
-        closeOracleId: roundId,
-        closePrice: parseInt(price.toString()),
-        closeTimestamp: Math.round(new Date().getTime() / 1000),
-        closed: true,
-      });
-
-      const bets = await this.db.betRepo.getCollectionDataByConditions([
-        {
-          field: 'epoch',
-          operator: '==',
-          value: parseInt(epoch.toString()),
-        },
-      ]);
-
       const round = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
         {
           field: 'epoch',
@@ -118,9 +121,27 @@ export class EventRoundListener implements OnApplicationBootstrap {
         },
       ]);
 
-      if (!round) {
-        this.Logger.error(`Round ${epoch.toString()} not found, can't update bet result!`);
+      // Update round
+      if (round) {
+        round.closeOracleId = parseInt(roundId.toString());
+        round.closePrice = parseInt(price.toString());
+        round.closeTimestamp = Math.round(new Date().getTime() / 1000);
+        round.closed = true;
+        round.cancel = round.totalAmount > 0 ? false : true;
+
+        await this.db.predictionRepo.upsertDocumentData(round.epoch.toString(), round);
+      } else {
+        this.Logger.error(`Round ${epoch.toString()} not found from DB when end on chain !`);
       }
+
+      //Update bets
+      const bets = await this.db.betRepo.getCollectionDataByConditions([
+        {
+          field: 'epoch',
+          operator: '==',
+          value: parseInt(epoch.toString()),
+        },
+      ]);
 
       const calculateResult = (): Position => {
         const r = round.closePrice - round.lockPrice;
@@ -133,18 +154,28 @@ export class EventRoundListener implements OnApplicationBootstrap {
         }
       };
 
+      // Update bet status & round
       if (bets) {
         for (const bet of bets) {
-          await this.db.betRepo.upsertDocumentData(bet.id, {
-            round: round ? round : null,
-            status: calculateResult() ? (bet.position === calculateResult() ? 'Win' : 'Lose') : 'Refund',
-          });
+          bet.round = round ? round : null;
+          bet.status = 'Refund';
 
+          // Calculate result if bet amount > 0
+          if (round && bet.amount > 0) {
+            bet.status = calculateResult() ? (bet.position === calculateResult() ? 'Win' : 'Lose') : 'Refund';
+          }
+
+          await this.db.betRepo.upsertDocumentData(bet.id, bet);
+
+          // Handle commission
           await this.handleMoney.handlePoint(bet.amount, bet.user_address);
         }
       }
+
+      // Set cronjob to execute round
       await this.prediction.setCronjob();
 
+      // Log
       this.Logger.log(`Round ${epoch.toString()} has ended !`);
     });
   }

@@ -13,6 +13,8 @@ export class Prediction {
 
   lockPrice: number;
 
+  cancel: boolean;
+
   closePrice: number;
 
   totalAmount: number;

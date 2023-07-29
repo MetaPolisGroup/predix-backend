@@ -43,6 +43,7 @@ export class PredictionService implements OnApplicationBootstrap {
   }
 
   async setCronjob() {
+    // Consts
     const availableRound = await this.db.predictionRepo.getFirstValueCollectionDataByConditionsAndOrderBy(
       [
         {
@@ -61,22 +62,22 @@ export class PredictionService implements OnApplicationBootstrap {
     const now = parseInt((new Date().getTime() / 1000).toString());
     const preferences = await this.db.preferenceRepo.getFirstValueCollectionData();
 
-    if (!preferences) {
-      this.logger.error(`Preferences not found when set cronjob`);
-    }
-
-    if (this.cronJobs[availableRound.epoch]) {
-      this.logger.log(`Cronjob for round ${availableRound.epoch} have already set !`);
-    }
-
     if (availableRound && !this.cronJobs[availableRound.epoch] && preferences) {
+      // Log error when exceed buffer time
       if (availableRound.lockTimestamp + preferences.buffer_seconds < now) {
         this.logger.error('Round exceed buffer time !');
         await this.setCronjob();
-      } else {
+      }
+
+      //
+      else {
+        // Execute round immediately if lock time is up
         if (availableRound.startTimestamp + preferences.interval_seconds < now) {
           await this.executeRound();
-        } else {
+        }
+
+        // Set cronjob to execute round  after interval time
+        else {
           const date = new Date((availableRound.startTimestamp + preferences.interval_seconds) * 1000);
           this.createCronJob(date, availableRound.epoch, async () => {
             await this.executeRound();
@@ -84,9 +85,18 @@ export class PredictionService implements OnApplicationBootstrap {
         }
       }
     }
+
+    // Log
+    if (!preferences) {
+      this.logger.error(`Preferences not found when set cronjob`);
+    }
+
+    if (this.cronJobs[availableRound.epoch]) {
+      this.logger.log(`Cronjob for round ${availableRound.epoch} have already set !`);
+    }
   }
 
-  @Cron('*/30 * * * * *')
+  @Cron('* */1 * * * *')
   async setCronjobAutomatically() {
     if (process.env.CONSTANT_ENABLE === 'True') {
       await this.setCronjob();
@@ -94,6 +104,7 @@ export class PredictionService implements OnApplicationBootstrap {
   }
 
   async executeRound() {
+    // Consts
     const p = new ethers.JsonRpcProvider(providerRPC['bsc'].rpc, {
       chainId: providerRPC['bsc'].chainId,
       name: providerRPC['bsc'].name,
