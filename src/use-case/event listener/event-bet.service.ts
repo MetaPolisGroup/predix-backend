@@ -148,7 +148,6 @@ export class EventBetListener implements OnApplicationBootstrap {
         // Refund bet to use if bet amount being cut all
         else if (amount == 0) {
           bet.winning_amount = 0;
-          bet.status === 'Refund';
         }
 
         // Set winning amount = amount bet if no preferences
