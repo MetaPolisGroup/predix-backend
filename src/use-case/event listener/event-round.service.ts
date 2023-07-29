@@ -162,7 +162,7 @@ export class EventRoundListener implements OnApplicationBootstrap {
 
           // Calculate result if bet amount > 0
           if (round && bet.amount > 0) {
-            bet.status = calculateResult() ? (bet.position === calculateResult() ? 'Win' : 'Lose') : 'Refund';
+            bet.status = calculateResult() ? (bet.position === calculateResult() ? 'Win' : 'Lose') : 'Lose';
           }
 
           await this.db.betRepo.upsertDocumentData(bet.id, bet);
