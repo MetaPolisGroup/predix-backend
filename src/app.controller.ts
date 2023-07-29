@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { IDataServices } from './core/abstract/data-services/data-service.abstract';
 import { ethers } from 'ethers';
 import constant from './configuration';
+import { User } from './core/entity/user.enity';
 
 @Controller()
 export class AppController {
@@ -22,51 +23,22 @@ export class AppController {
 
   @Get('fix-data')
   async testQueryFirestore() {
-    // const users = await this.db.userRepo.getCollectionData();
-    // if (users) {
-    //   for (const user of users) {
-    //     user.leaderboard = {
-    //       net_winnings: Math.floor(Math.random() * 100000),
-    //       round_played: Math.floor(Math.random() * 1000),
-    //       round_winning: Math.floor(Math.random() * 1000),
-    //       total_bnb: Math.floor(Math.random() * 100000),
-    //       win_rate: Math.floor(Math.random() * 100),
-    //     };
+    const me: User = await this.db.userRepo.getDocumentData('0xf3284BBF9Ebc7C05d2750FbF1232903cA33BF22C');
+    
+    const users = await this.db.userRepo.getCollectionDataByConditions([
+      { field: 'user_tree_commissions', operator: 'array-contains', value: me.id },
+    ]);
+    if (users) {
+      const arr: User[] = [];
+      users.map(user => {
+        if (user.user_tree_belong[0] === me.id) {
+          arr.push(user);
+        }
+      });
 
-    //     await this.db.userRepo.upsertDocumentData(user.id, { leaderboard: user.leaderboard });
-    //   }
-    // }
+      // return arr.map(item => item.id);
 
-    const users1 = await this.db.userRepo.getCollectionDataByConditionsOrderByStartAfterAndLimit(
-      [],
-      [{ field: 'leaderboard.net_winnings', option: 'desc' }],
-      null,
-      10
-    );
-
-    const users2 = await this.db.userRepo.getCollectionDataByConditionsOrderByStartAfterAndLimit(
-      [],
-      [{ field: 'leaderboard.net_winnings', option: 'desc' }],
-      users1[users1.length - 1],
-      10
-    );
-
-    if (users1 && users2) {
-      return {
-        length: users1.length,
-        value1: users1.map(user => {
-          return {
-            user_id: user.id,
-            leaderboard: user.leaderboard
-          }
-        }),
-        value2: users2.map(user => {
-          return {
-            user_id: user.id,
-            leaderboard: user.leaderboard
-          }
-        }),
-      };
+      return users.map(user => user.id);
     }
 
     return false;
