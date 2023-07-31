@@ -58,4 +58,23 @@ export class AppController {
       await this.userService.create({ user_address: `test${i}`, nickname: `test${i}`, recommend_id: user.id }, req);
     }
   }
+
+  @Get('/change-example-user')
+  async changeExampleUser(@Req() req: Request) {
+    const users = await this.db.userRepo.getCollectionData();
+    for (const user of users) {
+      for (let i = 0; i <= user.user_tree_belong.length; i++) {
+        if (user.user_tree_belong[i] === '0x5f84f858895BCC8261f1723B93D2C26a8cF16738') {
+          user.user_tree_belong[i] = '0xFf8b990Dd2d6Fb35fF627C01173958Eda197518A';
+        }
+      }
+      for (let i = 0; i <= user.user_tree_commissions.length; i++) {
+        if (user.user_tree_commissions[i] === '0x5f84f858895BCC8261f1723B93D2C26a8cF16738') {
+          user.user_tree_commissions[i] = '0xFf8b990Dd2d6Fb35fF627C01173958Eda197518A';
+        }
+      }
+      user.ref = '0xFf8b990Dd2d6Fb35fF627C01173958Eda197518A';
+      await this.db.userRepo.upsertDocumentData(user.id, user);
+    }
+  }
 }

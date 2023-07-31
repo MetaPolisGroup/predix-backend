@@ -6,26 +6,39 @@ import { IDataServices } from 'src/core/abstract/data-services/data-service.abst
 export class LeaderboardService {
   constructor(private readonly db: IDataServices) {}
 
-  async updateLeaderboard(round: string) {
-    const betslips = await this.db.betRepo.getCollectionDataByConditions([{ field: 'epoch', operator: '==', value: round }]);
-    for (const betslip of betslips) {
-      const user = await this.db.userRepo.getFirstValueCollectionDataByConditions([
-        { field: 'user_address', operator: '==', value: betslip.user_address },
-      ]);
-      if (user) {
-        user.leaderboard.round_played += 1;
-        if (betslip.status === 'Win') {
-          user.leaderboard.round_winning += 1;
-          user.leaderboard.net_winnings += betslip.amount;
-        } else if (betslip.status === 'Lose') {
-          user.leaderboard.net_winnings -= betslip.amount;
-        }
-        user.leaderboard.win_rate = (user.leaderboard.round_winning / user.leaderboard.round_played) * 100;
+  listenLeaderboard() {
+    this.db.predictionRepo.listenToChangesWithConditionsOrigin([{ field: 'closed', operator: '==', value: true }], async matchs => {
+      for (const match of matchs) {
+        await this.updateLeaderboard(match.doc.epoch);
       }
-      await this.db.userRepo.upsertDocumentData(user.id, user);
-      await this.winRate();
-      await this.roundPlayed();
-      await this.netWinnings();
+    });
+  }
+
+  async updateLeaderboard(round: number) {
+    const betslips = await this.db.betRepo.getCollectionDataByConditions([{ field: 'epoch', operator: '==', value: round }]);
+    if (betslips) {
+      for (const betslip of betslips) {
+        const user = await this.db.userRepo.getFirstValueCollectionDataByConditions([
+          { field: 'user_address', operator: '==', value: betslip.user_address },
+        ]);
+        if (user) {
+          user.leaderboard.round_played += 1;
+          if (betslip.status === 'Win') {
+            user.leaderboard.round_winning += 1;
+            user.leaderboard.total_amount += betslip.amount;
+            user.leaderboard.net_winnings += betslip.winning_amount;
+          } else if (betslip.status === 'Lose') {
+            user.leaderboard.net_winnings -= betslip.amount;
+            user.leaderboard.total_amount += betslip.amount;
+          }
+          user.leaderboard.win_rate = (user.leaderboard.round_winning / user.leaderboard.round_played) * 100;
+          await this.db.userRepo.upsertDocumentData(user.id, user);
+          await this.winRate();
+          await this.roundPlayed();
+          await this.netWinnings();
+          await this.totalBnb();
+        }
+      }
     }
   }
 
@@ -98,6 +111,8 @@ export class LeaderboardService {
       200,
     );
     const user_lists = [];
+    if (users) {
+    }
     for (const user of users) {
       const leaderboard = {
         user_id: user.id,
@@ -113,30 +128,33 @@ export class LeaderboardService {
     });
   }
 
-  // async totalBnb() {
-  //   const users = await this.db.userRepo.getCollectionDataByConditionsAndOrderBy(
-  //     [],
-  //     [
-  //       {
-  //         field: 'leaderboard.net_winnings',
-  //         option: 'asc',
-  //       },
-  //     ],
-  //   );
-  //   const user_lists = [];
-  //   for (const user of users) {
-  //     const leaderboard = {
-  //       user_id: user.id,
-  //       leaderboard: user.leaderboard,
-  //     };
-  //     user_lists.push(leaderboard);
-  //   }
+  async totalBnb() {
+    const users = await this.db.userRepo.getCollectionDataByConditionsOrderByStartAfterAndLimit(
+      [],
+      [
+        {
+          field: 'leaderboard.total_amount',
+          option: 'desc',
+        },
+      ],
+      null,
+      200,
+    );
 
-  //   await this.db.leaderboardRepo.upsertDocumentData('Total BNB', {
-  //     user_lists,
-  //     type: 'Total BNB',
-  //     id: 'Total BNB',
-  //     updated_at: new Date().getTime(),
-  //   });
-  // }
+    const user_lists = [];
+    for (const user of users) {
+      const leaderboard = {
+        user_id: user.id,
+        leaderboard: user.leaderboard,
+      };
+      user_lists.push(leaderboard);
+    }
+
+    await this.db.leaderboardRepo.upsertDocumentData(constant.LEADERBOARD.TOTAL_BNB, {
+      user_lists,
+      type: constant.LEADERBOARD.TOTAL_BNB,
+      id: constant.LEADERBOARD.TOTAL_BNB,
+      updated_at: new Date().getTime(),
+    });
+  }
 }
