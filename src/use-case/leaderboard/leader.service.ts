@@ -55,20 +55,23 @@ export class LeaderboardService {
       200,
     );
     const user_lists = [];
-    for (const user of users) {
-      const leaderboard = {
-        user_id: user.id,
-        leaderboard: user.leaderboard,
-      };
-      user_lists.push(leaderboard);
-    }
+    if (users) {
+      for (const user of users) {
+        const leaderboard = {
+          user_id: user.id,
+          nickname: user.nickname,
+          leaderboard: user.leaderboard,
+        };
+        user_lists.push(leaderboard);
+      }
 
-    await this.db.leaderboardRepo.upsertDocumentData(constant.LEADERBOARD.WIN_RATE, {
-      user_lists,
-      type: constant.LEADERBOARD.WIN_RATE,
-      id: constant.LEADERBOARD.WIN_RATE,
-      updated_at: new Date().getTime(),
-    });
+      await this.db.leaderboardRepo.upsertDocumentData(constant.LEADERBOARD.WIN_RATE, {
+        user_lists,
+        type: constant.LEADERBOARD.WIN_RATE,
+        id: constant.LEADERBOARD.WIN_RATE,
+        updated_at: new Date().getTime(),
+      });
+    }
   }
 
   async roundPlayed() {
@@ -82,20 +85,23 @@ export class LeaderboardService {
       ],
     );
     const user_lists = [];
-    for (const user of users) {
-      const leaderboard = {
-        user_id: user.id,
-        leaderboard: user.leaderboard,
-      };
-      user_lists.push(leaderboard);
-    }
+    if (users) {
+      for (const user of users) {
+        const leaderboard = {
+          user_id: user.id,
+          nickname: user.nickname,
+          leaderboard: user.leaderboard,
+        };
+        user_lists.push(leaderboard);
+      }
 
-    await this.db.leaderboardRepo.upsertDocumentData(constant.LEADERBOARD.ROUND_PLAYED, {
-      user_lists,
-      type: constant.LEADERBOARD.ROUND_PLAYED,
-      id: constant.LEADERBOARD.ROUND_PLAYED,
-      updated_at: new Date().getTime(),
-    });
+      await this.db.leaderboardRepo.upsertDocumentData(constant.LEADERBOARD.ROUND_PLAYED, {
+        user_lists,
+        type: constant.LEADERBOARD.ROUND_PLAYED,
+        id: constant.LEADERBOARD.ROUND_PLAYED,
+        updated_at: new Date().getTime(),
+      });
+    }
   }
 
   async netWinnings() {
@@ -112,20 +118,21 @@ export class LeaderboardService {
     );
     const user_lists = [];
     if (users) {
+      for (const user of users) {
+        const leaderboard = {
+          user_id: user.id,
+          nickname: user.nickname,
+          leaderboard: user.leaderboard,
+        };
+        user_lists.push(leaderboard);
+      }
+      await this.db.leaderboardRepo.upsertDocumentData(constant.LEADERBOARD.NET_WINNINGS, {
+        user_lists,
+        type: constant.LEADERBOARD.NET_WINNINGS,
+        id: constant.LEADERBOARD.NET_WINNINGS,
+        updated_at: new Date().getTime(),
+      });
     }
-    for (const user of users) {
-      const leaderboard = {
-        user_id: user.id,
-        leaderboard: user.leaderboard,
-      };
-      user_lists.push(leaderboard);
-    }
-    await this.db.leaderboardRepo.upsertDocumentData(constant.LEADERBOARD.NET_WINNINGS, {
-      user_lists,
-      type: constant.LEADERBOARD.NET_WINNINGS,
-      id: constant.LEADERBOARD.NET_WINNINGS,
-      updated_at: new Date().getTime(),
-    });
   }
 
   async totalBnb() {
@@ -142,19 +149,22 @@ export class LeaderboardService {
     );
 
     const user_lists = [];
-    for (const user of users) {
-      const leaderboard = {
-        user_id: user.id,
-        leaderboard: user.leaderboard,
-      };
-      user_lists.push(leaderboard);
-    }
+    if (users) {
+      for (const user of users) {
+        const leaderboard = {
+          user_id: user.id,
+          nickname: user.nickname,
+          leaderboard: user.leaderboard,
+        };
+        user_lists.push(leaderboard);
+      }
 
-    await this.db.leaderboardRepo.upsertDocumentData(constant.LEADERBOARD.TOTAL_BNB, {
-      user_lists,
-      type: constant.LEADERBOARD.TOTAL_BNB,
-      id: constant.LEADERBOARD.TOTAL_BNB,
-      updated_at: new Date().getTime(),
-    });
+      await this.db.leaderboardRepo.upsertDocumentData(constant.LEADERBOARD.TOTAL_BNB, {
+        user_lists,
+        type: constant.LEADERBOARD.TOTAL_BNB,
+        id: constant.LEADERBOARD.TOTAL_BNB,
+        updated_at: new Date().getTime(),
+      });
+    }
   }
 }

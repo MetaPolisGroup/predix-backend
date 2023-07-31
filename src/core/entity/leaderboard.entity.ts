@@ -8,6 +8,8 @@ export class Leaderboard {
     leaderboard: LeaderBoardUser;
 
     user_id: string;
+
+    nickname: string;
   }[];
 
   type: LeaderBoardType;
