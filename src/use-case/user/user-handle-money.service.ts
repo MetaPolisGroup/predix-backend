@@ -31,7 +31,7 @@ export class UserHandleMoney {
             total_revenue_share -= 0.1;
             break;
         }
-        const after_point = amount * revenue_share + recommend.point;
+        const after_point = (amount * revenue_share) / 100 + recommend.point;
         await this.db.userRepo.upsertDocumentData(recommend_id, { point: after_point });
       }
     }
