@@ -31,15 +31,18 @@ export class UserHandleMoney {
             total_revenue_share -= 0.1;
             break;
         }
-        const after_point = amount * revenue_share + recommend.point;
+        const after_point = (amount * revenue_share) / 100 + recommend.point;
         await this.db.userRepo.upsertDocumentData(recommend_id, { point: after_point });
       }
     }
-    const recommend = await this.db.userRepo.getFirstValueCollectionDataByConditions([
+    const admin = await this.db.userRepo.getFirstValueCollectionDataByConditions([
       { field: 'type', operator: '==', value: constant.USER.TYPE.ADMIN },
     ]);
-    const after_point = amount * total_revenue_share + recommend.point;
-    await this.db.userRepo.upsertDocumentData(recommend.id, { point: after_point });
+    if (!admin) {
+      return true;
+    }
+    const after_point = amount * total_revenue_share + admin.point;
+    await this.db.userRepo.upsertDocumentData(admin.id, { point: after_point });
     return true;
   }
 }

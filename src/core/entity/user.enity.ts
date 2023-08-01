@@ -39,4 +39,6 @@ export class LeaderBoardUser {
   net_winnings: number;
 
   win_rate: number;
+
+  total_amount: number;
 }
