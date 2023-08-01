@@ -9,7 +9,9 @@ export class LeaderboardService {
   listenLeaderboard() {
     this.db.predictionRepo.listenToChangesWithConditionsOrigin([{ field: 'closed', operator: '==', value: true }], async matchs => {
       for (const match of matchs) {
-        await this.updateLeaderboard(match.doc.epoch);
+        if (match.type === 'added') {
+          await this.updateLeaderboard(match.doc.epoch);
+        }
       }
     });
   }
