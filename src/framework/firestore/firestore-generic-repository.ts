@@ -243,6 +243,44 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
     });
   }
 
+  listenToChangesWithConditionsAndOrderBy(
+    conditions: { field: string; operator: WhereFilterOp; value: any }[],
+    orderBys: { field: string; option?: 'asc' | 'desc' }[],
+    callback: (changes: DocumentChange<T>[]) => Promise<void>,
+  ): void {
+    let query: Query<T> = this.collectionRef;
+    if (conditions) {
+      for (const condition of conditions) {
+        query = query.where(condition.field, condition.operator, condition.value);
+      }
+    }
+
+    if (orderBys) {
+      for (const orderBy of orderBys) {
+        query = query.orderBy(orderBy.field, orderBy.option);
+      }
+    }
+
+    if (!query) {
+      return null;
+    }
+
+    query.onSnapshot(async s => {
+      const result = s.docChanges().map(change => {
+        const data: DocumentChange<T> = {
+          doc: change.doc.data(),
+          newIndex: change.newIndex,
+          oldIndex: change.oldIndex,
+          type: change.type,
+        };
+
+        return data;
+      });
+
+      await callback(result);
+    });
+  }
+
   listenToChangesWithConditionsOrigin(
     conditions: { field: string; operator: WhereFilterOp; value: any }[],
     callback: (changes: DocumentChangeOrigin<T>[]) => Promise<void>,

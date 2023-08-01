@@ -172,9 +172,6 @@ export class EventRoundListener implements OnApplicationBootstrap {
         }
       }
 
-      // Set cronjob to execute round
-      await this.prediction.setCronjob();
-
       // Log
       this.Logger.log(`Round ${epoch.toString()} has ended !`);
     });

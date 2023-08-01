@@ -20,29 +20,20 @@ export class ChartService implements OnApplicationBootstrap {
   @Cron('*/5 * * * * *')
   async updatePriceFromChainlink() {
     if (process.env.CONSTANT_ENABLE === 'True') {
-      const p = new ethers.JsonRpcProvider(providerRPC['bsc'].rpc, {
-        chainId: providerRPC['bsc'].chainId,
-        name: providerRPC['bsc'].name,
-      });
-      const aggregatorContract = new ethers.Contract(constant.ADDRESS.AGGREGATOR, constant.ABI.AGGREGATOR, p);
+      const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
 
-      if (aggregatorContract) {
-        const d = await aggregatorContract.latestRoundData();
-        if (d) {
-          const chart: Chart = {
-            created_at: parseInt(d[2].toString()),
-            // created_at: new Date().getTime() / 1000,
-            delete: false,
-            price: parseInt(d[1].toString()),
-          };
-
-          await this.db.chartRepo.upsertDocumentData(parseInt(d[2].toString()).toString(), chart);
-        } else {
-          this.logger.warn('No chainlink data !');
-        }
-      } else {
-        this.logger.error('Failed to create Aggregator contract !');
+      if (!chainlinkPrice) {
+        this.logger.warn('No chainlink data !');
+        return;
       }
+
+      const chart: Chart = {
+        created_at: parseInt(chainlinkPrice[2].toString()),
+        delete: false,
+        price: parseInt(chainlinkPrice[1].toString()),
+      };
+
+      await this.db.chartRepo.upsertDocumentData(parseInt(chainlinkPrice[2].toString()).toString(), chart);
     }
   }
 }

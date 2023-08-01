@@ -50,6 +50,12 @@ export abstract class IGenericRepository<T> {
     callback: (changes: DocumentChange<T>[]) => Promise<void>,
   ): void;
 
+  abstract listenToChangesWithConditionsAndOrderBy(
+    conditions: { field: string; operator: WhereFilterOp; value: any }[],
+    orderBys: { field: string; option?: 'asc' | 'desc' }[],
+    callback: (changes: DocumentChange<T>[]) => Promise<void>,
+  ): void;
+
   abstract listenToChangesWithConditionsOrigin(
     conditions: {
       field: string;

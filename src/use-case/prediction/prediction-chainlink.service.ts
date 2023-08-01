@@ -17,25 +17,18 @@ export class ChainlinkService {
   @Cron('*/5 * * * * *')
   async updatePriceFromChainlink() {
     if (process.env.CONSTANT_ENABLE === 'True') {
-      const p = new ethers.JsonRpcProvider(providerRPC['bsc'].rpc, {
-        chainId: providerRPC['bsc'].chainId,
-        name: providerRPC['bsc'].name,
-      });
-      const aggregatorContract = new ethers.Contract(constant.ADDRESS.AGGREGATOR, constant.ABI.AGGREGATOR, p);
+      const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
 
-      if (aggregatorContract) {
-        const d = await aggregatorContract.latestRoundData();
-        if (d) {
-          await this.db.chainlinkRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.CHAINLINK, {
-            price: d[1].toString(),
-            updated_at: new Date().getTime(),
-          });
-        } else {
-          this.logger.warn('No chainlink data !');
-        }
-      } else {
-        this.logger.error('Failed to create Aggregator contract !');
+      if (!chainlinkPrice) {
+        this.logger.warn('No chainlink data !');
+        return;
       }
+
+      // Implement
+      await this.db.chainlinkRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.CHAINLINK, {
+        price: chainlinkPrice[1].toString(),
+        updated_at: new Date().getTime(),
+      });
     }
   }
 }

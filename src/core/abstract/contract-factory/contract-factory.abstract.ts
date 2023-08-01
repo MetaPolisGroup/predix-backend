@@ -5,5 +5,9 @@ export abstract class ContractFactoryAbstract {
 
   abstract predictionContract: Contract;
 
+  abstract predictionAdminContract: Contract;
+
+  abstract aggregatorContract: Contract;
+
   abstract provider: JsonRpcProvider;
 }

@@ -3,6 +3,7 @@ import { ethers } from 'ethers';
 import constant from 'src/configuration';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
+import { PredictionService } from '../prediction/prediction.service';
 
 @Injectable()
 export class EventSetListener implements OnApplicationBootstrap {
@@ -16,7 +17,11 @@ export class EventSetListener implements OnApplicationBootstrap {
     }
   }
 
-  constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) {
+  constructor(
+    private readonly factory: ContractFactoryAbstract,
+    private readonly db: IDataServices,
+    private readonly prediction: PredictionService,
+  ) {
     this.logger = new Logger(EventSetListener.name);
   }
 
@@ -40,6 +45,27 @@ export class EventSetListener implements OnApplicationBootstrap {
     await this.factory.predictionContract.on('NewTreasuryFee', async (epoch: bigint, treasuryFee: bigint) => {
       await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE, {
         fee: parseInt(treasuryFee.toString()),
+      });
+    });
+  }
+
+  async listenPause() {
+    await this.factory.predictionContract.on('Pause', async (epoch: bigint) => {
+      await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE, {
+        paused: true,
+      });
+
+      // Cancel current rounds
+      await this.prediction.cancelCurrentRound();
+    });
+  }
+
+  async listenUnPause() {
+    await this.factory.predictionContract.on('Unpause', async (epoch: bigint) => {
+      await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE, {
+        paused: false,
+        genesis_start: false,
+        genesis_lock: false,
       });
     });
   }

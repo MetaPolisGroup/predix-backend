@@ -4,4 +4,10 @@ export class Preferences {
   interval_seconds: number;
 
   buffer_seconds: number;
+
+  genesis_start: boolean;
+
+  genesis_lock: boolean;
+
+  paused: boolean;
 }
