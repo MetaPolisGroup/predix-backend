@@ -82,7 +82,7 @@ export class PredictionService implements OnApplicationBootstrap {
     // Log error when round locktime exceed buffer time
     if (availableRound.lockTimestamp + preferences.buffer_seconds < now) {
       this.logger.error('Round exceed buffer time !');
-      await this.setCronjob(availableRound);
+      // await this.setCronjob(availableRound);
     }
 
     //
