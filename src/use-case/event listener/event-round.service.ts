@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 import constant from 'src/configuration';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
-import { Position } from 'src/core/entity/bet.entity';
+import { Bet, BetStatus, Position } from 'src/core/entity/bet.entity';
 import { Prediction } from 'src/core/entity/prediction.enity';
 import { PredictionService } from '../prediction/prediction.service';
 import { UserHandleMoney } from '../user/user-handle-money.service';
@@ -143,15 +143,23 @@ export class EventRoundListener implements OnApplicationBootstrap {
         },
       ]);
 
-      const calculateResult = (): Position => {
+      const calculateResult = (bet: Bet, round: Prediction): BetStatus => {
         const r = round.closePrice - round.lockPrice;
-        if (r > 0) {
-          return 'UP';
-        } else if (r < 0) {
-          return 'DOWN';
+        let result: BetStatus;
+
+        if ((r > 0 && bet.position === 'UP') || (r < 0 && bet.position === 'DOWN')) {
+          result = 'Win';
+          if (bet.refund > 0) {
+            result = 'Winning Refund';
+          }
         } else {
-          return null;
+          result = 'Lose';
+          if (bet.refund > 0) {
+            result = 'Refund';
+          }
         }
+
+        return result;
       };
 
       // Update bet status & round
@@ -162,7 +170,7 @@ export class EventRoundListener implements OnApplicationBootstrap {
 
           // Calculate result if bet amount > 0
           if (round && bet.amount > 0) {
-            bet.status = calculateResult() ? (bet.position === calculateResult() ? 'Win' : 'Lose') : 'Lose';
+            bet.status = calculateResult(bet, round);
           }
 
           await this.db.betRepo.upsertDocumentData(bet.id, bet);

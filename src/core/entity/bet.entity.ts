@@ -19,7 +19,7 @@ export class Bet {
 
   claimed_amount: number;
 
-  status: 'Win' | 'Lose' | 'Refund' | 'Waiting' | 'Live';
+  status: BetStatus;
 
   round: Prediction;
 
@@ -27,5 +27,7 @@ export class Bet {
 
   delete: boolean;
 }
+
+export type BetStatus = 'Win' | 'Winning Refund' | 'Lose' | 'Refund' | 'Waiting' | 'Live';
 
 export type Position = 'UP' | 'DOWN';
