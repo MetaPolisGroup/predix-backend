@@ -259,7 +259,7 @@ export class PredictionService implements OnApplicationBootstrap {
   async cancelCurrentRound() {
     const currentRounds = await this.db.predictionRepo.getCollectionDataByConditions([
       {
-        field: 'locked',
+        field: 'closed',
         operator: '==',
         value: false,
       },
