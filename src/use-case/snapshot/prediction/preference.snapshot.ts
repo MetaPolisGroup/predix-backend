@@ -14,7 +14,7 @@ export class PreferenceSnapshotService implements OnApplicationBootstrap {
 
   onApplicationBootstrap() {
     if (process.env.CONSTANT_ENABLE === 'True') {
-      this.genesisSnapshot();
+      // this.genesisSnapshot();
     }
   }
 

@@ -69,6 +69,9 @@ export class EventSetListener implements OnApplicationBootstrap {
         genesis_start: false,
         genesis_lock: false,
       });
+
+      // Genesis start
+      await this.prediction.genesisStartRound();
     });
   }
 }
