@@ -169,11 +169,11 @@ export class PredictionService implements OnApplicationBootstrap {
 
     await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE, preference);
 
-    if (!genesisStart) {
+    if (genesisStart === undefined) {
       this.logger.warn("Can't get Genesis Start from contract !");
     }
 
-    if (!genesisLock) {
+    if (genesisLock === undefined) {
       this.logger.warn("Can't get Genesis Lock from contract !");
     }
 
@@ -241,7 +241,7 @@ export class PredictionService implements OnApplicationBootstrap {
 
     // Execute round success
     if (genesisLockRoundTx.status === 1) {
-      this.logger.log(`New round execute successfully!`);
+      this.logger.log(`Genesis Lock round successfully!`);
 
       // Update genesis lock preference
       await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE, {
@@ -251,7 +251,7 @@ export class PredictionService implements OnApplicationBootstrap {
 
     // Execute round failed
     else {
-      this.logger.log(`New round executed failed! retry...`);
+      this.logger.log(`Genesis Lock round failed! retry...`);
       await this.genesisLockRound();
     }
   }
