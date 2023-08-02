@@ -14,6 +14,8 @@ export class EventSetListener implements OnApplicationBootstrap {
       await this.listenSetIntervalSeconds();
       await this.listenSetBufferSeconds();
       await this.listenSetFee();
+      await this.listenPause();
+      await this.listenUnPause();
     }
   }
 
