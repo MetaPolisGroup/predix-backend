@@ -1,11 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
 import { CronJob } from 'cron';
-import { ethers } from 'ethers';
 import constant from 'src/configuration';
-import { providerRPC } from 'src/configuration/provider';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 import { Prediction } from 'src/core/entity/prediction.enity';

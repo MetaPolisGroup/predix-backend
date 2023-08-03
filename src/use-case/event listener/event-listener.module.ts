@@ -5,11 +5,12 @@ import { EventClaimListener } from './event.claim.service';
 import { PredictionModule } from '../prediction/prediction.module';
 import { EventSetListener } from './event-set.service';
 import { UserModule } from '../user/user.module';
+import { BetPredictionModule } from '../bet/prediction/bet-prediction.module';
 
 @Module({
   providers: [EventBetListener, EventRoundListener, EventClaimListener, EventSetListener],
   controllers: [],
-  imports: [PredictionModule, UserModule],
+  imports: [PredictionModule, UserModule, BetPredictionModule],
   exports: [],
 })
 export class EventListenerModule {}

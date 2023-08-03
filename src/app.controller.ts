@@ -1,9 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Controller, Get, Req } from '@nestjs/common';
-import { AppService } from './app.service';
 import { IDataServices } from './core/abstract/data-services/data-service.abstract';
-import { ContractFactory, ethers } from 'ethers';
-import constant from './configuration';
 import { User } from './core/entity/user.enity';
 import { UserAuthenService } from './use-case/user/user-authen.service';
 import { Request } from 'express';
@@ -12,7 +9,6 @@ import { ContractFactoryAbstract } from './core/abstract/contract-factory/contra
 @Controller()
 export class AppController {
   constructor(
-    private readonly appService: AppService,
     private readonly db: IDataServices,
     private readonly userService: UserAuthenService,
     private readonly factory: ContractFactoryAbstract,

@@ -13,6 +13,7 @@ import { ChartModule } from './use-case/chart/chart.module';
 import { LeaderboardModule } from './use-case/leaderboard/leaderboard.module';
 import { AppService } from './app.service';
 import { SnapshotModule } from './use-case/snapshot/snapshot.module';
+import { BetPredictionModule } from './use-case/bet/prediction/bet-prediction.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { SnapshotModule } from './use-case/snapshot/snapshot.module';
     EventListenerModule,
     ChartModule,
     LeaderboardModule,
+    BetPredictionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
