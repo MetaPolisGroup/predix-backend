@@ -2,11 +2,12 @@
 import { Controller, Get, Req } from '@nestjs/common';
 import { AppService } from './app.service';
 import { IDataServices } from './core/abstract/data-services/data-service.abstract';
-import { ethers } from 'ethers';
+import { ContractFactory, ethers } from 'ethers';
 import constant from './configuration';
 import { User } from './core/entity/user.enity';
 import { UserAuthenService } from './use-case/user/user-authen.service';
 import { Request } from 'express';
+import { ContractFactoryAbstract } from './core/abstract/contract-factory/contract-factory.abstract';
 
 @Controller()
 export class AppController {
@@ -14,17 +15,57 @@ export class AppController {
     private readonly appService: AppService,
     private readonly db: IDataServices,
     private readonly userService: UserAuthenService,
+    private readonly factory: ContractFactoryAbstract,
   ) {}
 
-  @Get()
-  async getHello() {
-    const signer = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY, constant.PROVIDER);
-    const amount = 10;
-    let message = ethers.solidityPacked(['uint256'], [amount]);
-    message = ethers.solidityPackedKeccak256(['bytes'], [message]);
-    const arrayIfy = ethers.getBytes(message);
-    const sig = await signer.signMessage(arrayIfy);
-    return sig;
+  @Get('unpause')
+  async unpause() {
+    const gasLimit = await this.factory.predictionAdminContract.unpause.estimateGas();
+    const gasPrice = await this.factory.provider.getFeeData();
+
+    const executeRoundTx = await this.factory.predictionAdminContract.unpause({
+      gasLimit,
+      gasPrice: gasPrice.gasPrice,
+      maxFeePerGas: gasPrice.maxFeePerGas,
+      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
+    });
+
+    const executeRound = await this.factory.provider.waitForTransaction(executeRoundTx.hash as string);
+
+    // Execute round success
+    if (executeRound.status === 1) {
+      console.log(`execute successfully!`);
+    }
+
+    // Execute round failed
+    else {
+      console.log(` executed failed! `);
+    }
+  }
+
+  @Get('pause')
+  async pause() {
+    const gasLimit = await this.factory.predictionAdminContract.pause.estimateGas();
+    const gasPrice = await this.factory.provider.getFeeData();
+
+    const executeRoundTx = await this.factory.predictionAdminContract.pause({
+      gasLimit,
+      gasPrice: gasPrice.gasPrice,
+      maxFeePerGas: gasPrice.maxFeePerGas,
+      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
+    });
+
+    const executeRound = await this.factory.provider.waitForTransaction(executeRoundTx.hash as string);
+
+    // Execute round success
+    if (executeRound.status === 1) {
+      console.log(`execute successfully!`);
+    }
+
+    // Execute round failed
+    else {
+      console.log(` executed failed! `);
+    }
   }
 
   @Get('fix-data')

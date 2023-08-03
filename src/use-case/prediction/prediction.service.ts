@@ -151,19 +151,19 @@ export class PredictionService implements OnApplicationBootstrap {
 
     const intervalSeconds = await this.factory.predictionContract.intervalSeconds();
 
-    if (genesisStart) {
+    if (genesisStart !== undefined) {
       preference.genesis_start = genesisStart;
     }
 
-    if (genesisLock) {
+    if (genesisLock !== undefined) {
       preference.genesis_lock = genesisLock;
     }
 
-    if (bufferSeconds) {
+    if (bufferSeconds !== undefined) {
       preference.buffer_seconds = parseInt(bufferSeconds.toString());
     }
 
-    if (intervalSeconds) {
+    if (intervalSeconds !== undefined) {
       preference.interval_seconds = parseInt(intervalSeconds.toString());
     }
 
