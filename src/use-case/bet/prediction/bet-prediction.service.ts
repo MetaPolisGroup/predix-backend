@@ -12,7 +12,9 @@ export class BetPredictionService implements OnApplicationBootstrap {
 
   async onApplicationBootstrap() {}
 
-  constructor(private readonly db: IDataServices, private readonly handleMoney: UserHandleMoney) {}
+  constructor(private readonly db: IDataServices, private readonly handleMoney: UserHandleMoney) {
+    this.logger = new Logger(BetPredictionService.name);
+  }
 
   async userBetBear(sender: string, epoch: bigint, amount: bigint) {
     //Const
