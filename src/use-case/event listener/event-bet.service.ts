@@ -24,7 +24,7 @@ export class EventBetListener implements OnApplicationBootstrap {
   async listenBetBull() {
     await this.factory.predictionContract.on('BetBull', async (sender: string, epoch: bigint, amount: bigint) => {
       // Handle bet
-      await this.betPrediction.userBetBear(sender, epoch, amount);
+      await this.betPrediction.userBetBull(sender, epoch, amount);
     });
   }
 
