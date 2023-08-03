@@ -234,7 +234,7 @@ export class BetPredictionService implements OnApplicationBootstrap {
     } else {
       result = 'Lose';
       if (bet.refund > 0) {
-        result = 'Refund';
+        result = 'Losing Refund';
       }
     }
 
