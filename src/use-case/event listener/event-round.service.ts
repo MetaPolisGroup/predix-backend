@@ -61,7 +61,7 @@ export class EventRoundListener implements OnApplicationBootstrap {
         totalAmount: parseInt(amount.toString()) * 2,
       });
 
-      this.Logger.log(`Cut bet round ${epoch.toString()} !`);
+      this.Logger.log(`Cut bet round ${epoch.toString()}, total bet ${parseInt(amount.toString()) * 2} !`);
     });
   }
 }
