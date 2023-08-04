@@ -38,7 +38,7 @@ export class BetPredictionService implements OnApplicationBootstrap {
     let winning_amount = betAmount;
 
     if (preferences) {
-      winning_amount = (betAmount * (preferences.fee * 2)) / 10000;
+      winning_amount = betAmount - (betAmount * (preferences.fee * 2)) / 10000;
     }
 
     const bet: Bet = {
