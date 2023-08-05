@@ -14,21 +14,21 @@ export class ChainlinkService {
 
   constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) {}
 
-  @Cron('*/5 * * * * *')
-  async updatePriceFromChainlink() {
-    if (process.env.CONSTANT_ENABLE === 'True') {
-      const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
+  // @Cron('*/5 * * * * *')
+  // async updatePriceFromChainlink() {
+  //   if (process.env.CONSTANT_ENABLE === 'True') {
+  //     const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
 
-      if (!chainlinkPrice) {
-        this.logger.warn('No chainlink data !');
-        return;
-      }
+  //     if (!chainlinkPrice) {
+  //       this.logger.warn('No chainlink data !');
+  //       return;
+  //     }
 
-      // Implement
-      await this.db.chainlinkRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.CHAINLINK, {
-        price: chainlinkPrice[1].toString(),
-        updated_at: new Date().getTime(),
-      });
-    }
-  }
+  //     // Implement
+  //     await this.db.chainlinkRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.CHAINLINK, {
+  //       price: chainlinkPrice[1].toString(),
+  //       updated_at: new Date().getTime(),
+  //     });
+  //   }
+  // }
 }
