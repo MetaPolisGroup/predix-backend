@@ -25,7 +25,7 @@ import { BetPredictionModule } from './use-case/bet/prediction/bet-prediction.mo
     AuthModule,
     PredictionModule,
     ContractFactoryModule,
-    TaskModule,
+    // TaskModule,
     EventListenerModule,
     ChartModule,
     LeaderboardModule,
