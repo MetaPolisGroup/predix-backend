@@ -7,13 +7,18 @@ export class LeaderboardService {
   constructor(private readonly db: IDataServices) {}
 
   listenLeaderboard() {
-    this.db.predictionRepo.listenToChangesWithConditionsOrigin([{ field: 'closed', operator: '==', value: true }], async matchs => {
-      for (const match of matchs) {
-        if (match.type === 'added') {
-          await this.updateLeaderboard(match.doc.epoch);
+    this.db.predictionRepo.listenToChangesWithConditionsAndOrderBy(
+      [{ field: 'closed', operator: '==', value: true }], 
+      [], 
+      async matchs => {
+        for (const match of matchs) {
+          if (match.type === 'added') {
+            console.log(match.doc.epoch);
+            await this.updateLeaderboard(match.doc.epoch);
+          }
         }
       }
-    });
+    );
   }
 
   async updateLeaderboard(round: number) {
@@ -24,12 +29,13 @@ export class LeaderboardService {
           { field: 'user_address', operator: '==', value: betslip.user_address },
         ]);
         if (user) {
-          user.leaderboard.round_played += 1;
-          if (betslip.status === 'Win') {
+          if (betslip.status === 'Win' || betslip.status === 'Winning Refund') {
             user.leaderboard.round_winning += 1;
+            user.leaderboard.round_played += 1;
             user.leaderboard.total_amount += betslip.amount;
             user.leaderboard.net_winnings += betslip.winning_amount;
-          } else if (betslip.status === 'Lose') {
+          } else if (betslip.status === 'Lose' || betslip.status === 'Losing Refund') {
+            user.leaderboard.round_played += 1;
             user.leaderboard.net_winnings -= betslip.amount;
             user.leaderboard.total_amount += betslip.amount;
           }
