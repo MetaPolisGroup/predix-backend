@@ -13,6 +13,7 @@ export class LeaderboardService {
       async matchs => {
         for (const match of matchs) {
           if (match.type === 'added') {
+            console.log(match.doc.epoch);
             await this.updateLeaderboard(match.doc.epoch);
           }
         }
