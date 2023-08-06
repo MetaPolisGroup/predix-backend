@@ -39,7 +39,6 @@ export class TaskService implements OnApplicationBootstrap {
 
   @Cron('*/5 * * * * *')
   async updatePriceFromChainlink() {
-    this.logger.log(process.env.CONSTANT_ENABLE);
     if (process.env.CONSTANT_ENABLE === 'True') {
       const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
 
