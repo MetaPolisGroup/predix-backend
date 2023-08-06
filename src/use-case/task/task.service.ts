@@ -13,7 +13,9 @@ export class TaskService implements OnApplicationBootstrap {
 
   async onApplicationBootstrap() {}
 
-  constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) {}
+  constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) {
+    this.logger = new Logger(TaskService.name);
+  }
 
   @Cron('*/5 * * * * *')
   async updatePriceFromChainlinkChart() {
