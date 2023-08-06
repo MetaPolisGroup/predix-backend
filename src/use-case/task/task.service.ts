@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
@@ -13,30 +14,6 @@ export class TaskService implements OnApplicationBootstrap {
   async onApplicationBootstrap() {}
 
   constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) {}
-
-  // @Cron('* */5 * * * *')
-  // async executeRound() {
-  //   const priceRandom = [24399280000, 24400000000, 24397541869, 24397644724, 24394974000, 24394703900, 24394904985];
-
-  //   const randomElement = priceRandom[Math.floor(Math.random() * priceRandom.length)];
-
-  //   const wallet = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY, constant.PROVIDER);
-
-  //   const predictionContract = new ethers.Contract(constant.ADDRESS.PREDICTION, constant.ABI.PREDICTION, wallet);
-
-  //   const gasLimit = await predictionContract.executeRound.estimateGas(randomElement);
-  //   const gasPrice = await constant.PROVIDER.getFeeData();
-
-  //   console.log({ gasLimit });
-
-  //   console.log({ gasPrice });
-  //   await predictionContract.executeRound(100, 1000, {
-  //     gasLimit,
-  //     gasPrice,
-  //   });
-
-  //   console.log('Cron');
-  // }
 
   @Cron('*/5 * * * * *')
   async updatePriceFromChainlinkChart() {
@@ -60,6 +37,7 @@ export class TaskService implements OnApplicationBootstrap {
 
   @Cron('*/5 * * * * *')
   async updatePriceFromChainlink() {
+    this.logger.log(process.env.CONSTANT_ENABLE);
     if (process.env.CONSTANT_ENABLE === 'True') {
       const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
 

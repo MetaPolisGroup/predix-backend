@@ -7,18 +7,13 @@ export class LeaderboardService {
   constructor(private readonly db: IDataServices) {}
 
   listenLeaderboard() {
-    this.db.predictionRepo.listenToChangesWithConditionsAndOrderBy(
-      [{ field: 'closed', operator: '==', value: true }], 
-      [], 
-      async matchs => {
-        for (const match of matchs) {
-          if (match.type === 'added') {
-            console.log(match.doc.epoch);
-            await this.updateLeaderboard(match.doc.epoch);
-          }
+    this.db.predictionRepo.listenToChangesWithConditionsAndOrderBy([{ field: 'closed', operator: '==', value: true }], [], async matchs => {
+      for (const match of matchs) {
+        if (match.type === 'added') {
+          await this.updateLeaderboard(match.doc.epoch);
         }
       }
-    );
+    });
   }
 
   async updateLeaderboard(round: number) {
