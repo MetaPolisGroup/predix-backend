@@ -164,7 +164,7 @@ export class PredictionService implements OnApplicationBootstrap {
       preference.interval_seconds = parseInt(intervalSeconds.toString());
     }
 
-    await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE, preference);
+    await this.db.preferenceRepo.upsertDocumentData(preference.id, preference);
 
     if (genesisStart === undefined) {
       this.logger.warn("Can't get Genesis Start from contract !");
