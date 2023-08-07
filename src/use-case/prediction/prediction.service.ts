@@ -6,6 +6,7 @@ import constant from 'src/configuration';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 import { Prediction } from 'src/core/entity/prediction.enity';
+import { Preferences } from 'src/core/entity/preferences.entity';
 
 @Injectable()
 export class PredictionService implements OnApplicationBootstrap {
@@ -133,12 +134,7 @@ export class PredictionService implements OnApplicationBootstrap {
   }
 
   async updateContractState() {
-    const preference = await this.db.preferenceRepo.getFirstValueCollectionData();
-
-    if (!preference) {
-      this.logger.error('Preference not found when update contract state !');
-      return;
-    }
+    let preference: Preferences;
 
     const genesisStart = await this.factory.predictionContract.genesisStartOnce();
 
