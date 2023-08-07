@@ -134,7 +134,14 @@ export class PredictionService implements OnApplicationBootstrap {
   }
 
   async updateContractState() {
-    let preference: Preferences;
+    const preference: Preferences = {
+      buffer_seconds: null,
+      fee: null,
+      genesis_lock: null,
+      genesis_start: null,
+      interval_seconds: null,
+      paused: null,
+    };
 
     const genesisStart = await this.factory.predictionContract.genesisStartOnce();
 
