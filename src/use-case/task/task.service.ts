@@ -19,39 +19,39 @@ export class TaskService implements OnApplicationBootstrap {
 
   @Cron('*/5 * * * * *')
   async updatePriceFromChainlinkChart() {
-    if (process.env.CONSTANT_ENABLE === 'True') {
-      const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
+    // if (process.env.CONSTANT_ENABLE === 'True') {
+    const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
 
-      if (!chainlinkPrice) {
-        this.logger.warn('No chainlink data !');
-        return;
-      }
-
-      const chart: Chart = {
-        created_at: parseInt(chainlinkPrice[2].toString()),
-        delete: false,
-        price: parseInt(chainlinkPrice[1].toString()),
-      };
-
-      await this.db.chartRepo.upsertDocumentData(parseInt(chainlinkPrice[2].toString()).toString(), chart);
+    if (!chainlinkPrice) {
+      this.logger.warn('No chainlink data !');
+      return;
     }
+
+    const chart: Chart = {
+      created_at: parseInt(chainlinkPrice[2].toString()),
+      delete: false,
+      price: parseInt(chainlinkPrice[1].toString()),
+    };
+
+    await this.db.chartRepo.upsertDocumentData(parseInt(chainlinkPrice[2].toString()).toString(), chart);
+    // }
   }
 
   @Cron('*/5 * * * * *')
   async updatePriceFromChainlink() {
-    if (process.env.CONSTANT_ENABLE === 'True') {
-      const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
+    // if (process.env.CONSTANT_ENABLE === 'True') {
+    const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
 
-      if (!chainlinkPrice) {
-        this.logger.warn('No chainlink data !');
-        return;
-      }
-
-      // Implement
-      await this.db.chainlinkRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.CHAINLINK, {
-        price: chainlinkPrice[1].toString(),
-        updated_at: new Date().getTime(),
-      });
+    if (!chainlinkPrice) {
+      this.logger.warn('No chainlink data !');
+      return;
     }
+
+    // Implement
+    await this.db.chainlinkRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.CHAINLINK, {
+      price: chainlinkPrice[1].toString(),
+      updated_at: new Date().getTime(),
+    });
+    // }
   }
 }
