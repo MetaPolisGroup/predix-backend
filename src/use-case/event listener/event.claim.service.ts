@@ -11,6 +11,7 @@ export class EventClaimListener implements OnApplicationBootstrap {
   async onApplicationBootstrap() {
     if (process.env.CONSTANT_ENABLE === 'True') {
       await this.listenClaim();
+      await this.listenClaimCommision();
     }
   }
 
@@ -36,6 +37,14 @@ export class EventClaimListener implements OnApplicationBootstrap {
       await this.db.betRepo.upsertDocumentData(bet.id, { claimed: true, claimed_amount: parseInt(amount.toString()) });
 
       this.logger.log(`${sender} claim ${ethers.formatEther(amount)} !`);
+    });
+  }
+
+  async listenClaimCommision() {
+    await this.factory.predictionContract.on('CommissionClaim', async (sender: string, amount: bigint) => {
+      await this.db.userRepo.upsertDocumentData(sender, { point: 0 });
+
+      this.logger.log(`${sender} claim ${ethers.formatEther(amount)} commision !`);
     });
   }
 }

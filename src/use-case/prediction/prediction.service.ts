@@ -134,7 +134,14 @@ export class PredictionService implements OnApplicationBootstrap {
   }
 
   async updateContractState() {
-    const preference = await this.db.preferenceRepo.getFirstValueCollectionData();
+    const preference: Preferences = {
+      buffer_seconds: null,
+      fee: null,
+      genesis_lock: null,
+      genesis_start: null,
+      interval_seconds: null,
+      paused: null,
+    };
 
     if (!preference) {
       this.logger.warn('Preference not found when update state contract !');
