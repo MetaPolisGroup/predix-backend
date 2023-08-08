@@ -1,4 +1,6 @@
 export class Preferences {
+  id?: string;
+
   fee: number;
 
   interval_seconds: number;

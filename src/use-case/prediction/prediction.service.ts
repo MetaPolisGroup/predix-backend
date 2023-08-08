@@ -143,6 +143,11 @@ export class PredictionService implements OnApplicationBootstrap {
       paused: null,
     };
 
+    if (!preference) {
+      this.logger.warn('Preference not found when update state contract !');
+      return;
+    }
+
     const genesisStart = await this.factory.predictionContract.genesisStartOnce();
 
     const genesisLock = await this.factory.predictionContract.genesisLockOnce();
@@ -151,7 +156,7 @@ export class PredictionService implements OnApplicationBootstrap {
 
     const intervalSeconds = await this.factory.predictionContract.intervalSeconds();
 
-    const fee = await this.factory.predictionContract.treasuryFee();
+    const treasuryFee = await this.factory.predictionContract.treasuryFee();
 
     if (genesisStart !== undefined) {
       preference.genesis_start = genesisStart;
@@ -169,8 +174,8 @@ export class PredictionService implements OnApplicationBootstrap {
       preference.interval_seconds = parseInt(intervalSeconds.toString());
     }
 
-    if (fee !== undefined) {
-      preference.fee = parseInt(fee.toString());
+    if (treasuryFee !== undefined) {
+      preference.fee = parseInt(treasuryFee.toString());
     }
 
     await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE, preference);
