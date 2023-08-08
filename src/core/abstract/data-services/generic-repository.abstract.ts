@@ -37,6 +37,8 @@ export abstract class IGenericRepository<T> {
 
   abstract upsertDocumentData(documentId: string, documentData: T | object): Promise<T>;
 
+  abstract upsertDocumentDataWithResult(documentId: string, documentData: T | object);
+
   abstract deleteDocumentData(documentId: string): Promise<void>;
 
   abstract deleteDocumentByConditions(conditions: { field: string; operator: WhereFilterOp; value: any }[]): void;

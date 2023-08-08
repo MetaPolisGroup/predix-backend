@@ -181,6 +181,12 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
     return documentData as T;
   }
 
+  async upsertDocumentDataWithResult(documentId: string, documentData: T | object) {
+    const documentRef = this.collectionRef.doc(documentId);
+    const result = await documentRef.set(documentData, { merge: true });
+    return result;
+  }
+
   // Delete
   async deleteDocumentData(documentId: string): Promise<void> {
     const documentRef = this.collectionRef.doc(documentId);

@@ -55,13 +55,14 @@ export class EventRoundListener implements OnApplicationBootstrap {
 
   async listenCutBetRound() {
     await this.factory.predictionContract.on('CutBet', async (epoch: bigint, amount: bigint) => {
-      await this.db.predictionRepo.upsertDocumentData(epoch.toString(), {
+      const result = await this.db.predictionRepo.upsertDocumentDataWithResult(epoch.toString(), {
         bearAmount: parseInt(amount.toString()),
         bullAmount: parseInt(amount.toString()),
         totalAmount: parseInt(amount.toString()) * 2,
       });
 
       this.Logger.log(`Cut bet round ${epoch.toString()}, total bet ${parseInt(amount.toString()) * 2} !`);
+      this.Logger.log(result);
     });
   }
 }
