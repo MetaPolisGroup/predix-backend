@@ -14,7 +14,7 @@ export class EventRoundListener implements OnApplicationBootstrap {
       await this.listenRoundStart();
       await this.listenRoundLock();
       await this.listenRoundEnd();
-      await this.listenCutBetRound();
+      // await this.listenCutBetRound();
     }
     this.Logger = new Logger(EventRoundListener.name);
   }
