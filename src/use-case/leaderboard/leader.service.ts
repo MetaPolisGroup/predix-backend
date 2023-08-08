@@ -7,18 +7,14 @@ export class LeaderboardService {
   constructor(private readonly db: IDataServices) {}
 
   listenLeaderboard() {
-    this.db.predictionRepo.listenToChangesWithConditionsAndOrderBy(
-      [{ field: 'closed', operator: '==', value: true }], 
-      [], 
-      async matchs => {
-        for (const match of matchs) {
-          if (match.type === 'added') {
-            console.log(match.doc.epoch);
-            await this.updateLeaderboard(match.doc.epoch);
-          }
+    this.db.predictionRepo.listenToChangesWithConditionsAndOrderBy([{ field: 'closed', operator: '==', value: true }], [], async matchs => {
+      for (const match of matchs) {
+        if (match.type === 'added') {
+          console.log(match.doc.epoch);
+          await this.updateLeaderboard(match.doc.epoch);
         }
       }
-    );
+    });
   }
 
   async updateLeaderboard(round: number) {
@@ -39,7 +35,11 @@ export class LeaderboardService {
             user.leaderboard.net_winnings -= betslip.amount;
             user.leaderboard.total_amount += betslip.amount;
           }
-          user.leaderboard.win_rate = (user.leaderboard.round_winning / user.leaderboard.round_played) * 100;
+          if (user.leaderboard.round_played !== 0 && user.leaderboard.round_winning !== 0) {
+            user.leaderboard.win_rate = (user.leaderboard.round_winning / user.leaderboard.round_played) * 100;
+          } else {
+            user.leaderboard.win_rate = 0;
+          }
           await this.db.userRepo.upsertDocumentData(user.id, user);
           await this.winRate();
           await this.roundPlayed();
