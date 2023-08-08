@@ -151,6 +151,8 @@ export class PredictionService implements OnApplicationBootstrap {
 
     const intervalSeconds = await this.factory.predictionContract.intervalSeconds();
 
+    const fee = await this.factory.predictionContract.treasuryFee();
+
     if (genesisStart !== undefined) {
       preference.genesis_start = genesisStart;
     }
@@ -165,6 +167,10 @@ export class PredictionService implements OnApplicationBootstrap {
 
     if (intervalSeconds !== undefined) {
       preference.interval_seconds = parseInt(intervalSeconds.toString());
+    }
+
+    if (fee !== undefined) {
+      preference.fee = parseInt(fee.toString());
     }
 
     await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE, preference);
