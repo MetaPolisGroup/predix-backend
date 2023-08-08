@@ -6,6 +6,7 @@ import { UserAuthenService } from './use-case/user/user-authen.service';
 import { Request } from 'express';
 import { ContractFactoryAbstract } from './core/abstract/contract-factory/contract-factory.abstract';
 import { LeaderboardService } from './use-case/leaderboard/leader.service';
+import { PredictionService } from './use-case/prediction/prediction.service';
 
 @Controller()
 export class AppController {
@@ -14,6 +15,7 @@ export class AppController {
     private readonly userService: UserAuthenService,
     private readonly factory: ContractFactoryAbstract,
     private readonly leaderboard: LeaderboardService,
+    private readonly prediction: PredictionService,
   ) {}
 
   @Get()
@@ -25,6 +27,11 @@ export class AppController {
         point: 0,
       });
     }
+  }
+
+  @Get('execute')
+  async ex() {
+    await this.prediction.executeRound();
   }
 
   @Get('unpause')
