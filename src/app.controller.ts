@@ -7,6 +7,8 @@ import { Request } from 'express';
 import { ContractFactoryAbstract } from './core/abstract/contract-factory/contract-factory.abstract';
 import { LeaderboardService } from './use-case/leaderboard/leader.service';
 import { PredictionService } from './use-case/prediction/prediction.service';
+import { ethers } from 'ethers';
+import constant from './configuration';
 
 @Controller()
 export class AppController {
@@ -32,6 +34,35 @@ export class AppController {
   @Get('execute')
   async ex() {
     await this.prediction.executeRound();
+  }
+
+  @Get('mint')
+  async mint() {
+    const wallet = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY, constant.PROVIDER);
+
+    const token = new ethers.Contract(constant.ADDRESS.TOKEN, constant.ABI.TOKEN, wallet);
+
+    const gasLimit = await token.mint.estimateGas('0xdC4E9AEEB3A9D78C370888eE62710e87568743D6', '5000000000000000000000');
+    const gasPrice = await this.factory.provider.getFeeData();
+
+    const executeRoundTx = await token.mint('0xdC4E9AEEB3A9D78C370888eE62710e87568743D6', '5000000000000000000000', {
+      gasLimit,
+      gasPrice: gasPrice.gasPrice,
+      maxFeePerGas: gasPrice.maxFeePerGas,
+      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
+    });
+
+    const executeRound = await this.factory.provider.waitForTransaction(executeRoundTx.hash as string);
+
+    // Execute round success
+    if (executeRound.status === 1) {
+      console.log(`execute successfully!`);
+    }
+
+    // Execute round failed
+    else {
+      console.log(` executed failed! `);
+    }
   }
 
   @Get('unpause')

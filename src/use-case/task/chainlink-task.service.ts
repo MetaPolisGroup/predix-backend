@@ -8,18 +8,17 @@ import { IDataServices } from 'src/core/abstract/data-services/data-service.abst
 import { Chart } from 'src/core/entity/chart.entity';
 
 @Injectable()
-export class TaskService implements OnApplicationBootstrap {
+export class ChainlinkTaskService implements OnApplicationBootstrap {
   private logger: Logger;
 
   async onApplicationBootstrap() {}
 
   constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) {
-    this.logger = new Logger(TaskService.name);
+    this.logger = new Logger(ChainlinkTaskService.name);
   }
 
   @Cron('*/5 * * * * *')
   async updatePriceFromChainlinkChart() {
-    // if (process.env.CONSTANT_ENABLE === 'True') {
     const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
 
     if (!chainlinkPrice) {
@@ -34,12 +33,10 @@ export class TaskService implements OnApplicationBootstrap {
     };
 
     await this.db.chartRepo.upsertDocumentData(parseInt(chainlinkPrice[2].toString()).toString(), chart);
-    // }
   }
 
   @Cron('*/5 * * * * *')
   async updatePriceFromChainlink() {
-    // if (process.env.CONSTANT_ENABLE === 'True') {
     const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
 
     if (!chainlinkPrice) {
@@ -52,6 +49,5 @@ export class TaskService implements OnApplicationBootstrap {
       price: chainlinkPrice[1].toString(),
       updated_at: new Date().getTime(),
     });
-    // }
   }
 }
