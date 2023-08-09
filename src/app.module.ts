@@ -25,7 +25,7 @@ import { EventListenerModule } from './use-case/event listener/prediction/event-
     AuthModule,
     PredictionModule,
     ContractFactoryModule,
-    // TaskModule,
+    TaskModule,
     EventListenerModule,
     ChartModule,
     LeaderboardModule,
