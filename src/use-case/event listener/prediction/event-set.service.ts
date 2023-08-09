@@ -2,7 +2,7 @@ import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import constant from 'src/configuration';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
-import { PredictionService } from '../prediction/prediction.service';
+import { PredictionService } from 'src/use-case/prediction/prediction.service';
 
 @Injectable()
 export class EventSetListener implements OnApplicationBootstrap {
