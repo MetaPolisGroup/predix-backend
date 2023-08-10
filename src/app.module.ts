@@ -10,10 +10,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { PredictionModule } from './use-case/prediction/prediction.module';
 import { ChartModule } from './use-case/chart/chart.module';
 import { LeaderboardModule } from './use-case/leaderboard/leaderboard.module';
-import { AppService } from './app.service';
 import { SnapshotModule } from './use-case/snapshot/snapshot.module';
-import { BetPredictionModule } from './use-case/bet/prediction/bet-prediction.module';
-import { EventListenerModule } from './use-case/event listener/prediction/event-listener.module';
+import { EventListenerModule } from './use-case/event listener/event-listener.module';
+import { BetModule } from './use-case/bet/bet.module';
 
 @Module({
   imports: [
@@ -29,9 +28,9 @@ import { EventListenerModule } from './use-case/event listener/prediction/event-
     EventListenerModule,
     ChartModule,
     LeaderboardModule,
-    BetPredictionModule,
+    BetModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [],
 })
 export class AppModule {}

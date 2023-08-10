@@ -1,4 +1,6 @@
+import { BetStatus, Position } from 'src/configuration/type';
 import { Prediction } from './prediction.enity';
+import { Market } from './market.entity';
 
 export class Bet {
   id?: string;
@@ -21,13 +23,9 @@ export class Bet {
 
   status: BetStatus;
 
-  round: Prediction;
+  round: Prediction | Market;
 
   created_at: number;
 
   delete: boolean;
 }
-
-export type BetStatus = 'Win' | 'Winning Refund' | 'Lose' | 'Losing Refund' | 'Refund' | 'Waiting' | 'Live';
-
-export type Position = 'UP' | 'DOWN';

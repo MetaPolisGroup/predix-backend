@@ -8,4 +8,5 @@ export type collectionsName =
   | 'chainlink'
   | 'charts'
   | 'preferences'
+  | 'markets'
   | 'leaderboard';

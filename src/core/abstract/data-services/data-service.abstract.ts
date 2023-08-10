@@ -9,6 +9,7 @@ import { Chainlink } from 'src/core/entity/chainlink.entity';
 import { Leaderboard } from 'src/core/entity/leaderboard.entity';
 import { Chart } from 'src/core/entity/chart.entity';
 import { Preferences } from 'src/core/entity/preferences.entity';
+import { Market } from 'src/core/entity/market.entity';
 
 export abstract class IDataServices {
   // Firestore
@@ -17,7 +18,11 @@ export abstract class IDataServices {
 
   abstract userRepo: IGenericRepository<User>;
 
+  // Bets
+
   abstract betRepo: IGenericRepository<Bet>;
+
+  abstract betMarketRepo: IGenericRepository<Bet>;
 
   abstract preferenceRepo: IGenericRepository<Preferences>;
 
@@ -27,11 +32,14 @@ export abstract class IDataServices {
 
   abstract pointHistoryRepo: IGenericRepository<PointHistory>;
 
-  abstract predictionRepo: IGenericRepository<Prediction>;
-
   abstract productRepo: IGenericRepository<Product>;
 
   abstract chainlinkRepo: IGenericRepository<Chainlink>;
 
   abstract leaderboardRepo: IGenericRepository<Leaderboard>;
+
+  //  Games
+  abstract predictionRepo: IGenericRepository<Prediction>;
+
+  abstract marketRepo: IGenericRepository<Market>;
 }
