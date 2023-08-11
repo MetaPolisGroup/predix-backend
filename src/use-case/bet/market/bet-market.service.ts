@@ -57,7 +57,7 @@ export class BetMarketService implements OnApplicationBootstrap {
       user_address: sender,
     };
 
-    await this.db.betRepo.createDocumentData(bet);
+    await this.db.betMarketRepo.createDocumentData(bet);
   }
 
   async userBetBull(sender: string, epoch: bigint, amount: bigint) {
@@ -101,7 +101,7 @@ export class BetMarketService implements OnApplicationBootstrap {
       user_address: sender,
     };
 
-    await this.db.betRepo.createDocumentData(bet);
+    await this.db.betMarketRepo.createDocumentData(bet);
   }
 
   async userCutBet(epoch: bigint, sender: string, betAmount: bigint, refundAmount: bigint) {
@@ -110,7 +110,7 @@ export class BetMarketService implements OnApplicationBootstrap {
     const refund = parseInt(refundAmount.toString());
 
     // Bet
-    const bet = await this.db.betRepo.getFirstValueCollectionDataByConditions([
+    const bet = await this.db.betMarketRepo.getFirstValueCollectionDataByConditions([
       {
         field: 'epoch',
         operator: '==',
@@ -149,7 +149,7 @@ export class BetMarketService implements OnApplicationBootstrap {
     }
 
     // Upsert
-    await this.db.betRepo.upsertDocumentData(bet.id, bet);
+    await this.db.betMarketRepo.upsertDocumentData(bet.id, bet);
   }
 
   async updateBetWhenRoundIsEnded(epoch: bigint) {
@@ -162,7 +162,7 @@ export class BetMarketService implements OnApplicationBootstrap {
     ]);
 
     //Update bets
-    const bets = await this.db.betRepo.getCollectionDataByConditions([
+    const bets = await this.db.betMarketRepo.getCollectionDataByConditions([
       {
         field: 'epoch',
         operator: '==',
@@ -181,7 +181,7 @@ export class BetMarketService implements OnApplicationBootstrap {
           bet.status = this.calculateResult(bet, round);
         }
 
-        await this.db.betRepo.upsertDocumentData(bet.id, bet);
+        await this.db.betMarketRepo.upsertDocumentData(bet.id, bet);
 
         // Handle commission
         // await this.handleMoney.handlePoint(bet.amount, bet.user_address);
