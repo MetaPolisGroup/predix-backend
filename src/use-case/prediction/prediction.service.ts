@@ -109,10 +109,10 @@ export class PredictionService implements OnApplicationBootstrap {
     }
 
     // Implement
-    const gasLimit = await this.factory.predictionAdminContract.executeRound.estimateGas(chainLinkPrice[0], chainLinkPrice[1]);
+    const gasLimit = await this.factory.predictionContract.executeRound.estimateGas(chainLinkPrice[0], chainLinkPrice[1]);
     const gasPrice = await this.factory.provider.getFeeData();
 
-    const executeRoundTx = await this.factory.predictionAdminContract.executeRound(chainLinkPrice[0], chainLinkPrice[1], {
+    const executeRoundTx = await this.factory.predictionContract.executeRound(chainLinkPrice[0], chainLinkPrice[1], {
       gasLimit,
       gasPrice: gasPrice.gasPrice,
       maxFeePerGas: gasPrice.maxFeePerGas,
@@ -178,7 +178,7 @@ export class PredictionService implements OnApplicationBootstrap {
       preference.fee = parseInt(treasuryFee.toString());
     }
 
-    await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE, preference);
+    await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION, preference);
 
     if (genesisStart === undefined) {
       this.logger.warn("Can't get Genesis Start from contract !");
@@ -199,10 +199,10 @@ export class PredictionService implements OnApplicationBootstrap {
 
   async genesisStartRound() {
     // Implement
-    const gasLimit = await this.factory.predictionAdminContract.genesisStartRound.estimateGas();
+    const gasLimit = await this.factory.predictionContract.genesisStartRound.estimateGas();
     const gasPrice = await this.factory.provider.getFeeData();
 
-    const genesisStartRound = await this.factory.predictionAdminContract.genesisStartRound({
+    const genesisStartRound = await this.factory.predictionContract.genesisStartRound({
       gasLimit,
       gasPrice: gasPrice.gasPrice,
       maxFeePerGas: gasPrice.maxFeePerGas,
@@ -217,7 +217,7 @@ export class PredictionService implements OnApplicationBootstrap {
 
       // Update genesis start preference
 
-      await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE, {
+      await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION, {
         genesis_start: true,
       });
     }
@@ -238,10 +238,10 @@ export class PredictionService implements OnApplicationBootstrap {
     }
 
     // Implement
-    const gasLimit = await this.factory.predictionAdminContract.genesisLockRound.estimateGas(chainLinkPrice[0], chainLinkPrice[1]);
+    const gasLimit = await this.factory.predictionContract.genesisLockRound.estimateGas(chainLinkPrice[0], chainLinkPrice[1]);
     const gasPrice = await this.factory.provider.getFeeData();
 
-    const genesisLockRound = await this.factory.predictionAdminContract.genesisLockRound(chainLinkPrice[0], chainLinkPrice[1], {
+    const genesisLockRound = await this.factory.predictionContract.genesisLockRound(chainLinkPrice[0], chainLinkPrice[1], {
       gasLimit,
       gasPrice: gasPrice.gasPrice,
       maxFeePerGas: gasPrice.maxFeePerGas,
@@ -255,7 +255,7 @@ export class PredictionService implements OnApplicationBootstrap {
       this.logger.log(`Genesis Lock round successfully!`);
 
       // Update genesis lock preference
-      await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE, {
+      await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION, {
         genesis_lock: true,
       });
     }

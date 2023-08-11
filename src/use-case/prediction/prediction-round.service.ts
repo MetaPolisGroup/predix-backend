@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { CronJob } from 'cron';
+import constant from 'src/configuration';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 import { Prediction } from 'src/core/entity/prediction.enity';
 
@@ -18,7 +19,7 @@ export class PredictionRoundService implements OnApplicationBootstrap {
   }
 
   async createNewRound(epoch: bigint) {
-    const preferences = await this.db.preferenceRepo.getFirstValueCollectionData();
+    const preferences = await this.db.preferenceRepo.getDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION);
     const now = Math.round(new Date().getTime() / 1000);
 
     if (!preferences) {

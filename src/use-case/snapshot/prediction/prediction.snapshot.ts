@@ -8,7 +8,7 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
 
   onApplicationBootstrap() {
     if (process.env.CONSTANT_ENABLE === 'True') {
-      // this.availableRoundSnapshot();
+      this.availableRoundSnapshot();
     }
   }
 

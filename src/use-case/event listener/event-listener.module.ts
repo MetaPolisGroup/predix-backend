@@ -1,16 +1,30 @@
 import { Module } from '@nestjs/common';
-import { EventBetListener } from './event-bet.service';
-import { EventRoundListener } from './event-round.service';
-import { EventClaimListener } from './event.claim.service';
-import { PredictionModule } from '../prediction/prediction.module';
-import { EventSetListener } from './event-set.service';
-import { UserModule } from '../user/user.module';
-import { BetPredictionModule } from '../bet/prediction/bet-prediction.module';
+import { EventBetListener } from './prediction/event-bet.service';
+import { EventRoundListener } from './prediction/event-round.service';
+import { EventClaimListener } from './prediction/event.claim.service';
+import { EventSetListener } from './prediction/event-set.service';
+import { PredictionModule } from 'src/use-case/prediction/prediction.module';
+import { UserModule } from 'src/use-case/user/user.module';
+import { EventMarketBetListener } from './market/event-bet-market.service';
+import { EventMarketClaimListener } from './market/event-claim-market.service';
+import { EventMarketSetListener } from './market/event-set-market.service';
+import { EventMarketRoundListener } from './market/event-round-market.service';
+import { BetModule } from '../bet/bet.module';
+import { MarketModule } from '../market/market.module';
 
 @Module({
-  providers: [EventBetListener, EventRoundListener, EventClaimListener, EventSetListener],
+  providers: [
+    EventBetListener,
+    EventRoundListener,
+    EventClaimListener,
+    EventSetListener,
+    EventMarketBetListener,
+    EventMarketClaimListener,
+    EventMarketSetListener,
+    EventMarketRoundListener,
+  ],
   controllers: [],
-  imports: [PredictionModule, UserModule, BetPredictionModule],
+  imports: [PredictionModule, UserModule, BetModule, MarketModule],
   exports: [],
 })
 export class EventListenerModule {}

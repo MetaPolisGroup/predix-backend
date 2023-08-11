@@ -1,6 +1,6 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
-import { BetPredictionService } from '../bet/prediction/bet-prediction.service';
+import { BetPredictionService } from '../../bet/prediction/bet-prediction.service';
 
 @Injectable()
 export class EventBetListener implements OnApplicationBootstrap {

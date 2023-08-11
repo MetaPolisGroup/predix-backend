@@ -5,24 +5,23 @@ import constant from 'src/configuration';
 import { BetStatus } from 'src/configuration/type';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 import { Bet } from 'src/core/entity/bet.entity';
-import { Prediction } from 'src/core/entity/prediction.enity';
-import { UserHandleMoney } from 'src/use-case/user/user-handle-money.service';
+import { Market } from 'src/core/entity/market.entity';
 
 @Injectable()
-export class BetPredictionService implements OnApplicationBootstrap {
+export class BetMarketService implements OnApplicationBootstrap {
   private logger: Logger;
 
   async onApplicationBootstrap() {}
 
-  constructor(private readonly db: IDataServices, private readonly handleMoney: UserHandleMoney) {
-    this.logger = new Logger(BetPredictionService.name);
+  constructor(private readonly db: IDataServices) {
+    this.logger = new Logger(BetMarketService.name);
   }
 
   async userBetBear(sender: string, epoch: bigint, amount: bigint) {
     //Const
     const betAmount = parseInt(amount.toString());
 
-    const round = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
+    const round = await this.db.marketRepo.getFirstValueCollectionDataByConditions([
       {
         field: 'epoch',
         operator: '==',
@@ -33,10 +32,10 @@ export class BetPredictionService implements OnApplicationBootstrap {
     round.totalAmount += betAmount;
     round.bearAmount += betAmount;
 
-    await this.db.predictionRepo.upsertDocumentData(round.epoch.toString(), round);
+    await this.db.marketRepo.upsertDocumentData(round.epoch.toString(), round);
 
     //Preferences
-    const preferences = await this.db.preferenceRepo.getDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION);
+    const preferences = await this.db.preferenceRepo.getDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.MARKET);
     let winning_amount = betAmount;
 
     if (preferences) {
@@ -58,7 +57,7 @@ export class BetPredictionService implements OnApplicationBootstrap {
       user_address: sender,
     };
 
-    await this.db.betRepo.createDocumentData(bet);
+    await this.db.betMarketRepo.createDocumentData(bet);
   }
 
   async userBetBull(sender: string, epoch: bigint, amount: bigint) {
@@ -66,7 +65,7 @@ export class BetPredictionService implements OnApplicationBootstrap {
     const betAmount = parseInt(amount.toString());
 
     //Round
-    const round = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
+    const round = await this.db.marketRepo.getFirstValueCollectionDataByConditions([
       {
         field: 'epoch',
         operator: '==',
@@ -77,10 +76,10 @@ export class BetPredictionService implements OnApplicationBootstrap {
     round.totalAmount += betAmount;
     round.bullAmount += betAmount;
 
-    await this.db.predictionRepo.upsertDocumentData(round.epoch.toString(), round);
+    await this.db.marketRepo.upsertDocumentData(round.epoch.toString(), round);
 
     //Preferences
-    const preferences = await this.db.preferenceRepo.getDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION);
+    const preferences = await this.db.preferenceRepo.getFirstValueCollectionData();
     let winning_amount = betAmount;
 
     if (preferences) {
@@ -102,7 +101,7 @@ export class BetPredictionService implements OnApplicationBootstrap {
       user_address: sender,
     };
 
-    await this.db.betRepo.createDocumentData(bet);
+    await this.db.betMarketRepo.createDocumentData(bet);
   }
 
   async userCutBet(epoch: bigint, sender: string, betAmount: bigint, refundAmount: bigint) {
@@ -111,7 +110,7 @@ export class BetPredictionService implements OnApplicationBootstrap {
     const refund = parseInt(refundAmount.toString());
 
     // Bet
-    const bet = await this.db.betRepo.getFirstValueCollectionDataByConditions([
+    const bet = await this.db.betMarketRepo.getFirstValueCollectionDataByConditions([
       {
         field: 'epoch',
         operator: '==',
@@ -129,7 +128,7 @@ export class BetPredictionService implements OnApplicationBootstrap {
     }
 
     //Preferences
-    const preferences = await this.db.preferenceRepo.getDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION);
+    const preferences = await this.db.preferenceRepo.getDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.MARKET);
 
     bet.amount = amount;
     bet.refund = refund;
@@ -150,42 +149,11 @@ export class BetPredictionService implements OnApplicationBootstrap {
     }
 
     // Upsert
-    await this.db.betRepo.upsertDocumentData(bet.id, bet);
-  }
-
-  async updateBetWhenRoundIsLocked(epoch: bigint) {
-    const round = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
-      {
-        field: 'epoch',
-        operator: '==',
-        value: parseInt(epoch.toString()),
-      },
-    ]);
-
-    const bets = await this.db.betRepo.getCollectionDataByConditions([
-      {
-        field: 'epoch',
-        operator: '==',
-        value: parseInt(epoch.toString()),
-      },
-    ]);
-
-    // Change bets's status to live
-    if (bets) {
-      for (const bet of bets) {
-        await this.db.betRepo.upsertDocumentData(bet.id, {
-          round: round ? round : null,
-          status: 'Live',
-        });
-      }
-    }
-
-    // Log
-    this.logger.log(`Round ${epoch.toString()} has locked !`);
+    await this.db.betMarketRepo.upsertDocumentData(bet.id, bet);
   }
 
   async updateBetWhenRoundIsEnded(epoch: bigint) {
-    const round = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
+    const round = await this.db.marketRepo.getFirstValueCollectionDataByConditions([
       {
         field: 'epoch',
         operator: '==',
@@ -194,7 +162,7 @@ export class BetPredictionService implements OnApplicationBootstrap {
     ]);
 
     //Update bets
-    const bets = await this.db.betRepo.getCollectionDataByConditions([
+    const bets = await this.db.betMarketRepo.getCollectionDataByConditions([
       {
         field: 'epoch',
         operator: '==',
@@ -213,10 +181,10 @@ export class BetPredictionService implements OnApplicationBootstrap {
           bet.status = this.calculateResult(bet, round);
         }
 
-        await this.db.betRepo.upsertDocumentData(bet.id, bet);
+        await this.db.betMarketRepo.upsertDocumentData(bet.id, bet);
 
         // Handle commission
-        await this.handleMoney.handlePoint(bet.amount, bet.user_address);
+        // await this.handleMoney.handlePoint(bet.amount, bet.user_address);
       }
     }
 
@@ -224,11 +192,10 @@ export class BetPredictionService implements OnApplicationBootstrap {
     this.logger.log(`Round ${epoch.toString()} has ended !`);
   }
 
-  private calculateResult(bet: Bet, round: Prediction): BetStatus {
-    const r = round.closePrice - round.lockPrice;
+  private calculateResult(bet: Bet, round: Market): BetStatus {
     let result: BetStatus;
 
-    if ((r > 0 && bet.position === 'UP') || (r < 0 && bet.position === 'DOWN')) {
+    if ((round.result === 'Up' && bet.position === 'UP') || (round.result === 'Down ' && bet.position === 'DOWN')) {
       result = 'Win';
       if (bet.refund > 0) {
         result = 'Winning Refund';

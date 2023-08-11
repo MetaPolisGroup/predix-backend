@@ -10,39 +10,44 @@ export class ContractFactory implements ContractFactoryAbstract {
 
   readonly predictionContract: Contract;
 
-  readonly predictionAdminContract: Contract;
+  readonly tokenContract: Contract;
 
   readonly aggregatorContract: Contract;
 
   readonly provider: JsonRpcProvider;
 
+  readonly marketContract: Contract;
+
   constructor() {
     // Provider
     this.provider = constant.PROVIDER;
 
-    // PredictionContract
-    this.predictionContract = new ethers.Contract(
-      constant.ADDRESS.PREDICTION,
-      new ethers.Interface(constant.ABI.PREDICTION),
-      constant.PROVIDER,
-    );
+    // Prediction Contract
+    this.predictionContract = this.getPredictionContract();
 
-    // PredictionAdminContract
-    this.predictionAdminContract = this.getPredictionAdminContract();
+    // Token Contract
+    this.tokenContract = this.getTokenContract();
+
+    // Market Contract
+    this.marketContract = this.getMarketContract();
 
     // Aggregator contract
-    this.aggregatorContract = new ethers.Contract(constant.ADDRESS.AGGREGATOR, constant.ABI.AGGREGATOR, this.getMainetProvider());
+    this.aggregatorContract = this.getAggregatorContract();
 
     if (!this.provider) {
       throw new Error('Provider not found !');
     }
 
-    if (!this.predictionContract) {
+    if (!this.tokenContract) {
       throw new Error('Prediction contract create failed !');
     }
 
-    if (!this.predictionAdminContract) {
-      throw new Error('Prediction admin contract create failed !');
+    if (!this.marketContract) {
+      throw new Error('Prediction contract create failed !');
+    }
+
+    if (!this.predictionContract) {
+      throw new Error('Prediction contract create failed !');
     }
 
     if (!this.aggregatorContract) {
@@ -50,12 +55,34 @@ export class ContractFactory implements ContractFactoryAbstract {
     }
   }
 
-  private getPredictionAdminContract() {
+  private getPredictionContract() {
     const wallet = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY, constant.PROVIDER);
 
     const predictionContract = new ethers.Contract(constant.ADDRESS.PREDICTION, constant.ABI.PREDICTION, wallet);
 
     return predictionContract;
+  }
+
+  private getTokenContract() {
+    const wallet = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY, constant.PROVIDER);
+
+    const tokenContract = new ethers.Contract(constant.ADDRESS.TOKEN, constant.ABI.TOKEN, wallet);
+
+    return tokenContract;
+  }
+
+  private getMarketContract() {
+    const wallet = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY, constant.PROVIDER);
+
+    const marketContract = new ethers.Contract(constant.ADDRESS.MARKET, constant.ABI.MARKET, wallet);
+
+    return marketContract;
+  }
+
+  private getAggregatorContract() {
+    const aggregatorContract = new ethers.Contract(constant.ADDRESS.AGGREGATOR, constant.ABI.AGGREGATOR, this.getMainetProvider());
+
+    return aggregatorContract;
   }
 
   getMainetProvider() {

@@ -2,7 +2,7 @@ import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import constant from 'src/configuration';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
-import { PredictionService } from '../prediction/prediction.service';
+import { PredictionService } from 'src/use-case/prediction/prediction.service';
 
 @Injectable()
 export class EventSetListener implements OnApplicationBootstrap {
@@ -28,7 +28,7 @@ export class EventSetListener implements OnApplicationBootstrap {
 
   async listenSetIntervalSeconds() {
     await this.factory.predictionContract.on('NewIntervalSeconds', async (intervalSeconds: bigint) => {
-      await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE, {
+      await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION, {
         interval_seconds: parseInt(intervalSeconds.toString()),
       });
     });
@@ -36,7 +36,7 @@ export class EventSetListener implements OnApplicationBootstrap {
 
   async listenSetBufferSeconds() {
     await this.factory.predictionContract.on('NewBufferSeconds', async (bufferSeconds: bigint) => {
-      await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE, {
+      await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION, {
         buffer_seconds: parseInt(bufferSeconds.toString()),
       });
     });
@@ -44,7 +44,7 @@ export class EventSetListener implements OnApplicationBootstrap {
 
   async listenSetFee() {
     await this.factory.predictionContract.on('NewTreasuryFee', async (epoch: bigint, treasuryFee: bigint) => {
-      await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE, {
+      await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION, {
         fee: parseInt(treasuryFee.toString()),
       });
     });
@@ -52,7 +52,7 @@ export class EventSetListener implements OnApplicationBootstrap {
 
   async listenPause() {
     await this.factory.predictionContract.on('Pause', async (epoch: bigint) => {
-      await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE, {
+      await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION, {
         paused: true,
       });
 
@@ -63,7 +63,7 @@ export class EventSetListener implements OnApplicationBootstrap {
 
   async listenUnPause() {
     await this.factory.predictionContract.on('Unpause', async (epoch: bigint) => {
-      await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE, {
+      await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION, {
         paused: false,
         genesis_start: false,
         genesis_lock: false,

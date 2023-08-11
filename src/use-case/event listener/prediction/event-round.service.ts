@@ -2,8 +2,8 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
-import { PredictionRoundService } from '../prediction/prediction-round.service';
-import { BetPredictionService } from '../bet/prediction/bet-prediction.service';
+import { BetPredictionService } from 'src/use-case/bet/prediction/bet-prediction.service';
+import { PredictionRoundService } from 'src/use-case/prediction/prediction-round.service';
 
 @Injectable()
 export class EventRoundListener implements OnApplicationBootstrap {
@@ -55,14 +55,14 @@ export class EventRoundListener implements OnApplicationBootstrap {
 
   async listenCutBetRound() {
     await this.factory.predictionContract.on('CutBet', async (epoch: bigint, amount: bigint) => {
+      const a = parseInt(amount.toString());
       const result = await this.db.predictionRepo.upsertDocumentDataWithResult(epoch.toString(), {
-        bearAmount: parseInt(amount.toString()),
-        bullAmount: parseInt(amount.toString()),
-        totalAmount: parseInt(amount.toString()) * 2,
+        bearAmount: a,
+        bullAmount: a,
+        totalAmount: a * 2,
       });
 
-      this.Logger.log(`Cut bet round ${epoch.toString()}, total bet ${parseInt(amount.toString()) * 2} !`);
-      this.Logger.log(result);
+      this.Logger.log(`Cut bet round ${epoch.toString()}, total bet ${a * 2} !`);
     });
   }
 }

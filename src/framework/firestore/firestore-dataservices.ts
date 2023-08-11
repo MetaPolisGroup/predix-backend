@@ -16,6 +16,7 @@ import { Chainlink } from 'src/core/entity/chainlink.entity';
 import { Leaderboard } from 'src/core/entity/leaderboard.entity';
 import { Chart } from 'src/core/entity/chart.entity';
 import { Preferences } from 'src/core/entity/preferences.entity';
+import { Market } from 'src/core/entity/market.entity';
 
 @Injectable()
 export class FirestoreDataServices implements IDataServices, OnApplicationBootstrap {
@@ -24,17 +25,11 @@ export class FirestoreDataServices implements IDataServices, OnApplicationBootst
 
   userRepo: FirestoreGenericRepository<User>;
 
-  betRepo: FirestoreGenericRepository<Bet>;
-
-  preferenceRepo: FirestoreGenericRepository<Preferences>;
-
   chartRepo: FirestoreGenericRepository<Chart>;
 
   cashHistoryRepoRepo: FirestoreGenericRepository<CashHistory>;
 
   pointHistoryRepo: FirestoreGenericRepository<PointHistory>;
-
-  predictionRepo: FirestoreGenericRepository<Prediction>;
 
   productRepo: FirestoreGenericRepository<Product>;
 
@@ -43,6 +38,19 @@ export class FirestoreDataServices implements IDataServices, OnApplicationBootst
   chainlinkRepo: FirestoreGenericRepository<Chainlink>;
 
   leaderboardRepo: FirestoreGenericRepository<Leaderboard>;
+
+  preferenceRepo: FirestoreGenericRepository<Preferences>;
+
+  // Prediction
+
+  predictionRepo: FirestoreGenericRepository<Prediction>;
+
+  betRepo: FirestoreGenericRepository<Bet>;
+
+  // Market
+  betMarketRepo: FirestoreGenericRepository<Bet>;
+
+  marketRepo: FirestoreGenericRepository<Market>;
 
   constructor() {}
 
@@ -67,10 +75,6 @@ export class FirestoreDataServices implements IDataServices, OnApplicationBootst
 
     this.pointHistoryRepo = new FirestoreGenericRepository<PointHistory>(firestore, constant.FIREBASE.COLLECTIONS.POINT_HISTORIES);
 
-    this.predictionRepo = new FirestoreGenericRepository<Prediction>(firestore, constant.FIREBASE.COLLECTIONS.PREDICTIONS);
-
-    this.betRepo = new FirestoreGenericRepository<Bet>(firestore, constant.FIREBASE.COLLECTIONS.BETS);
-
     this.productRepo = new FirestoreGenericRepository<Product>(firestore, constant.FIREBASE.COLLECTIONS.PRODUCTS);
 
     this.chartRepo = new FirestoreGenericRepository<Chart>(firestore, constant.FIREBASE.COLLECTIONS.CHARTS);
@@ -80,5 +84,17 @@ export class FirestoreDataServices implements IDataServices, OnApplicationBootst
     this.leaderboardRepo = new FirestoreGenericRepository<Leaderboard>(firestore, constant.FIREBASE.COLLECTIONS.LEADERBOARD);
 
     this.preferenceRepo = new FirestoreGenericRepository<Preferences>(firestore, constant.FIREBASE.COLLECTIONS.PREFERENCES);
+
+    // Prediction
+
+    this.predictionRepo = new FirestoreGenericRepository<Prediction>(firestore, constant.FIREBASE.COLLECTIONS.PREDICTIONS);
+
+    this.betRepo = new FirestoreGenericRepository<Bet>(firestore, constant.FIREBASE.COLLECTIONS.BETS);
+
+    // Market
+
+    this.betMarketRepo = new FirestoreGenericRepository<Bet>(firestore, constant.FIREBASE.COLLECTIONS.BETS_MARKET);
+
+    this.marketRepo = new FirestoreGenericRepository<Market>(firestore, constant.FIREBASE.COLLECTIONS.MARKETS);
   }
 }
