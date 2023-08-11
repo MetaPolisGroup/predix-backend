@@ -14,6 +14,11 @@ import { LeaderboardModule } from './use-case/leaderboard/leaderboard.module';
 import { AppService } from './app.service';
 import { SnapshotModule } from './use-case/snapshot/snapshot.module';
 import { BetPredictionModule } from './use-case/bet/prediction/bet-prediction.module';
+import { DatabaseModule } from './core/database-mongodb/database.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { BetMongoModule } from './core/database-mongodb/bet/bet.module';
+import { ChainlinkMongoModule } from './core/database-mongodb/chain-link/chain-link.module';
+import { UserMongoModule } from './core/database-mongodb/user/user.module';
 
 @Module({
   imports: [
@@ -30,6 +35,9 @@ import { BetPredictionModule } from './use-case/bet/prediction/bet-prediction.mo
     ChartModule,
     LeaderboardModule,
     BetPredictionModule,
+    DatabaseModule,
+    MongooseModule.forRoot(process.env.MONGO_DB_HOST, {}),
+    UserMongoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

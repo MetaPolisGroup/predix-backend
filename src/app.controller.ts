@@ -6,6 +6,10 @@ import { UserAuthenService } from './use-case/user/user-authen.service';
 import { Request } from 'express';
 import { ContractFactoryAbstract } from './core/abstract/contract-factory/contract-factory.abstract';
 import { LeaderboardService } from './use-case/leaderboard/leader.service';
+import { UserRepository } from './core/database-mongodb/user/user.repository';
+import { BetRepository } from './core/database-mongodb/bet/bet.repository';
+import { BetMongoModule } from './core/database-mongodb/bet/bet.module';
+import { UserMongoModule } from './core/database-mongodb/user/user.module';
 
 @Controller()
 export class AppController {
@@ -14,6 +18,7 @@ export class AppController {
     private readonly userService: UserAuthenService,
     private readonly factory: ContractFactoryAbstract,
     private readonly leaderboard: LeaderboardService,
+    private readonly userRepo: UserMongoModule,
   ) {}
 
   @Get()
