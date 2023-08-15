@@ -7,9 +7,9 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
   private logger: Logger;
 
   onApplicationBootstrap() {
-    if (process.env.CONSTANT_ENABLE === 'True') {
-      this.availableRoundSnapshot();
-    }
+    // if (process.env.CONSTANT_ENABLE === 'True') {
+    this.availableRoundSnapshot();
+    // }
   }
 
   constructor(private readonly db: IDataServices, private readonly prediction: PredictionService) {
