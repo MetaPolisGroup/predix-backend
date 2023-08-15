@@ -6,8 +6,8 @@ import { BetPredictionService } from '../../bet/prediction/bet-prediction.servic
 export class EventBetListener implements OnApplicationBootstrap {
   async onApplicationBootstrap() {
     if (process.env.CONSTANT_ENABLE === 'True') {
-      await this.listenBetBear();
       await this.listenBetBull();
+      await this.listenBetBear();
       await this.listenCutBetUser();
     }
   }
