@@ -12,6 +12,8 @@ import { Preferences } from 'src/core/entity/preferences.entity';
 export class PredictionService implements OnApplicationBootstrap {
   private cronJobs: { [id: string]: CronJob } = {};
 
+  private cronJobsBet: { [id: string]: CronJob } = {};
+
   private logger: Logger;
 
   async onApplicationBootstrap() {
@@ -24,24 +26,24 @@ export class PredictionService implements OnApplicationBootstrap {
     this.logger = new Logger(PredictionService.name);
   }
 
-  private createCronJob(date: Date, id: number, cb?: () => Promise<void>): void {
+  private createCronJob(cj: { [id: string]: CronJob }, date: Date, id: number, cb?: () => Promise<void>): void {
     const cronjob = new CronJob(date, async function () {
       await cb?.();
     });
 
-    if (this.cronJobs[id] && this.cronJobs[id].running) {
+    if (cj[id] && cj[id].running) {
       this.logger.log(`Cronjob for round ${id} have already set !`);
       return;
     }
 
-    this.cronJobs[id] = cronjob;
+    cj[id] = cronjob;
 
     cronjob.start();
 
     this.logger.log(`Cronjob for round ${id} have been set !`);
   }
 
-  async setCronjob(availableRound: Prediction) {
+  async setCronjobExecute(availableRound: Prediction) {
     // Consts
 
     const now = parseInt((new Date().getTime() / 1000).toString());
@@ -72,7 +74,7 @@ export class PredictionService implements OnApplicationBootstrap {
     //
     if (preferences.genesis_start && !preferences.genesis_lock) {
       const date = new Date((availableRound.startTimestamp + preferences.interval_seconds) * 1000);
-      this.createCronJob(date, availableRound.epoch, async () => {
+      this.createCronJob(this.cronJobs, date, availableRound.epoch, async () => {
         await this.genesisLockRound();
       });
     }
@@ -93,11 +95,28 @@ export class PredictionService implements OnApplicationBootstrap {
       // Set cronjob to execute round  after interval time
       else {
         const date = new Date((availableRound.startTimestamp + preferences.interval_seconds) * 1000);
-        this.createCronJob(date, availableRound.epoch, async () => {
+        this.createCronJob(this.cronJobs, date, availableRound.epoch, async () => {
           await this.executeRound();
         });
       }
     }
+  }
+
+  setCronjobAutoBet(availableRound: Prediction) {
+    if (this.cronJobsBet[availableRound?.epoch]) {
+      this.logger.log(`Cronjob bet for round ${availableRound.epoch} have already set !`);
+      return;
+    }
+
+    if (!availableRound) {
+      this.logger.warn(`No available round to set cronjob bet!`);
+      return;
+    }
+
+    const date = new Date((availableRound.lockTimestamp - 120) * 1000);
+    this.createCronJob(this.cronJobsBet, date, availableRound.epoch, async () => {
+      await this.automaticBotBet(2000);
+    });
   }
 
   async executeRound() {
@@ -288,5 +307,135 @@ export class PredictionService implements OnApplicationBootstrap {
         });
       }
     }
+  }
+
+  async automaticBotBet(limit: number) {
+    const round = await this.db.predictionRepo.getFirstValueCollectionDataByConditionsAndOrderBy(
+      [
+        {
+          field: 'locked',
+          operator: '==',
+          value: false,
+        },
+        {
+          field: 'cancel',
+          operator: '==',
+          value: false,
+        },
+      ],
+      [
+        {
+          field: 'epoch',
+          option: 'desc',
+        },
+      ],
+    );
+
+    const betDown = await this.db.betRepo.getCollectionDataByConditions([
+      {
+        field: 'epoch',
+        operator: '==',
+        value: round.epoch,
+      },
+      {
+        field: 'position',
+        operator: '==',
+        value: constant.BET.POS.DOWN,
+      },
+    ]);
+
+    const betUp = await this.db.betRepo.getCollectionDataByConditions([
+      {
+        field: 'epoch',
+        operator: '==',
+        value: round.epoch,
+      },
+      {
+        field: 'position',
+        operator: '==',
+        value: constant.BET.POS.UP,
+      },
+    ]);
+
+    if (!betDown && betUp) {
+      await this.betBear(round.epoch.toString(), this.getRandomAmount().toString());
+    } else if (!betUp && betDown) {
+      await this.betBull(round.epoch.toString(), this.getRandomAmount().toString());
+    } else if (betDown && betUp) {
+      let totalBetDown = 0;
+      let totalBetUp = 0;
+
+      for (const bet of betDown) {
+        totalBetDown += bet.amount;
+      }
+      for (const bet of betUp) {
+        totalBetUp += bet.amount;
+      }
+      const limitt = this.getGap(totalBetDown, totalBetUp);
+
+      if (limitt > limit) {
+        if (totalBetDown > totalBetUp) {
+          await this.betBull(round.epoch.toString(), this.getRandomAmount().toString());
+        } else {
+          await this.betBear(round.epoch.toString(), this.getRandomAmount().toString());
+        }
+      }
+    }
+  }
+
+  async betBear(epoch: string, amount: string) {
+    const gasLimit = await this.factory.predictionContract.betBear.estimateGas(epoch, amount);
+    const gasPrice = await this.factory.provider.getFeeData();
+
+    const executeRoundTx = await this.factory.predictionContract.betBear(epoch, amount, {
+      gasLimit,
+      gasPrice: gasPrice.gasPrice,
+      maxFeePerGas: gasPrice.maxFeePerGas,
+      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
+    });
+
+    const executeRound = await this.factory.provider.waitForTransaction(executeRoundTx.hash as string);
+
+    // Execute round success
+    if (executeRound.status === 1) {
+      console.log(`Autobot bet bear ${parseInt(amount) / 10 ** 18} PRX successfully on round ${epoch.toString()}!`);
+    }
+
+    // Execute round failed
+    else {
+      console.log(` Autobot bet bear failed on round ${epoch.toString()} ! `);
+    }
+  }
+
+  async betBull(epoch: string, amount: string) {
+    const gasLimit = await this.factory.predictionContract.betBull.estimateGas(epoch, amount);
+    const gasPrice = await this.factory.provider.getFeeData();
+
+    const executeRoundTx = await this.factory.predictionContract.betBull(epoch, amount, {
+      gasLimit,
+      gasPrice: gasPrice.gasPrice,
+      maxFeePerGas: gasPrice.maxFeePerGas,
+      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
+    });
+
+    const executeRound = await this.factory.provider.waitForTransaction(executeRoundTx.hash as string);
+
+    // Execute round success
+    if (executeRound.status === 1) {
+      console.log(`Autobot bet bull ${parseInt(amount) / 10 ** 18} PRX successfully on round ${epoch.toString()}!`);
+    }
+
+    // Execute round failed
+    else {
+      console.log(`Autobot bet bull failed on round ${epoch.toString()}! `);
+    }
+  }
+
+  getRandomAmount() {
+    return (Math.floor(Math.random() * (2000 - 500 + 1)) + 500) * 10 ** 18;
+  }
+
+  getGap(a: number, b: number) {
+    return Math.abs(a / 10 ** 18 - b / 10 ** 18);
   }
 }

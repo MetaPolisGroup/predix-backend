@@ -10,6 +10,9 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
     if (process.env.CONSTANT_ENABLE === 'True') {
       this.availableRoundSnapshot();
     }
+    if (process.env.CONSTANT_BOT === 'True') {
+      this.automaticBotBetSnapshot();
+    }
   }
 
   constructor(private readonly db: IDataServices, private readonly prediction: PredictionService) {
@@ -39,7 +42,37 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
       async changes => {
         for (const change of changes) {
           if (change.type === 'added') {
-            await this.prediction.setCronjob(change.doc);
+            await this.prediction.setCronjobExecute(change.doc);
+          }
+        }
+      },
+    );
+  }
+
+  automaticBotBetSnapshot() {
+    this.db.predictionRepo.listenToChangesWithConditionsAndOrderBy(
+      [
+        {
+          field: 'locked',
+          operator: '==',
+          value: false,
+        },
+        {
+          field: 'cancel',
+          operator: '==',
+          value: false,
+        },
+      ],
+      [
+        {
+          field: 'epoch',
+          option: 'desc',
+        },
+      ],
+      async changes => {
+        for (const change of changes) {
+          if (change.type === 'added') {
+            this.prediction.setCronjobAutoBet(change.doc);
           }
         }
       },
