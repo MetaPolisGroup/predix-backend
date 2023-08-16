@@ -6,10 +6,10 @@ import { UserAuthenService } from './use-case/user/user-authen.service';
 import { Request } from 'express';
 import { ContractFactoryAbstract } from './core/abstract/contract-factory/contract-factory.abstract';
 import { LeaderboardService } from './use-case/leaderboard/leader.service';
-import { UserMongoModule } from './core/database-mongodb/user/user.module';
 import { ethers } from 'ethers';
 import constant from './configuration';
 import { PredictionService } from './use-case/prediction/prediction.service';
+import { IMongoDbServices } from './core/abstract/data-services/data-mongodb-service.abstract';
 
 @Controller()
 export class AppController {
@@ -18,19 +18,13 @@ export class AppController {
     private readonly userService: UserAuthenService,
     private readonly factory: ContractFactoryAbstract,
     private readonly leaderboard: LeaderboardService,
-    private readonly userRepo: UserMongoModule,
+    private readonly dbMongo: IMongoDbServices,
     private readonly prediction: PredictionService,
   ) {}
 
   @Get()
   async test() {
-    const users = await this.db.userRepo.getCollectionData();
-    for (const user of users) {
-      await this.db.userRepo.upsertDocumentData(user.id, {
-        leaderboard: { net_winnings: 0, round_played: 0, round_winning: 0, total_amount: 0, win_rate: 0 },
-        point: 0,
-      });
-    }
+    return this.dbMongo.userMongoRepo.create({ user_address: '123123123' });
   }
 
   @Get('execute')

@@ -11,9 +11,8 @@ import { PredictionModule } from './use-case/prediction/prediction.module';
 import { ChartModule } from './use-case/chart/chart.module';
 import { LeaderboardModule } from './use-case/leaderboard/leaderboard.module';
 import { SnapshotModule } from './use-case/snapshot/snapshot.module';
-import { DatabaseModule } from './core/database-mongodb/database.module';
+import { DatabaseModule } from './framework/database-mongodb/database.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserMongoModule } from './core/database-mongodb/user/user.module';
 import { EventListenerModule } from './use-case/event listener/event-listener.module';
 
 @Module({
@@ -33,7 +32,6 @@ import { EventListenerModule } from './use-case/event listener/event-listener.mo
     PredictionModule,
     DatabaseModule,
     MongooseModule.forRoot(process.env.MONGO_DB_HOST, {}),
-    UserMongoModule,
   ],
   controllers: [AppController],
   providers: [],

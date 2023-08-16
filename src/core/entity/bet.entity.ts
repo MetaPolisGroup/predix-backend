@@ -1,6 +1,7 @@
 import { BetStatus, Position } from 'src/configuration/type';
 import { Prediction } from './prediction.enity';
 import { Market } from './market.entity';
+import { SchemaFactory } from '@nestjs/mongoose';
 
 export class Bet {
   id?: string;

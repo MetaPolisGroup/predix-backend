@@ -1,17 +1,8 @@
-import {
-  Model,
-  FilterQuery,
-  QueryOptions,
-  Document,
-  ProjectionFields,
-  PipelineStage,
-  UpdateQuery,
-  PopulateOptions,
-  ProjectionType,
-} from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, FilterQuery, QueryOptions, Document, ProjectionFields, PipelineStage, UpdateQuery, PopulateOptions } from 'mongoose';
 
 export class BaseRepository<T extends Document> {
-  constructor(private readonly model: Model<T>) {}
+  constructor(readonly model: Model<T>) {}
 
   async create(doc): Promise<any> {
     const createdEntity = new this.model(doc);

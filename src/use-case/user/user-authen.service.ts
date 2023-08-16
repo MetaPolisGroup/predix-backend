@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { hash, hashSync } from 'bcrypt';
 import { Request } from 'express';
 import constant from 'src/configuration';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
