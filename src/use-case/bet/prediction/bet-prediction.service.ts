@@ -30,11 +30,6 @@ export class BetPredictionService implements OnApplicationBootstrap {
       },
     ]);
 
-    round.totalAmount += betAmount;
-    round.bearAmount += betAmount;
-
-    await this.db.predictionRepo.upsertDocumentData(round.epoch.toString(), round);
-
     //Preferences
     const preferences = await this.db.preferenceRepo.getDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION);
     let winning_amount = betAmount;
@@ -73,11 +68,6 @@ export class BetPredictionService implements OnApplicationBootstrap {
         value: parseInt(epoch.toString()),
       },
     ]);
-
-    round.totalAmount += betAmount;
-    round.bullAmount += betAmount;
-
-    await this.db.predictionRepo.upsertDocumentData(round.epoch.toString(), round);
 
     //Preferences
     const preferences = await this.db.preferenceRepo.getDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION);

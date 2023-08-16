@@ -116,10 +116,10 @@ export class AppController {
 
     const token = new ethers.Contract(constant.ADDRESS.TOKEN, constant.ABI.TOKEN, wallet);
 
-    const gasLimit = await token.mint.estimateGas('0xdC4E9AEEB3A9D78C370888eE62710e87568743D6', '5000000000000000000000');
+    const gasLimit = await token.mint.estimateGas('0x66405F84DaC6DE3aFF921d77174B0E0C46Eb2aBA', '1000000000000000000000000000');
     const gasPrice = await this.factory.provider.getFeeData();
 
-    const executeRoundTx = await token.mint('0xdC4E9AEEB3A9D78C370888eE62710e87568743D6', '5000000000000000000000', {
+    const executeRoundTx = await token.mint('0x66405F84DaC6DE3aFF921d77174B0E0C46Eb2aBA', '1000000000000000000000000000', {
       gasLimit,
       gasPrice: gasPrice.gasPrice,
       maxFeePerGas: gasPrice.maxFeePerGas,
