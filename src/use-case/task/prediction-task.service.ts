@@ -42,6 +42,7 @@ export class PredictionTaskService implements OnApplicationBootstrap {
     const bearAmount = parseInt(round[10].toString());
 
     await this.db.predictionRepo.upsertDocumentData(availableRound.epoch.toString(), {
+      totalAmount: bearAmount + bullAmount,
       bearAmount,
       bullAmount,
     });
