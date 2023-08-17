@@ -16,6 +16,10 @@ export class PredictionService implements OnApplicationBootstrap {
 
   private logger: Logger;
 
+  private s = 20;
+
+  private limit = 2000;
+
   async onApplicationBootstrap() {
     if (process.env.CONSTANT_ENABLE === 'True') {
       await this.updateContractState();
@@ -112,11 +116,13 @@ export class PredictionService implements OnApplicationBootstrap {
       this.logger.warn(`No available round to set cronjob bet!`);
       return;
     }
+    if (availableRound.lockTimestamp - this.s > new Date().getTime() / 1000) {
+      const date = new Date((availableRound.lockTimestamp - this.s) * 1000);
 
-    const date = new Date((availableRound.lockTimestamp - 20) * 1000);
-    this.createCronJob(this.cronJobsBet, date, availableRound.epoch, async () => {
-      await this.automaticBotBet(2000);
-    });
+      this.createCronJob(this.cronJobsBet, date, availableRound.epoch, async () => {
+        await this.automaticBotBet(this.limit);
+      });
+    }
   }
 
   async executeRound() {
@@ -432,7 +438,8 @@ export class PredictionService implements OnApplicationBootstrap {
   }
 
   getRandomAmount() {
-    return (Math.floor(Math.random() * (2000 - 500 + 1)) + 500) * 10 ** 18;
+    const amount = (Math.floor(Math.random() * (2000 - 500 + 1)) + 500) * 10 ** 18;
+    return BigInt(amount);
   }
 
   getGap(a: number, b: number) {
