@@ -113,7 +113,7 @@ export class PredictionService implements OnApplicationBootstrap {
       return;
     }
 
-    const date = new Date((availableRound.lockTimestamp - 120) * 1000);
+    const date = new Date((availableRound.lockTimestamp - 20) * 1000);
     this.createCronJob(this.cronJobsBet, date, availableRound.epoch, async () => {
       await this.automaticBotBet(2000);
     });
