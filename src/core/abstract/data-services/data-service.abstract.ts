@@ -10,6 +10,7 @@ import { Leaderboard } from 'src/core/entity/leaderboard.entity';
 import { Chart } from 'src/core/entity/chart.entity';
 import { Preferences } from 'src/core/entity/preferences.entity';
 import { Market } from 'src/core/entity/market.entity';
+import { Dice } from 'src/core/entity/dice.entity';
 
 export abstract class IDataServices {
   // Firestore
@@ -17,12 +18,6 @@ export abstract class IDataServices {
   abstract firestore: any;
 
   abstract userRepo: IGenericRepository<User>;
-
-  // Bets
-
-  abstract betRepo: IGenericRepository<Bet>;
-
-  abstract betMarketRepo: IGenericRepository<Bet>;
 
   abstract preferenceRepo: IGenericRepository<Preferences>;
 
@@ -38,8 +33,18 @@ export abstract class IDataServices {
 
   abstract leaderboardRepo: IGenericRepository<Leaderboard>;
 
+  // Bets
+
+  abstract betRepo: IGenericRepository<Bet>;
+
+  abstract betDiceRepo: IGenericRepository<Bet>;
+
+  abstract betMarketRepo: IGenericRepository<Bet>;
+
   //  Games
   abstract predictionRepo: IGenericRepository<Prediction>;
+
+  abstract diceRepo: IGenericRepository<Dice>;
 
   abstract marketRepo: IGenericRepository<Market>;
 }

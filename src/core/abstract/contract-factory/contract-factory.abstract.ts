@@ -9,6 +9,8 @@ export abstract class ContractFactoryAbstract {
 
   abstract marketContract: Contract;
 
+  abstract diceContract: Contract;
+
   abstract aggregatorContract: Contract;
 
   abstract provider: JsonRpcProvider;

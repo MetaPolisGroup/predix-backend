@@ -11,6 +11,11 @@ import { EventMarketSetListener } from './market/event-set-market.service';
 import { EventMarketRoundListener } from './market/event-round-market.service';
 import { BetModule } from '../bet/bet.module';
 import { MarketModule } from '../market/market.module';
+import { DiceModule } from '../dice/dice.module';
+import { EventDiceBetListener } from './dice/event-bet-dice.service';
+import { EventDiceClaimListener } from './dice/event.claim-dice.service';
+import { EventDiceRoundListener } from './dice/event-round-dice.service';
+import { EventDiceSetListener } from './dice/event-set-dice.service';
 
 @Module({
   providers: [
@@ -18,13 +23,21 @@ import { MarketModule } from '../market/market.module';
     EventRoundListener,
     EventClaimListener,
     EventSetListener,
+
+    // Market
     EventMarketBetListener,
     EventMarketClaimListener,
     EventMarketSetListener,
     EventMarketRoundListener,
+
+    // Dice
+    EventDiceBetListener,
+    EventDiceClaimListener,
+    EventDiceRoundListener,
+    EventDiceSetListener,
   ],
   controllers: [],
-  imports: [PredictionModule, UserModule, BetModule, MarketModule],
+  imports: [PredictionModule, UserModule, BetModule, MarketModule, DiceModule],
   exports: [],
 })
 export class EventListenerModule {}

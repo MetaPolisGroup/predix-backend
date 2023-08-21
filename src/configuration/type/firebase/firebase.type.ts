@@ -4,9 +4,12 @@ export type collectionsName =
   | 'products'
   | 'point_histories'
   | 'cash_histories'
+  | 'bets_market'
+  | 'bets_dice'
   | 'bets'
   | 'chainlink'
   | 'charts'
   | 'preferences'
   | 'markets'
+  | 'dices'
   | 'leaderboard';

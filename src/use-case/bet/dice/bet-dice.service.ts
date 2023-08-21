@@ -5,24 +5,25 @@ import constant from 'src/configuration';
 import { BetStatus } from 'src/configuration/type';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 import { Bet } from 'src/core/entity/bet.entity';
+import { Dice } from 'src/core/entity/dice.entity';
 import { Prediction } from 'src/core/entity/prediction.enity';
 import { UserHandleMoney } from 'src/use-case/user/user-handle-money.service';
 
 @Injectable()
-export class BetPredictionService implements OnApplicationBootstrap {
+export class BetDiceService implements OnApplicationBootstrap {
   private logger: Logger;
 
   async onApplicationBootstrap() {}
 
   constructor(private readonly db: IDataServices, private readonly handleMoney: UserHandleMoney) {
-    this.logger = new Logger(BetPredictionService.name);
+    this.logger = new Logger(BetDiceService.name);
   }
 
   async userBetBear(sender: string, epoch: bigint, amount: bigint) {
     //Const
     const betAmount = parseInt(amount.toString());
 
-    const round = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
+    const round = await this.db.diceRepo.getFirstValueCollectionDataByConditions([
       {
         field: 'epoch',
         operator: '==',
@@ -30,8 +31,13 @@ export class BetPredictionService implements OnApplicationBootstrap {
       },
     ]);
 
+    round.totalAmount += betAmount;
+    round.bearAmount += betAmount;
+
+    await this.db.diceRepo.upsertDocumentData(round.epoch.toString(), round);
+
     //Preferences
-    const preferences = await this.db.preferenceRepo.getDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION);
+    const preferences = await this.db.preferenceRepo.getDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.DICE);
     let winning_amount = betAmount;
 
     if (preferences) {
@@ -53,7 +59,7 @@ export class BetPredictionService implements OnApplicationBootstrap {
       user_address: sender,
     };
 
-    await this.db.betRepo.createDocumentData(bet);
+    await this.db.betDiceRepo.createDocumentData(bet);
   }
 
   async userBetBull(sender: string, epoch: bigint, amount: bigint) {
@@ -61,7 +67,7 @@ export class BetPredictionService implements OnApplicationBootstrap {
     const betAmount = parseInt(amount.toString());
 
     //Round
-    const round = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
+    const round = await this.db.diceRepo.getFirstValueCollectionDataByConditions([
       {
         field: 'epoch',
         operator: '==',
@@ -69,8 +75,13 @@ export class BetPredictionService implements OnApplicationBootstrap {
       },
     ]);
 
+    round.totalAmount += betAmount;
+    round.bullAmount += betAmount;
+
+    await this.db.diceRepo.upsertDocumentData(round.epoch.toString(), round);
+
     //Preferences
-    const preferences = await this.db.preferenceRepo.getDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION);
+    const preferences = await this.db.preferenceRepo.getDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.DICE);
     let winning_amount = betAmount;
 
     if (preferences) {
@@ -92,7 +103,7 @@ export class BetPredictionService implements OnApplicationBootstrap {
       user_address: sender,
     };
 
-    await this.db.betRepo.createDocumentData(bet);
+    await this.db.betDiceRepo.createDocumentData(bet);
   }
 
   async userCutBet(epoch: bigint, sender: string, betAmount: bigint, refundAmount: bigint) {
@@ -101,7 +112,7 @@ export class BetPredictionService implements OnApplicationBootstrap {
     const refund = parseInt(refundAmount.toString());
 
     // Bet
-    const bet = await this.db.betRepo.getFirstValueCollectionDataByConditions([
+    const bet = await this.db.betDiceRepo.getFirstValueCollectionDataByConditions([
       {
         field: 'epoch',
         operator: '==',
@@ -119,7 +130,7 @@ export class BetPredictionService implements OnApplicationBootstrap {
     }
 
     //Preferences
-    const preferences = await this.db.preferenceRepo.getDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION);
+    const preferences = await this.db.preferenceRepo.getDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.DICE);
 
     bet.amount = amount;
     bet.refund = refund;
@@ -140,42 +151,11 @@ export class BetPredictionService implements OnApplicationBootstrap {
     }
 
     // Upsert
-    await this.db.betRepo.upsertDocumentData(bet.id, bet);
-  }
-
-  async updateBetWhenRoundIsLocked(epoch: bigint) {
-    const round = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
-      {
-        field: 'epoch',
-        operator: '==',
-        value: parseInt(epoch.toString()),
-      },
-    ]);
-
-    const bets = await this.db.betRepo.getCollectionDataByConditions([
-      {
-        field: 'epoch',
-        operator: '==',
-        value: parseInt(epoch.toString()),
-      },
-    ]);
-
-    // Change bets's status to live
-    if (bets) {
-      for (const bet of bets) {
-        await this.db.betRepo.upsertDocumentData(bet.id, {
-          round: round ? round : null,
-          status: 'Live',
-        });
-      }
-    }
-
-    // Log
-    this.logger.log(`Round ${epoch.toString()} has locked !`);
+    await this.db.betDiceRepo.upsertDocumentData(bet.id, bet);
   }
 
   async updateBetWhenRoundIsEnded(epoch: bigint) {
-    const round = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
+    const round = await this.db.diceRepo.getFirstValueCollectionDataByConditions([
       {
         field: 'epoch',
         operator: '==',
@@ -184,7 +164,7 @@ export class BetPredictionService implements OnApplicationBootstrap {
     ]);
 
     //Update bets
-    const bets = await this.db.betRepo.getCollectionDataByConditions([
+    const bets = await this.db.betDiceRepo.getCollectionDataByConditions([
       {
         field: 'epoch',
         operator: '==',
@@ -211,33 +191,23 @@ export class BetPredictionService implements OnApplicationBootstrap {
     }
 
     // Log
-    this.logger.log(`Round ${epoch.toString()} has ended !`);
+    this.logger.log(`Dice round ${epoch.toString()} has ended !`);
   }
 
-  private calculateResult(bet: Bet, round: Prediction): BetStatus {
-    const r = round.closePrice - round.lockPrice;
+  private calculateResult(bet: Bet, round: Dice): BetStatus {
+    const { sum } = round;
     let result: BetStatus;
 
-    const win = (r > 0 && bet.position === 'UP') || (r < 0 && bet.position === 'DOWN');
-
-    // Win
-    if (win) {
+    if ((sum >= 11 && sum <= 18 && bet.position === 'UP') || (sum >= 3 && sum <= 10 && bet.position === 'DOWN')) {
       result = 'Win';
       if (bet.refund > 0) {
         result = 'Winning Refund';
       }
-    }
-
-    // Lose
-    else {
+    } else {
       result = 'Lose';
       if (bet.refund > 0) {
         result = 'Losing Refund';
       }
-    }
-
-    if (r == 0) {
-      result = 'Draw';
     }
 
     return result;

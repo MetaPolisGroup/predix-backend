@@ -1,5 +1,5 @@
-import { predictionABI, tokenABI, rawAggregatorABI, marketABI } from './abi';
-import { predictionAddr, tokenAddr, marketAddr } from './address';
+import { predictionABI, tokenABI, rawAggregatorABI, marketABI, diceABI } from './abi';
+import { predictionAddr, tokenAddr, marketAddr, diceAddr } from './address';
 import { betPosition, betStatus, collectionNames, LeaderBoard, Path, userType } from './constant';
 import { ChainType } from './chain';
 import provider from './provider';
@@ -14,6 +14,7 @@ const constant = {
       PREFERENCE: {
         PREDICTION: 'A3KoWYY5TAIkcb8E6gZF',
         MARKET: 'market',
+        DICE: 'dice',
       },
       CHAINLINK: 'yxyBQpwTC7EyziO7NDia',
     },
@@ -38,12 +39,14 @@ const constant = {
     PREDICTION: predictionAddr[CURRENT_NETWORK],
     TOKEN: tokenAddr[CURRENT_NETWORK],
     MARKET: marketAddr[CURRENT_NETWORK],
+    DICE: diceAddr[CURRENT_NETWORK],
     AGGREGATOR: '0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE',
   },
   ABI: {
     PREDICTION: predictionABI[CURRENT_NETWORK],
     TOKEN: tokenABI[CURRENT_NETWORK],
     MARKET: marketABI[CURRENT_NETWORK],
+    DICE: diceABI[CURRENT_NETWORK],
     AGGREGATOR: rawAggregatorABI,
   },
   PROVIDER: provider(CURRENT_NETWORK),

@@ -11,5 +11,7 @@ export class Preferences {
 
   genesis_lock?: boolean;
 
+  genesis_end?: boolean;
+
   paused: boolean;
 }

@@ -1,6 +1,7 @@
 import { BetStatus, Position } from 'src/configuration/type';
 import { Prediction } from './prediction.enity';
 import { Market } from './market.entity';
+import { Dice } from './dice.entity';
 
 export class Bet {
   id?: string;
@@ -23,7 +24,7 @@ export class Bet {
 
   status: BetStatus;
 
-  round: Prediction | Market;
+  round: Prediction | Market | Dice;
 
   created_at: number;
 

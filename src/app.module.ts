@@ -13,6 +13,8 @@ import { LeaderboardModule } from './use-case/leaderboard/leaderboard.module';
 import { SnapshotModule } from './use-case/snapshot/snapshot.module';
 import { EventListenerModule } from './use-case/event listener/event-listener.module';
 import { BetModule } from './use-case/bet/bet.module';
+import { DiceModule } from './use-case/dice/dice.module';
+import { DiceController } from './dice.controller';
 
 @Module({
   imports: [
@@ -23,6 +25,7 @@ import { BetModule } from './use-case/bet/bet.module';
     UserModule,
     AuthModule,
     PredictionModule,
+    DiceModule,
     ContractFactoryModule,
     // TaskModule,
     EventListenerModule,
@@ -30,7 +33,7 @@ import { BetModule } from './use-case/bet/bet.module';
     LeaderboardModule,
     BetModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, DiceController],
   providers: [],
 })
 export class AppModule {}

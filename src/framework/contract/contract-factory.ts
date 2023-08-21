@@ -18,6 +18,8 @@ export class ContractFactory implements ContractFactoryAbstract {
 
   readonly marketContract: Contract;
 
+  readonly diceContract: Contract;
+
   constructor() {
     // Provider
     this.provider = constant.PROVIDER;
@@ -30,6 +32,9 @@ export class ContractFactory implements ContractFactoryAbstract {
 
     // Market Contract
     this.marketContract = this.getMarketContract();
+
+    // Dice Contract
+    this.diceContract = this.getDiceContract();
 
     // Aggregator contract
     this.aggregatorContract = this.getAggregatorContract();
@@ -44,6 +49,10 @@ export class ContractFactory implements ContractFactoryAbstract {
 
     if (!this.marketContract) {
       throw new Error('Prediction contract create failed !');
+    }
+
+    if (!this.diceContract) {
+      throw new Error('Dice contract create failed !');
     }
 
     if (!this.predictionContract) {
@@ -77,6 +86,14 @@ export class ContractFactory implements ContractFactoryAbstract {
     const marketContract = new ethers.Contract(constant.ADDRESS.MARKET, constant.ABI.MARKET, wallet);
 
     return marketContract;
+  }
+
+  private getDiceContract() {
+    const wallet = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY, constant.PROVIDER);
+
+    const diceContract = new ethers.Contract(constant.ADDRESS.DICE, constant.ABI.DICE, wallet);
+
+    return diceContract;
   }
 
   private getAggregatorContract() {

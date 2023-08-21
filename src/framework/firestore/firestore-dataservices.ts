@@ -17,6 +17,7 @@ import { Leaderboard } from 'src/core/entity/leaderboard.entity';
 import { Chart } from 'src/core/entity/chart.entity';
 import { Preferences } from 'src/core/entity/preferences.entity';
 import { Market } from 'src/core/entity/market.entity';
+import { Dice } from 'src/core/entity/dice.entity';
 
 @Injectable()
 export class FirestoreDataServices implements IDataServices, OnApplicationBootstrap {
@@ -46,6 +47,11 @@ export class FirestoreDataServices implements IDataServices, OnApplicationBootst
   predictionRepo: FirestoreGenericRepository<Prediction>;
 
   betRepo: FirestoreGenericRepository<Bet>;
+
+  // Dice
+  diceRepo: FirestoreGenericRepository<Dice>;
+
+  betDiceRepo: FirestoreGenericRepository<Bet>;
 
   // Market
   betMarketRepo: FirestoreGenericRepository<Bet>;
@@ -91,6 +97,10 @@ export class FirestoreDataServices implements IDataServices, OnApplicationBootst
 
     this.betRepo = new FirestoreGenericRepository<Bet>(firestore, constant.FIREBASE.COLLECTIONS.BETS);
 
+    // Dice
+    this.diceRepo = new FirestoreGenericRepository<Dice>(firestore, constant.FIREBASE.COLLECTIONS.DICES);
+
+    this.betDiceRepo = new FirestoreGenericRepository<Bet>(firestore, constant.FIREBASE.COLLECTIONS.BETS_DICE);
     // Market
 
     this.betMarketRepo = new FirestoreGenericRepository<Bet>(firestore, constant.FIREBASE.COLLECTIONS.BETS_MARKET);
