@@ -140,56 +140,6 @@ export class AppController {
     }
   }
 
-  @Get('unpause')
-  async unpause() {
-    const gasLimit = await this.factory.predictionContract.unpause.estimateGas();
-    const gasPrice = await this.factory.provider.getFeeData();
-
-    const executeRoundTx = await this.factory.predictionContract.unpause({
-      gasLimit,
-      gasPrice: gasPrice.gasPrice,
-      maxFeePerGas: gasPrice.maxFeePerGas,
-      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
-    });
-
-    const executeRound = await this.factory.provider.waitForTransaction(executeRoundTx.hash as string);
-
-    // Execute round success
-    if (executeRound.status === 1) {
-      console.log(`execute successfully!`);
-    }
-
-    // Execute round failed
-    else {
-      console.log(` executed failed! `);
-    }
-  }
-
-  @Get('pause')
-  async pause() {
-    const gasLimit = await this.factory.predictionContract.pause.estimateGas();
-    const gasPrice = await this.factory.provider.getFeeData();
-
-    const executeRoundTx = await this.factory.predictionContract.pause({
-      gasLimit,
-      gasPrice: gasPrice.gasPrice,
-      maxFeePerGas: gasPrice.maxFeePerGas,
-      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
-    });
-
-    const executeRound = await this.factory.provider.waitForTransaction(executeRoundTx.hash as string);
-
-    // Execute round success
-    if (executeRound.status === 1) {
-      console.log(`execute successfully!`);
-    }
-
-    // Execute round failed
-    else {
-      console.log(` executed failed! `);
-    }
-  }
-
   @Get('fix-data')
   async testQueryFirestore() {
     const me: User = await this.db.userRepo.getDocumentData('0xf3284BBF9Ebc7C05d2750FbF1232903cA33BF22C');

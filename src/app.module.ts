@@ -17,6 +17,7 @@ import { EventListenerModule } from './use-case/event listener/event-listener.mo
 import { BetModule } from './use-case/bet/bet.module';
 import { DiceModule } from './use-case/dice/dice.module';
 import { DiceController } from './dice.controller';
+import { PredixController } from './predix.controller';
 
 @Module({
   imports: [
@@ -40,7 +41,7 @@ import { DiceController } from './dice.controller';
       {},
     ),
   ],
-  controllers: [AppController, DiceController],
+  controllers: [AppController, DiceController, PredixController],
   providers: [],
 })
 export class AppModule {}
