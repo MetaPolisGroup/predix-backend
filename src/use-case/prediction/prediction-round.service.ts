@@ -108,6 +108,7 @@ export class PredictionRoundService implements OnApplicationBootstrap {
   async getRoundFromChain(epoch: bigint): Promise<Prediction> {
     const roundFromChain = await this.factory.predictionContract.rounds(epoch);
     const now = new Date().getTime() / 1000;
+    const preferences = await this.db.preferenceRepo.getFirstValueCollectionData();
     const round: Prediction = {
       epoch: +roundFromChain[0].toString(),
       startTimestamp: +roundFromChain[1].toString(),
@@ -120,13 +121,13 @@ export class PredictionRoundService implements OnApplicationBootstrap {
       totalAmount: +roundFromChain[8].toString(),
       bullAmount: +roundFromChain[9].toString(),
       bearAmount: +roundFromChain[10].toString(),
-      locked: +roundFromChain[2].toString() > now,
-      closed: +roundFromChain[3].toString() > now,
+      locked: +roundFromChain[2].toString() + preferences.buffer_seconds < now,
+      closed: +roundFromChain[3].toString() + preferences.buffer_seconds < now,
       delele: false,
       cancel: false,
     };
 
-    round.cancel = (!round.closed && now > round.closeTimestamp) || (round.closed && round.totalAmount <= 0);
+    round.cancel = (!round.closed && now > round.closeTimestamp + preferences.buffer_seconds) || (round.closed && round.totalAmount <= 0);
 
     return round;
   }

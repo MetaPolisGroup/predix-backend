@@ -40,7 +40,7 @@ export class PredictionService implements OnApplicationBootstrap {
 
     const now = parseInt((new Date().getTime() / 1000).toString());
     const genesis_start = await this.factory.predictionContract.genesisStartOnce();
-    const genesis_lock = await this.factory.predictionContract.genesisStartOnce();
+    const genesis_lock = await this.factory.predictionContract.genesisLockOnce();
     const paused = await this.factory.predictionContract.paused();
 
     // Log
@@ -71,48 +71,51 @@ export class PredictionService implements OnApplicationBootstrap {
       this.logger.error(`Preferences not found when set cronjob`);
       return;
     }
-    //
-    if (genesis_start && !genesis_lock) {
-      const date = new Date((availableRound.startTimestamp + preferences.interval_seconds) * 1000);
-      this.cronJobs = this.helper.createCronJob(
-        this.logger,
-        this.cronJobs,
-        date,
-        availableRound.epoch,
-        `Cronjob Genesis lock Predix for round ${availableRound.epoch} have been set`,
-        async () => {
-          await this.genesisLockRound();
-        },
-      );
-    }
 
-    // Log error and pause when round locktime exceed buffer time
     if (availableRound.lockTimestamp + preferences.buffer_seconds < now) {
       this.logger.error('Round exceed buffer time !');
       await this.pause();
+      return;
     }
-
     //
-    else {
-      // Execute round immediately if lock time is up
+    if (genesis_start && !genesis_lock) {
       if (availableRound.startTimestamp + preferences.interval_seconds < now) {
-        await this.executeRound();
-      }
-
-      // Set cronjob to execute round after interval time
-      else {
+        await this.genesisLockRound();
+        return;
+      } else {
         const date = new Date((availableRound.startTimestamp + preferences.interval_seconds) * 1000);
         this.cronJobs = this.helper.createCronJob(
           this.logger,
           this.cronJobs,
           date,
           availableRound.epoch,
-          `Cronjob execute Predix for round ${availableRound.epoch} have been set`,
+          `Cronjob Genesis lock Predix for round ${availableRound.epoch} have been set`,
           async () => {
-            await this.executeRound();
+            await this.genesisLockRound();
           },
         );
+        return;
       }
+    }
+
+    // Execute round immediately if lock time is up
+    if (availableRound.startTimestamp + preferences.interval_seconds < now) {
+      await this.executeRound();
+    }
+
+    // Set cronjob to execute round after interval time
+    else {
+      const date = new Date((availableRound.startTimestamp + preferences.interval_seconds) * 1000);
+      this.cronJobs = this.helper.createCronJob(
+        this.logger,
+        this.cronJobs,
+        date,
+        availableRound.epoch,
+        `Cronjob execute Predix for round ${availableRound.epoch} have been set`,
+        async () => {
+          await this.executeRound();
+        },
+      );
     }
   }
 
