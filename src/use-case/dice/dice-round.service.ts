@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import constant from 'src/configuration';
+import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 import { Dice } from 'src/core/entity/dice.entity';
 
@@ -9,9 +10,14 @@ import { Dice } from 'src/core/entity/dice.entity';
 export class DiceRoundService implements OnApplicationBootstrap {
   private logger: Logger;
 
-  async onApplicationBootstrap() {}
+  async onApplicationBootstrap() {
+    if (process.env.CONSTANT_ENABLE_DICE === 'True') {
+      await this.validateRoundInDb();
+      await this.updateCurrentRound();
+    }
+  }
 
-  constructor(private readonly db: IDataServices) {
+  constructor(private readonly db: IDataServices, private readonly factory: ContractFactoryAbstract) {
     this.logger = new Logger(DiceRoundService.name);
   }
 
@@ -74,5 +80,54 @@ export class DiceRoundService implements OnApplicationBootstrap {
     round.cancel = round.totalAmount <= 0;
 
     await this.db.diceRepo.upsertDocumentData(round.epoch.toString(), round);
+  }
+
+  async getRoundFromChain(epoch: bigint): Promise<Dice> {
+    const roundFromChain = await this.factory.diceContract.rounds(epoch);
+    const round: Dice = {
+      epoch: +roundFromChain[0].toString(),
+      startTimestamp: +roundFromChain[1].toString(),
+      closeTimestamp: +roundFromChain[2].toString(),
+      dice1: +roundFromChain[3].toString(),
+      dice2: +roundFromChain[4].toString(),
+      dice3: +roundFromChain[5].toString(),
+      sum: +roundFromChain[6].toString(),
+      totalAmount: +roundFromChain[7].toString(),
+      bullAmount: +roundFromChain[8].toString(),
+      bearAmount: +roundFromChain[9].toString(),
+      closed: roundFromChain[10],
+      delele: false,
+      cancel: false,
+    };
+
+    return round;
+  }
+
+  async updateCurrentRound() {
+    const currentEpoch = await this.factory.diceContract.currentEpoch();
+
+    // Update Current round
+    const currentRound = await this.getRoundFromChain(currentEpoch);
+    await this.db.diceRepo.upsertDocumentData(currentRound.epoch.toString(), currentRound);
+
+    // Update Live round
+    const liveRound = await this.getRoundFromChain(BigInt(+currentEpoch.toString() - 1));
+    await this.db.diceRepo.upsertDocumentData(liveRound.epoch.toString(), liveRound);
+  }
+
+  async validateRoundInDb() {
+    const rounds = await this.db.diceRepo.getCollectionDataByConditions([
+      {
+        field: 'cancel',
+        operator: '==',
+        value: false,
+      },
+    ]);
+
+    for (const r of rounds) {
+      const round = await this.getRoundFromChain(BigInt(r.epoch));
+      round.cancel = round.closed && round.totalAmount <= 0;
+      await this.db.diceRepo.upsertDocumentData(round.epoch.toString(), round);
+    }
   }
 }
