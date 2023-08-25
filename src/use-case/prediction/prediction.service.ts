@@ -7,6 +7,7 @@ import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/cont
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 import { Prediction } from 'src/core/entity/prediction.enity';
 import { Preferences } from 'src/core/entity/preferences.entity';
+import { HelperService } from '../helper/helper.service';
 
 @Injectable()
 export class PredictionService implements OnApplicationBootstrap {
@@ -26,41 +27,25 @@ export class PredictionService implements OnApplicationBootstrap {
     }
   }
 
-  constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) {
+  constructor(
+    private readonly factory: ContractFactoryAbstract,
+    private readonly db: IDataServices,
+    private readonly helper: HelperService,
+  ) {
     this.logger = new Logger(PredictionService.name);
-  }
-
-  private createCronJob(cj: { [id: string]: CronJob }, date: Date, id: number, cb?: () => Promise<void>): void {
-    const cronjob = new CronJob(date, async function () {
-      await cb?.();
-    });
-
-    if (cj[id] && cj[id].running) {
-      this.logger.log(`Cronjob for round ${id} have already set !`);
-      return;
-    }
-
-    cj[id] = cronjob;
-
-    cronjob.start();
-
-    this.logger.log(`Cronjob for round ${id} have been set !`);
   }
 
   async setCronjobExecute(availableRound: Prediction) {
     // Consts
 
     const now = parseInt((new Date().getTime() / 1000).toString());
-    const preferences = await this.db.preferenceRepo.getFirstValueCollectionData();
+    const genesis_start = await this.factory.predictionContract.genesisStartOnce();
+    const genesis_lock = await this.factory.predictionContract.genesisStartOnce();
 
     // Log
-    if (!preferences) {
-      this.logger.error(`Preferences not found when set cronjob`);
-      return;
-    }
 
     if (this.cronJobs[availableRound?.epoch]) {
-      this.logger.log(`Cronjob for round ${availableRound.epoch} have already set !`);
+      this.logger.log(`Cronjob execute for round ${availableRound.epoch} have already set !`);
       return;
     }
 
@@ -70,23 +55,31 @@ export class PredictionService implements OnApplicationBootstrap {
     }
 
     //
-    if (!preferences.genesis_start && !preferences.genesis_lock) {
+    if (genesis_start && genesis_lock) {
       this.logger.warn(`Only execute round after Genesis Start and Genesis Lock`);
       return;
     }
+    const preferences = await this.db.preferenceRepo.getFirstValueCollectionData();
 
     //
-    if (preferences.genesis_start && !preferences.genesis_lock) {
+    if (genesis_start && !genesis_lock) {
       const date = new Date((availableRound.startTimestamp + preferences.interval_seconds) * 1000);
-      this.createCronJob(this.cronJobs, date, availableRound.epoch, async () => {
-        await this.genesisLockRound();
-      });
+      this.cronJobs = this.helper.createCronJob(
+        this.logger,
+        this.cronJobs,
+        date,
+        availableRound.epoch,
+        `Cronjob Genesis lock Predix for round ${availableRound.epoch} have been set`,
+        async () => {
+          await this.genesisLockRound();
+        },
+      );
     }
 
-    // Log error when round locktime exceed buffer time
+    // Log error and pause when round locktime exceed buffer time
     if (availableRound.lockTimestamp + preferences.buffer_seconds < now) {
       this.logger.error('Round exceed buffer time !');
-      // await this.setCronjob(availableRound);
+      await this.pause();
     }
 
     //
@@ -96,32 +89,42 @@ export class PredictionService implements OnApplicationBootstrap {
         await this.executeRound();
       }
 
-      // Set cronjob to execute round  after interval time
+      // Set cronjob to execute round after interval time
       else {
         const date = new Date((availableRound.startTimestamp + preferences.interval_seconds) * 1000);
-        this.createCronJob(this.cronJobs, date, availableRound.epoch, async () => {
-          await this.executeRound();
-        });
+        this.cronJobs = this.helper.createCronJob(
+          this.logger,
+          this.cronJobs,
+          date,
+          availableRound.epoch,
+          `Cronjob execute Predix for round ${availableRound.epoch} have been set`,
+          async () => {
+            await this.executeRound();
+          },
+        );
       }
     }
   }
 
   setCronjobAutoBet(availableRound: Prediction) {
-    if (this.cronJobsBet[availableRound?.epoch]) {
-      this.logger.log(`Cronjob bet for round ${availableRound.epoch} have already set !`);
-      return;
-    }
-
     if (!availableRound) {
       this.logger.warn(`No available round to set cronjob bet!`);
       return;
     }
+
     if (availableRound.lockTimestamp - this.s > new Date().getTime() / 1000) {
       const date = new Date((availableRound.lockTimestamp - this.s) * 1000);
 
-      this.createCronJob(this.cronJobsBet, date, availableRound.epoch, async () => {
-        await this.automaticBotBet(this.limit);
-      });
+      this.cronJobsBet = this.helper.createCronJob(
+        this.logger,
+        this.cronJobsBet,
+        date,
+        availableRound.epoch,
+        `Cronjob bet bot Predix for round ${availableRound.epoch} have been set`,
+        async () => {
+          await this.automaticBotBet(this.limit);
+        },
+      );
     }
   }
 
@@ -183,6 +186,8 @@ export class PredictionService implements OnApplicationBootstrap {
 
     const treasuryFee = await this.factory.predictionContract.treasuryFee();
 
+    const paused = await this.factory.predictionContract.paused();
+
     if (genesisStart !== undefined) {
       preference.genesis_start = genesisStart;
     }
@@ -203,6 +208,10 @@ export class PredictionService implements OnApplicationBootstrap {
       preference.fee = parseInt(treasuryFee.toString());
     }
 
+    if (paused !== undefined) {
+      preference.paused = paused;
+    }
+
     await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION, preference);
 
     if (genesisStart === undefined) {
@@ -213,8 +222,16 @@ export class PredictionService implements OnApplicationBootstrap {
       this.logger.warn("Can't get Genesis Lock from contract !");
     }
 
+    if (paused === undefined) {
+      this.logger.warn("Can't get Paused from contract !");
+    }
+
     if (!bufferSeconds) {
       this.logger.warn("Can't get Buffer seconds from contract !");
+    }
+
+    if (!treasuryFee) {
+      this.logger.warn("Can't get Fee from contract !");
     }
 
     if (!intervalSeconds) {
@@ -434,6 +451,30 @@ export class PredictionService implements OnApplicationBootstrap {
     // Execute round failed
     else {
       console.log(`Autobot bet bull failed on round ${epoch.toString()}! `);
+    }
+  }
+
+  async pause() {
+    const gasLimit = await this.factory.predictionContract.pause.estimateGas();
+    const gasPrice = await this.factory.provider.getFeeData();
+
+    const pauseTx = await this.factory.predictionContract.pause({
+      gasLimit,
+      gasPrice: gasPrice.gasPrice,
+      maxFeePerGas: gasPrice.maxFeePerGas,
+      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
+    });
+
+    const pause = await this.factory.provider.waitForTransaction(pauseTx.hash as string);
+
+    // Execute round success
+    if (pause.status === 1) {
+      console.log(`Prediction contract has been paused !`);
+    }
+
+    // Execute round failed
+    else {
+      console.log(`Prediction contract pause failed !`);
     }
   }
 

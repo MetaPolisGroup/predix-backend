@@ -3,18 +3,20 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { CronJob } from 'cron';
 import constant from 'src/configuration';
+import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 import { Prediction } from 'src/core/entity/prediction.enity';
+import { ContractFactory } from 'src/framework/contract/contract-factory';
 
 @Injectable()
 export class PredictionRoundService implements OnApplicationBootstrap {
-  private cronJobs: { [id: string]: CronJob } = {};
-
   private logger: Logger;
 
-  async onApplicationBootstrap() {}
+  async onApplicationBootstrap() {
+    await this.updateCurrentRound();
+  }
 
-  constructor(private readonly db: IDataServices) {
+  constructor(private readonly db: IDataServices, private readonly factory: ContractFactoryAbstract) {
     this.logger = new Logger(PredictionRoundService.name);
   }
 
@@ -52,7 +54,9 @@ export class PredictionRoundService implements OnApplicationBootstrap {
   }
 
   async updateLockRound(epoch: bigint, roundId: bigint, price: bigint) {
-    const round = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
+    let round: Prediction = null;
+
+    round = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
       {
         field: 'epoch',
         operator: '==',
@@ -62,6 +66,7 @@ export class PredictionRoundService implements OnApplicationBootstrap {
 
     if (!round) {
       this.logger.error(`Round ${epoch.toString()} not found from DB when locked on chain !`);
+
       return;
     }
 
@@ -97,5 +102,46 @@ export class PredictionRoundService implements OnApplicationBootstrap {
     round.cancel = round.totalAmount <= 0;
 
     await this.db.predictionRepo.upsertDocumentData(round.epoch.toString(), round);
+  }
+
+  async getRoundFromChain(epoch: bigint): Promise<Prediction> {
+    const roundFromChain = await this.factory.predictionContract.rounds(epoch);
+    const round: Prediction = {
+      epoch: +roundFromChain[0].toString(),
+      startTimestamp: +roundFromChain[1].toString(),
+      lockTimestamp: +roundFromChain[2].toString(),
+      closeTimestamp: +roundFromChain[3].toString(),
+      lockPrice: +roundFromChain[4].toString(),
+      closePrice: +roundFromChain[5].toString(),
+      lockOracleId: +roundFromChain[6].toString(),
+      closeOracleId: +roundFromChain[7].toString(),
+      totalAmount: +roundFromChain[8].toString(),
+      bullAmount: +roundFromChain[9].toString(),
+      bearAmount: +roundFromChain[10].toString(),
+      cancel: false,
+      locked: false,
+      closed: false,
+      delele: false,
+    };
+
+    return round;
+  }
+
+  async updateCurrentRound() {
+    const currentEpoch = await this.factory.predictionContract.currentEpoch();
+
+    // Update Current round
+    const currentRound = await this.getRoundFromChain(currentEpoch);
+    await this.db.predictionRepo.upsertDocumentData(currentRound.epoch.toString(), currentRound);
+
+    // Update Live round
+    const liveRound = await this.getRoundFromChain(BigInt(+currentEpoch.toString() - 1));
+    liveRound.locked = true;
+    await this.db.predictionRepo.upsertDocumentData(liveRound.epoch.toString(), liveRound);
+
+    const expiredRound = await this.getRoundFromChain(BigInt(+currentEpoch.toString() - 2));
+    expiredRound.locked = true;
+    expiredRound.closed = true;
+    await this.db.predictionRepo.upsertDocumentData(expiredRound.epoch.toString(), expiredRound);
   }
 }

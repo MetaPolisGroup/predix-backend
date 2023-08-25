@@ -62,6 +62,13 @@ export class DiceService implements OnApplicationBootstrap {
       return;
     }
 
+    if (!availableRound) {
+      this.logger.warn(`No available round to set cronjob !`);
+      return;
+    }
+
+    //
+
     if (preferences.genesis_start && !preferences.genesis_end) {
       const date = new Date((availableRound.startTimestamp + preferences.interval_seconds) * 1000);
       if (date.getTime() / 1000 < now) {
@@ -73,25 +80,17 @@ export class DiceService implements OnApplicationBootstrap {
       });
     }
 
-    if (!availableRound) {
-      this.logger.warn(`No available round to set cronjob !`);
-      return;
+    // Execute round immediately if lock time is up
+    if (availableRound.startTimestamp + preferences.interval_seconds < now) {
+      await this.executeRound();
     }
 
-    //
+    // Set cronjob to execute round  after interval time
     else {
-      // Execute round immediately if lock time is up
-      if (availableRound.startTimestamp + preferences.interval_seconds < now) {
+      const date = new Date((availableRound.startTimestamp + preferences.interval_seconds) * 1000);
+      this.createCronJob(date, availableRound.epoch, async () => {
         await this.executeRound();
-      }
-
-      // Set cronjob to execute round  after interval time
-      else {
-        const date = new Date((availableRound.startTimestamp + preferences.interval_seconds) * 1000);
-        this.createCronJob(date, availableRound.epoch, async () => {
-          await this.executeRound();
-        });
-      }
+      });
     }
   }
 

@@ -18,12 +18,14 @@ import { BetModule } from './use-case/bet/bet.module';
 import { DiceModule } from './use-case/dice/dice.module';
 import { DiceController } from './dice.controller';
 import { PredixController } from './predix.controller';
+import { HelperModule } from './use-case/helper/helper.module';
 
 @Module({
   imports: [
     ScheduleModule.forRoot(),
     DataServicesModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
+    HelperModule,
     SnapshotModule,
     UserModule,
     AuthModule,
