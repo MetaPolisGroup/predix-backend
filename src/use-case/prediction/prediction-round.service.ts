@@ -13,7 +13,10 @@ export class PredictionRoundService implements OnApplicationBootstrap {
   private logger: Logger;
 
   async onApplicationBootstrap() {
-    await this.updateCurrentRound();
+    if (process.env.CONSTANT_ENABLE === 'True') {
+      await this.validateRoundInDb();
+      await this.updateCurrentRound();
+    }
   }
 
   constructor(private readonly db: IDataServices, private readonly factory: ContractFactoryAbstract) {
@@ -143,5 +146,24 @@ export class PredictionRoundService implements OnApplicationBootstrap {
     expiredRound.locked = true;
     expiredRound.closed = true;
     await this.db.predictionRepo.upsertDocumentData(expiredRound.epoch.toString(), expiredRound);
+  }
+
+  async validateRoundInDb() {
+    const rounds = await this.db.predictionRepo.getCollectionDataByConditions([
+      {
+        field: 'cancel',
+        operator: '==',
+        value: false,
+      },
+    ]);
+
+    for (const r of rounds) {
+      const round = await this.getRoundFromChain(BigInt(r.epoch));
+      const now = new Date().getTime() / 1000;
+      round.locked = round.lockTimestamp < now;
+      round.closed = round.closeTimestamp < now;
+      round.cancel = round.closed && round.totalAmount <= 0;
+      await this.db.predictionRepo.upsertDocumentData(round.epoch.toString(), round);
+    }
   }
 }

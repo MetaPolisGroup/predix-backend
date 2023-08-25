@@ -55,7 +55,7 @@ export class PredictionService implements OnApplicationBootstrap {
     }
 
     //
-    if (genesis_start && genesis_lock) {
+    if (!genesis_start && !genesis_lock) {
       this.logger.warn(`Only execute round after Genesis Start and Genesis Lock`);
       return;
     }

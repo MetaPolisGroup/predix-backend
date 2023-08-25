@@ -3,9 +3,9 @@ import { PredictionService } from './prediction.service';
 import { PredictionRoundService } from './prediction-round.service';
 
 @Module({
-  providers: [PredictionService, PredictionRoundService],
+  providers: [PredictionRoundService, PredictionService],
   controllers: [],
   imports: [],
-  exports: [PredictionService, PredictionRoundService],
+  exports: [PredictionRoundService, PredictionService],
 })
 export class PredictionModule {}
