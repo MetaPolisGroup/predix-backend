@@ -84,6 +84,7 @@ export class DiceRoundService implements OnApplicationBootstrap {
 
   async getRoundFromChain(epoch: bigint): Promise<Dice> {
     const roundFromChain = await this.factory.diceContract.rounds(epoch);
+    const now = new Date().getTime() / 1000;
     const round: Dice = {
       epoch: +roundFromChain[0].toString(),
       startTimestamp: +roundFromChain[1].toString(),
@@ -99,6 +100,8 @@ export class DiceRoundService implements OnApplicationBootstrap {
       delele: false,
       cancel: false,
     };
+
+    round.cancel = (!round.closed && now > round.closeTimestamp) || (round.closed && round.totalAmount <= 0);
 
     return round;
   }
@@ -124,10 +127,11 @@ export class DiceRoundService implements OnApplicationBootstrap {
       },
     ]);
 
-    for (const r of rounds) {
-      const round = await this.getRoundFromChain(BigInt(r.epoch));
-      round.cancel = round.closed && round.totalAmount <= 0;
-      await this.db.diceRepo.upsertDocumentData(round.epoch.toString(), round);
+    if (rounds) {
+      for (const r of rounds) {
+        const round = await this.getRoundFromChain(BigInt(r.epoch));
+        await this.db.diceRepo.upsertDocumentData(round.epoch.toString(), round);
+      }
     }
   }
 }

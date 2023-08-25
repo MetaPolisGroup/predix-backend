@@ -44,11 +44,13 @@ export class DiceService implements OnApplicationBootstrap {
     // Consts
 
     const now = parseInt((new Date().getTime() / 1000).toString());
-    const preferences = await this.db.preferenceRepo.getDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.DICE);
-
+    const genesis_start = await this.factory.diceContract.genesisStartOnce();
+    const genesis_end = await this.factory.diceContract.genesisEndOnce();
+    const paused = await this.factory.diceContract.paused();
     // Log
-    if (!preferences) {
-      this.logger.error(`Preferences not found when set cronjob`);
+
+    if (paused) {
+      this.logger.log(`Dice contract is paused !`);
       return;
     }
 
@@ -57,7 +59,7 @@ export class DiceService implements OnApplicationBootstrap {
       return;
     }
 
-    if (!preferences.genesis_start && !preferences.genesis_end) {
+    if (!genesis_start && !genesis_end) {
       this.logger.warn(`Only execute round after Genesis Start and Genesis End`);
       return;
     }
@@ -67,9 +69,15 @@ export class DiceService implements OnApplicationBootstrap {
       return;
     }
 
+    const preferences = await this.db.preferenceRepo.getDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.DICE);
+    if (!preferences) {
+      this.logger.error(`Preferences not found when set cronjob`);
+      return;
+    }
+
     //
 
-    if (preferences.genesis_start && !preferences.genesis_end) {
+    if (genesis_start && !genesis_end) {
       const date = new Date((availableRound.startTimestamp + preferences.interval_seconds) * 1000);
       if (date.getTime() / 1000 < now) {
         await this.genesisEndRound();

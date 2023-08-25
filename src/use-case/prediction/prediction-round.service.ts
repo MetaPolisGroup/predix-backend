@@ -68,9 +68,7 @@ export class PredictionRoundService implements OnApplicationBootstrap {
     ]);
 
     if (!round) {
-      this.logger.error(`Round ${epoch.toString()} not found from DB when locked on chain !`);
-
-      return;
+      round = await this.getRoundFromChain(epoch);
     }
 
     // Update round
@@ -109,6 +107,7 @@ export class PredictionRoundService implements OnApplicationBootstrap {
 
   async getRoundFromChain(epoch: bigint): Promise<Prediction> {
     const roundFromChain = await this.factory.predictionContract.rounds(epoch);
+    const now = new Date().getTime() / 1000;
     const round: Prediction = {
       epoch: +roundFromChain[0].toString(),
       startTimestamp: +roundFromChain[1].toString(),
@@ -121,11 +120,13 @@ export class PredictionRoundService implements OnApplicationBootstrap {
       totalAmount: +roundFromChain[8].toString(),
       bullAmount: +roundFromChain[9].toString(),
       bearAmount: +roundFromChain[10].toString(),
-      cancel: false,
-      locked: false,
-      closed: false,
+      locked: +roundFromChain[2].toString() < now,
+      closed: +roundFromChain[3].toString() < now,
       delele: false,
+      cancel: false,
     };
+
+    round.cancel = (!round.closed && now > round.closeTimestamp) || (round.closed && round.totalAmount <= 0);
 
     return round;
   }
@@ -139,12 +140,9 @@ export class PredictionRoundService implements OnApplicationBootstrap {
 
     // Update Live round
     const liveRound = await this.getRoundFromChain(BigInt(+currentEpoch.toString() - 1));
-    liveRound.locked = true;
     await this.db.predictionRepo.upsertDocumentData(liveRound.epoch.toString(), liveRound);
 
     const expiredRound = await this.getRoundFromChain(BigInt(+currentEpoch.toString() - 2));
-    expiredRound.locked = true;
-    expiredRound.closed = true;
     await this.db.predictionRepo.upsertDocumentData(expiredRound.epoch.toString(), expiredRound);
   }
 
@@ -157,13 +155,11 @@ export class PredictionRoundService implements OnApplicationBootstrap {
       },
     ]);
 
-    for (const r of rounds) {
-      const round = await this.getRoundFromChain(BigInt(r.epoch));
-      const now = new Date().getTime() / 1000;
-      round.locked = round.lockTimestamp < now;
-      round.closed = round.closeTimestamp < now;
-      round.cancel = round.closed && round.totalAmount <= 0;
-      await this.db.predictionRepo.upsertDocumentData(round.epoch.toString(), round);
+    if (rounds) {
+      for (const r of rounds) {
+        const round = await this.getRoundFromChain(BigInt(r.epoch));
+        await this.db.predictionRepo.upsertDocumentData(round.epoch.toString(), round);
+      }
     }
   }
 }

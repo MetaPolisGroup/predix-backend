@@ -41,8 +41,14 @@ export class PredictionService implements OnApplicationBootstrap {
     const now = parseInt((new Date().getTime() / 1000).toString());
     const genesis_start = await this.factory.predictionContract.genesisStartOnce();
     const genesis_lock = await this.factory.predictionContract.genesisStartOnce();
+    const paused = await this.factory.predictionContract.paused();
 
     // Log
+
+    if (paused) {
+      this.logger.log(`Prediction contract is paused !`);
+      return;
+    }
 
     if (this.cronJobs[availableRound?.epoch]) {
       this.logger.log(`Cronjob execute for round ${availableRound.epoch} have already set !`);
@@ -61,6 +67,10 @@ export class PredictionService implements OnApplicationBootstrap {
     }
     const preferences = await this.db.preferenceRepo.getFirstValueCollectionData();
 
+    if (!preferences) {
+      this.logger.error(`Preferences not found when set cronjob`);
+      return;
+    }
     //
     if (genesis_start && !genesis_lock) {
       const date = new Date((availableRound.startTimestamp + preferences.interval_seconds) * 1000);
@@ -469,12 +479,12 @@ export class PredictionService implements OnApplicationBootstrap {
 
     // Execute round success
     if (pause.status === 1) {
-      console.log(`Prediction contract has been paused !`);
+      this.logger.log(`Prediction contract has been paused !`);
     }
 
     // Execute round failed
     else {
-      console.log(`Prediction contract pause failed !`);
+      this.logger.log(`Prediction contract pause failed !`);
     }
   }
 
