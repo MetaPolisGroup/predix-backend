@@ -121,8 +121,8 @@ export class PredictionRoundService implements OnApplicationBootstrap {
       totalAmount: +roundFromChain[8].toString(),
       bullAmount: +roundFromChain[9].toString(),
       bearAmount: +roundFromChain[10].toString(),
-      locked: +roundFromChain[2].toString() + preferences.buffer_seconds < now,
-      closed: +roundFromChain[3].toString() + preferences.buffer_seconds < now,
+      locked: +roundFromChain[6].toString() !== 0 && +roundFromChain[2].toString() < now,
+      closed: +roundFromChain[7].toString() !== 0 && +roundFromChain[3].toString() < now,
       delele: false,
       cancel: false,
     };

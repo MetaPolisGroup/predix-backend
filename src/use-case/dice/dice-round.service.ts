@@ -101,7 +101,7 @@ export class DiceRoundService implements OnApplicationBootstrap {
       cancel: false,
     };
 
-    round.cancel = (!round.closed && now > round.closeTimestamp) || (round.closed && round.totalAmount <= 0);
+    round.cancel = round.closed && round.totalAmount <= 0;
 
     return round;
   }
