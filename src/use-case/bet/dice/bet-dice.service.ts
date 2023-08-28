@@ -183,7 +183,7 @@ export class BetDiceService implements OnApplicationBootstrap {
           bet.status = this.calculateResult(bet, round);
         }
 
-        await this.db.betRepo.upsertDocumentData(bet.id, bet);
+        await this.db.betDiceRepo.upsertDocumentData(bet.id, bet);
 
         // Handle commission
         await this.handleMoney.handlePoint(bet.amount, bet.user_address);
