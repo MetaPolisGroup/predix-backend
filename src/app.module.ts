@@ -19,7 +19,6 @@ import { DiceModule } from './use-case/dice/dice.module';
 import { DiceController } from './dice.controller';
 import { PredixController } from './predix.controller';
 import { HelperModule } from './use-case/helper/helper.module';
-import { LoggerModule } from './service/custom-logger/logger.module';
 import { NFTController } from './nft.controller';
 
 @Module({
