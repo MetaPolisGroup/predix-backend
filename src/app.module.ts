@@ -19,6 +19,8 @@ import { DiceModule } from './use-case/dice/dice.module';
 import { DiceController } from './dice.controller';
 import { PredixController } from './predix.controller';
 import { HelperModule } from './use-case/helper/helper.module';
+import { LoggerModule } from './service/custom-logger/logger.module';
+import { NFTController } from './nft.controller';
 
 @Module({
   imports: [
@@ -37,12 +39,13 @@ import { HelperModule } from './use-case/helper/helper.module';
     ChartModule,
     LeaderboardModule,
     DatabaseModule,
+    // LoggerModule,
     MongooseModule.forRoot(
       'mongodb+srv://doadmin:rR0J35Z71VWio928@db-mongodb-sgp1-76973-464ced0f.mongo.ondigitalocean.com/C300AMG?tls=true&authSource=admin&replicaSet=db-mongodb-sgp1-76973',
       {},
     ),
   ],
-  controllers: [AppController, DiceController, PredixController],
+  controllers: [AppController, DiceController, PredixController, NFTController],
   providers: [],
 })
 export class AppModule {}
