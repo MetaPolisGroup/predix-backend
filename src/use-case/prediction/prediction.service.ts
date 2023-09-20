@@ -149,29 +149,18 @@ export class PredictionService implements OnApplicationBootstrap {
       return;
     }
 
-    // Implement
-    const gasLimit = await this.factory.predictionContract.executeRound.estimateGas(chainLinkPrice[0], chainLinkPrice[1]);
-    const gasPrice = await this.factory.provider.getFeeData();
+    await this.helper.executeContract(
+      this.factory.predictionContract,
+      'executeRound',
+      'New round execute successfully!',
+      'New round executed failed! retry...',
+      undefined,
+      async () => await this.executeRound(),
 
-    const executeRoundTx = await this.factory.predictionContract.executeRound(chainLinkPrice[0], chainLinkPrice[1], {
-      gasLimit,
-      gasPrice: gasPrice.gasPrice,
-      maxFeePerGas: gasPrice.maxFeePerGas,
-      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
-    });
-
-    const executeRound = await this.factory.provider.waitForTransaction(executeRoundTx.hash as string);
-
-    // Execute round success
-    if (executeRound.status === 1) {
-      this.logger.log(`New round execute successfully!`);
-    }
-
-    // Execute round failed
-    else {
-      this.logger.log(`New round executed failed! retry...`);
-      await this.executeRound();
-    }
+      constant.GAS,
+      chainLinkPrice[0],
+      chainLinkPrice[1],
+    );
   }
 
   async updateContractState() {
@@ -253,35 +242,20 @@ export class PredictionService implements OnApplicationBootstrap {
   }
 
   async genesisStartRound() {
-    // Implement
-    const gasLimit = await this.factory.predictionContract.genesisStartRound.estimateGas();
-    const gasPrice = await this.factory.provider.getFeeData();
+    await this.helper.executeContract(
+      this.factory.predictionContract,
+      'genesisStartRound',
+      'Genesis start round successfully!',
+      'Genesis start failed! retry...',
+      async () => {
+        await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION, {
+          genesis_start: true,
+        });
+      },
+      async () => await this.genesisStartRound(),
 
-    const genesisStartRound = await this.factory.predictionContract.genesisStartRound({
-      gasLimit,
-      gasPrice: gasPrice.gasPrice,
-      maxFeePerGas: gasPrice.maxFeePerGas,
-      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
-    });
-
-    const genesisStartRoundTx = await this.factory.provider.waitForTransaction(genesisStartRound.hash as string);
-
-    // Execute round success
-    if (genesisStartRoundTx.status === 1) {
-      this.logger.log(`Genesis start round successfully!`);
-
-      // Update genesis start preference
-
-      await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION, {
-        genesis_start: true,
-      });
-    }
-
-    // Execute round failed
-    else {
-      this.logger.log(`Genesis start failed! retry...`);
-      await this.genesisStartRound();
-    }
+      constant.GAS,
+    );
   }
 
   async genesisLockRound() {
@@ -292,34 +266,22 @@ export class PredictionService implements OnApplicationBootstrap {
       return;
     }
 
-    // Implement
-    const gasLimit = await this.factory.predictionContract.genesisLockRound.estimateGas(chainLinkPrice[0], chainLinkPrice[1]);
-    const gasPrice = await this.factory.provider.getFeeData();
+    await this.helper.executeContract(
+      this.factory.predictionContract,
+      'genesisLockRound',
+      'Genesis lock round successfully!',
+      'Genesis lock failed! retry...',
+      async () => {
+        await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION, {
+          genesis_lock: true,
+        });
+      },
+      async () => await this.genesisLockRound(),
 
-    const genesisLockRound = await this.factory.predictionContract.genesisLockRound(chainLinkPrice[0], chainLinkPrice[1], {
-      gasLimit,
-      gasPrice: gasPrice.gasPrice,
-      maxFeePerGas: gasPrice.maxFeePerGas,
-      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
-    });
-
-    const genesisLockRoundTx = await this.factory.provider.waitForTransaction(genesisLockRound.hash as string);
-
-    // Execute round success
-    if (genesisLockRoundTx.status === 1) {
-      this.logger.log(`Genesis Lock round successfully!`);
-
-      // Update genesis lock preference
-      await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION, {
-        genesis_lock: true,
-      });
-    }
-
-    // Execute round failed
-    else {
-      this.logger.log(`Genesis Lock round failed! retry...`);
-      await this.genesisLockRound();
-    }
+      constant.GAS,
+      chainLinkPrice[0],
+      chainLinkPrice[1],
+    );
   }
 
   async cancelCurrentRound() {
@@ -420,75 +382,46 @@ export class PredictionService implements OnApplicationBootstrap {
   }
 
   async betBear(epoch: string, amount: string) {
-    const gasLimit = await this.factory.predictionContract.betBear.estimateGas(epoch, amount);
-    const gasPrice = await this.factory.provider.getFeeData();
+    await this.helper.executeContract(
+      this.factory.predictionContract,
+      'betBear',
+      `Autobot bet bear ${parseInt(amount) / 10 ** 18} PRX successfully on round ${epoch.toString()}!`,
+      `Autobot bet bear failed on round ${epoch.toString()}! `,
+      undefined,
+      undefined,
 
-    const executeRoundTx = await this.factory.predictionContract.betBear(epoch, amount, {
-      gasLimit,
-      gasPrice: gasPrice.gasPrice,
-      maxFeePerGas: gasPrice.maxFeePerGas,
-      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
-    });
-
-    const executeRound = await this.factory.provider.waitForTransaction(executeRoundTx.hash as string);
-
-    // Execute round success
-    if (executeRound.status === 1) {
-      console.log(`Autobot bet bear ${parseInt(amount) / 10 ** 18} PRX successfully on round ${epoch.toString()}!`);
-    }
-
-    // Execute round failed
-    else {
-      console.log(` Autobot bet bear failed on round ${epoch.toString()} ! `);
-    }
+      constant.GAS,
+      epoch,
+      amount,
+    );
   }
 
   async betBull(epoch: string, amount: string) {
-    const gasLimit = await this.factory.predictionContract.betBull.estimateGas(epoch, amount);
-    const gasPrice = await this.factory.provider.getFeeData();
+    await this.helper.executeContract(
+      this.factory.predictionContract,
+      'betBull',
+      `Autobot bet byll ${parseInt(amount) / 10 ** 18} PRX successfully on round ${epoch.toString()}!`,
+      `Autobot bet byll failed on round ${epoch.toString()}! `,
+      undefined,
+      undefined,
 
-    const executeRoundTx = await this.factory.predictionContract.betBull(epoch, amount, {
-      gasLimit,
-      gasPrice: gasPrice.gasPrice,
-      maxFeePerGas: gasPrice.maxFeePerGas,
-      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
-    });
-
-    const executeRound = await this.factory.provider.waitForTransaction(executeRoundTx.hash as string);
-
-    // Execute round success
-    if (executeRound.status === 1) {
-      console.log(`Autobot bet bull ${parseInt(amount) / 10 ** 18} PRX successfully on round ${epoch.toString()}!`);
-    }
-
-    // Execute round failed
-    else {
-      console.log(`Autobot bet bull failed on round ${epoch.toString()}! `);
-    }
+      constant.GAS,
+      epoch,
+      amount,
+    );
   }
 
   async pause() {
-    const gasLimit = await this.factory.predictionContract.pause.estimateGas();
-    const gasPrice = await this.factory.provider.getFeeData();
+    await this.helper.executeContract(
+      this.factory.predictionContract,
+      'pause',
+      `Prediction contract has been paused !`,
+      `Prediction contract pause failed !`,
+      undefined,
+      undefined,
 
-    const pauseTx = await this.factory.predictionContract.pause({
-      gasLimit,
-      gasPrice: gasPrice.gasPrice,
-      maxFeePerGas: gasPrice.maxFeePerGas,
-      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
-    });
-
-    const pause = await this.factory.provider.waitForTransaction(pauseTx.hash as string);
-
-    // Execute round success
-    if (pause.status === 1) {
-      this.logger.log(`Prediction contract has been paused !`);
-    }
-
-    // Execute round failed
-    else {
-      this.logger.log(`Prediction contract pause failed !`);
-    }
+      constant.GAS,
+    );
   }
 
   getRandomAmount() {

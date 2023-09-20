@@ -15,7 +15,7 @@ export class PredictionRoundService implements OnApplicationBootstrap {
   async onApplicationBootstrap() {
     if (process.env.CONSTANT_ENABLE === 'True') {
       await this.validateRoundInDb();
-      await this.updateCurrentRound();
+      // await this.updateCurrentRound();
     }
   }
 

@@ -149,5 +149,6 @@ const rawFaucetABI = `[
 
 export const faucetABI = {
   [ChainType.BSCTESTNET]: rawFaucetABI,
+  [ChainType.BASETESTNET]: rawFaucetABI,
   [ChainType.BSC]: rawFaucetABI,
 };

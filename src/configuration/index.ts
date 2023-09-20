@@ -4,15 +4,16 @@ import { betPosition, betStatus, collectionNames, LeaderBoard, Path, userType } 
 import { ChainType } from './chain';
 import provider from './provider';
 
-const CURRENT_NETWORK = ChainType.BSCTESTNET;
+const CURRENT_NETWORK = ChainType.BASETESTNET;
 const constant = {
+  GAS: 1000000,
   STORAGE_PATH: Path,
   FIREBASE: {
     NAME: 'FirestoreDataservices',
     COLLECTIONS: collectionNames,
     DOCUMENT: {
       PREFERENCE: {
-        PREDICTION: 'A3KoWYY5TAIkcb8E6gZF',
+        PREDICTION: 'predix',
         MARKET: 'market',
         DICE: 'dice',
       },

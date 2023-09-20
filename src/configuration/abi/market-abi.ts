@@ -846,5 +846,6 @@ const rawMarketABI = `[
 
 export const marketABI = {
   [ChainType.BSCTESTNET]: rawMarketABI,
+  [ChainType.BASETESTNET]: rawMarketABI,
   [ChainType.BSC]: rawMarketABI,
 };

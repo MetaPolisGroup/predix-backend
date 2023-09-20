@@ -6,6 +6,7 @@ import { ContractFactoryAbstract } from './core/abstract/contract-factory/contra
 import { LeaderboardService } from './use-case/leaderboard/leader.service';
 import { PredictionService } from './use-case/prediction/prediction.service';
 import { DiceService } from './use-case/dice/dice.service';
+import { HelperService } from './use-case/helper/helper.service';
 
 @Controller('dice')
 export class DiceController {
@@ -15,6 +16,7 @@ export class DiceController {
     private readonly factory: ContractFactoryAbstract,
 
     private readonly dice: DiceService,
+    private readonly helper: HelperService,
   ) {}
 
   @Get('bet')
@@ -46,6 +48,11 @@ export class DiceController {
   @Get('cancel')
   async cancel() {
     await this.dice.cancelCurrentRound();
+  }
+
+  @Get('pause')
+  async pause() {
+    await this.helper.executeContract(this.factory.diceContract, 'pause', undefined, undefined, undefined, undefined, undefined);
   }
 
   @Get('genesis-start')

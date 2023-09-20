@@ -13,6 +13,11 @@ export const providerRPC = {
     rpc: 'https://bsc-dataseed.binance.org/',
     chainId: 56,
   },
+  [ChainType.BASETESTNET]: {
+    name: 'baseTestnet',
+    rpc: 'https://goerli.base.org',
+    chainId: 84531,
+  },
   [ChainType.SEPOLIA]: {
     name: 'Sepolia',
     rpc: 'https://rpc.sepolia.org',
@@ -21,9 +26,13 @@ export const providerRPC = {
 };
 
 const provider = (env: ChainType): JsonRpcProvider => {
-  return new ethers.JsonRpcProvider(providerRPC[env].rpc, {
-    chainId: providerRPC[env].chainId,
-    name: providerRPC[env].name,
-  });
+  return new ethers.JsonRpcProvider(
+    providerRPC[env].rpc,
+    {
+      chainId: providerRPC[env].chainId,
+      name: providerRPC[env].name,
+    },
+    { polling: true },
+  );
 };
 export default provider;

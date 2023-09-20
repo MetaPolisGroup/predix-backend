@@ -12,9 +12,9 @@ export class MarketService implements OnApplicationBootstrap {
   private logger: Logger;
 
   async onApplicationBootstrap() {
-    // if (process.env.CONSTANT_ENABLE === 'True') {
-    // }
-    await this.updateContractState();
+    if (process.env.CONSTANT_ENABLE === 'True') {
+      await this.updateContractState();
+    }
   }
 
   constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) {

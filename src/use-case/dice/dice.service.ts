@@ -8,6 +8,7 @@ import { IDataServices } from 'src/core/abstract/data-services/data-service.abst
 import { Dice } from 'src/core/entity/dice.entity';
 import { Prediction } from 'src/core/entity/prediction.enity';
 import { Preferences } from 'src/core/entity/preferences.entity';
+import { HelperService } from '../helper/helper.service';
 
 @Injectable()
 export class DiceService implements OnApplicationBootstrap {
@@ -19,7 +20,11 @@ export class DiceService implements OnApplicationBootstrap {
     await this.updateContractState();
   }
 
-  constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) {
+  constructor(
+    private readonly factory: ContractFactoryAbstract,
+    private readonly db: IDataServices,
+    private readonly helper: HelperService,
+  ) {
     this.logger = new Logger(DiceService.name);
   }
 
@@ -112,29 +117,18 @@ export class DiceService implements OnApplicationBootstrap {
       return;
     }
 
-    // Implement
-    const gasLimit = await this.factory.diceContract.executeRound.estimateGas(d1, d2, d3);
-    const gasPrice = await this.factory.provider.getFeeData();
-
-    const executeRoundTx = await this.factory.diceContract.executeRound(d1, d2, d3, {
-      gasLimit,
-      gasPrice: gasPrice.gasPrice,
-      maxFeePerGas: gasPrice.maxFeePerGas,
-      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
-    });
-
-    const executeRound = await this.factory.provider.waitForTransaction(executeRoundTx.hash as string);
-
-    // Execute round success
-    if (executeRound.status === 1) {
-      this.logger.log(`New Dice round execute successfully!`);
-    }
-
-    // Execute round failed
-    else {
-      this.logger.log(`New Dice round executed failed! retry...`);
-      await this.executeRound();
-    }
+    await this.helper.executeContract(
+      this.factory.diceContract,
+      'executeRound',
+      'New Dice round execute successfully!',
+      'New Dice round executed failed! retry...',
+      async () => await this.executeRound(),
+      undefined,
+      constant.GAS,
+      d1,
+      d2,
+      d3,
+    );
   }
 
   async updateContractState() {
@@ -204,35 +198,20 @@ export class DiceService implements OnApplicationBootstrap {
   }
 
   async genesisStartRound() {
-    // Implement
-    const gasLimit = await this.factory.diceContract.genesisStartRound.estimateGas();
-    const gasPrice = await this.factory.provider.getFeeData();
+    await this.helper.executeContract(
+      this.factory.diceContract,
+      'genesisStartRound',
+      'Genesis start round successfully!',
+      'Genesis start failed! retry...',
+      async () => {
+        await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.DICE, {
+          genesis_start: true,
+        });
+      },
+      async () => await this.genesisStartRound(),
 
-    const genesisStartRound = await this.factory.diceContract.genesisStartRound({
-      gasLimit,
-      gasPrice: gasPrice.gasPrice,
-      maxFeePerGas: gasPrice.maxFeePerGas,
-      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
-    });
-
-    const genesisStartRoundTx = await this.factory.provider.waitForTransaction(genesisStartRound.hash as string);
-
-    // Execute round success
-    if (genesisStartRoundTx.status === 1) {
-      this.logger.log(`Genesis start round successfully!`);
-
-      // Update genesis start preference
-
-      await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.DICE, {
-        genesis_start: true,
-      });
-    }
-
-    // Execute round failed
-    else {
-      this.logger.log(`Genesis start failed! retry...`);
-      await this.genesisStartRound();
-    }
+      constant.GAS,
+    );
   }
 
   async genesisEndRound() {
@@ -244,35 +223,24 @@ export class DiceService implements OnApplicationBootstrap {
       this.logger.warn('Get dice failed !');
       return;
     }
-    // Implement
-    const gasLimit = await this.factory.diceContract.genesisEndRound.estimateGas(d1, d2, d3);
-    const gasPrice = await this.factory.provider.getFeeData();
 
-    const genesisEndRound = await this.factory.diceContract.genesisEndRound(d1, d2, d3, {
-      gasLimit,
-      gasPrice: gasPrice.gasPrice,
-      maxFeePerGas: gasPrice.maxFeePerGas,
-      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
-    });
+    await this.helper.executeContract(
+      this.factory.diceContract,
+      'genesisEndRound',
+      'Genesis emd round successfully!',
+      'Genesis emd failed! retry...',
+      async () => {
+        await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.DICE, {
+          genesis_end: true,
+        });
+      },
+      async () => await this.genesisStartRound(),
 
-    const genesisEndRoundTx = await this.factory.provider.waitForTransaction(genesisEndRound.hash as string);
-
-    // Execute round success
-    if (genesisEndRoundTx.status === 1) {
-      this.logger.log(`Genesis end round successfully!`);
-
-      // Update genesis end preference
-
-      await this.db.preferenceRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.DICE, {
-        genesis_end: true,
-      });
-    }
-
-    // Execute round failed
-    else {
-      this.logger.log(`Genesis end failed! retry...`);
-      await this.genesisEndRound();
-    }
+      constant.GAS,
+      d1,
+      d2,
+      d3,
+    );
   }
 
   async cancelCurrentRound() {

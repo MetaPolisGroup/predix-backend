@@ -1,5 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { CronJob } from 'cron';
+import { Contract, ethers } from 'ethers';
+import constant from 'src/configuration';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 
@@ -24,5 +26,40 @@ export class HelperService {
     logger.log(message);
 
     return cj;
+  }
+
+  async executeContract(
+    contract: Contract,
+    functionName: string,
+    successMsg = 'Execute successfully !',
+    failedMsg = 'Execute failed !',
+    callBackSuccess?: () => Promise<void>,
+    callBackFailed?: () => Promise<void>,
+    gasFee?: number,
+    ...agrs: string[]
+  ) {
+    const gasLimit = await contract[functionName].estimateGas(...agrs);
+    const gasPrice = await this.factory.provider.getFeeData();
+
+    const executeRoundTx = await contract[functionName](...agrs, {
+      gasLimit,
+
+      maxFeePerGas: gasFee ? BigInt(gasFee) : gasPrice.maxFeePerGas,
+      maxPriorityFeePerGas: gasFee ? BigInt(gasFee) : gasPrice.maxPriorityFeePerGas,
+    });
+
+    const executeRound = await this.factory.provider.waitForTransaction(executeRoundTx.hash as string);
+
+    // Execute round success
+    if (executeRound.status === 1) {
+      console.log(successMsg);
+      await callBackSuccess?.();
+    }
+
+    // Execute round failed
+    else {
+      console.log(failedMsg);
+      await callBackFailed?.();
+    }
   }
 }
