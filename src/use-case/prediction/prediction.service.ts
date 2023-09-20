@@ -11,7 +11,7 @@ import { HelperService } from '../helper/helper.service';
 
 @Injectable()
 export class PredictionService implements OnApplicationBootstrap {
-  private cronJobs: { [id: string]: CronJob } = {};
+  public cronJobs: { [id: string]: CronJob } = {};
 
   private cronJobsBet: { [id: string]: CronJob } = {};
 
@@ -105,7 +105,7 @@ export class PredictionService implements OnApplicationBootstrap {
 
     // Set cronjob to execute round after interval time
     else {
-      const date = new Date((availableRound.startTimestamp + preferences.interval_seconds) * 1000);
+      const date = new Date((availableRound.startTimestamp + preferences.interval_seconds + 5) * 1000);
       this.cronJobs = this.helper.createCronJob(
         this.logger,
         this.cronJobs,

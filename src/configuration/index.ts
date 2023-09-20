@@ -1,5 +1,5 @@
-import { predictionABI, tokenABI, rawAggregatorABI, marketABI, diceABI } from './abi';
-import { predictionAddr, tokenAddr, marketAddr, diceAddr } from './address';
+import { predictionABI, tokenABI, rawAggregatorABI, marketABI, diceABI, nftABI, faucetABI } from './abi';
+import { predictionAddr, tokenAddr, marketAddr, diceAddr, nftAddr, faucetAddr } from './address';
 import { betPosition, betStatus, collectionNames, LeaderBoard, Path, userType } from './constant';
 import { ChainType } from './chain';
 import provider from './provider';
@@ -40,6 +40,8 @@ const constant = {
     TOKEN: tokenAddr[CURRENT_NETWORK],
     MARKET: marketAddr[CURRENT_NETWORK],
     DICE: diceAddr[CURRENT_NETWORK],
+    NFT: nftAddr[CURRENT_NETWORK],
+    FAUCET: faucetAddr[CURRENT_NETWORK],
     AGGREGATOR: '0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE',
   },
   ABI: {
@@ -47,6 +49,8 @@ const constant = {
     TOKEN: tokenABI[CURRENT_NETWORK],
     MARKET: marketABI[CURRENT_NETWORK],
     DICE: diceABI[CURRENT_NETWORK],
+    NFT: nftABI[CURRENT_NETWORK],
+    FAUCET: faucetABI[CURRENT_NETWORK],
     AGGREGATOR: rawAggregatorABI,
   },
   PROVIDER: provider(CURRENT_NETWORK),

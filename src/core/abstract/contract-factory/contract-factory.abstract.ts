@@ -11,6 +11,8 @@ export abstract class ContractFactoryAbstract {
 
   abstract diceContract: Contract;
 
+  abstract nftContract: Contract;
+
   abstract aggregatorContract: Contract;
 
   abstract provider: JsonRpcProvider;

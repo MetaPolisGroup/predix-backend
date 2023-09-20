@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Controller, Get, Req } from '@nestjs/common';
 import { IDataServices } from './core/abstract/data-services/data-service.abstract';
 import { UserAuthenService } from './use-case/user/user-authen.service';
@@ -15,6 +16,32 @@ export class DiceController {
 
     private readonly dice: DiceService,
   ) {}
+
+  @Get('bet')
+  async bet() {
+    const currentEpoch = await this.factory.diceContract.currentEpoch();
+    const gasLimit = await this.factory.diceContract.betBear.estimateGas(currentEpoch.toString(), '200');
+    const gasPrice = await this.factory.provider.getFeeData();
+
+    const executeRoundTx = await this.factory.diceContract.betBear(currentEpoch.toString(), '200', {
+      gasLimit,
+      gasPrice: gasPrice.gasPrice,
+      maxFeePerGas: gasPrice.maxFeePerGas,
+      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
+    });
+
+    const executeRound = await this.factory.provider.waitForTransaction(executeRoundTx.hash as string);
+
+    // Execute round success
+    if (executeRound.status === 1) {
+      console.log(`execute successfully!`);
+    }
+
+    // Execute round failed
+    else {
+      console.log(` executed failed! `);
+    }
+  }
 
   @Get('cancel')
   async cancel() {

@@ -18,6 +18,8 @@ export class ContractFactory implements ContractFactoryAbstract {
 
   readonly marketContract: Contract;
 
+  readonly nftContract: Contract;
+
   readonly diceContract: Contract;
 
   constructor() {
@@ -38,6 +40,9 @@ export class ContractFactory implements ContractFactoryAbstract {
 
     // Aggregator contract
     this.aggregatorContract = this.getAggregatorContract();
+
+    //Nft contract
+    this.nftContract = this.getNftContract();
 
     if (!this.provider) {
       throw new Error('Provider not found !');
@@ -61,6 +66,10 @@ export class ContractFactory implements ContractFactoryAbstract {
 
     if (!this.aggregatorContract) {
       throw new Error('Prediction Aggregator contract create failed !');
+    }
+
+    if (!this.nftContract) {
+      throw new Error('NFT contract create failed !');
     }
   }
 
@@ -94,6 +103,14 @@ export class ContractFactory implements ContractFactoryAbstract {
     const diceContract = new ethers.Contract(constant.ADDRESS.DICE, constant.ABI.DICE, wallet);
 
     return diceContract;
+  }
+
+  private getNftContract() {
+    const wallet = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY, constant.PROVIDER);
+
+    const nftcontract = new ethers.Contract(constant.ADDRESS.NFT, constant.ABI.NFT, wallet);
+
+    return nftcontract;
   }
 
   private getAggregatorContract() {
