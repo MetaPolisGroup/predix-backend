@@ -1,4 +1,4 @@
-import { JsonRpcProvider, ethers } from 'ethers';
+import { AbstractProvider, JsonRpcProvider, ethers } from 'ethers';
 import { ChainType } from './chain';
 
 // 2. Define network configurations
@@ -15,7 +15,7 @@ export const providerRPC = {
   },
   [ChainType.BASETESTNET]: {
     name: 'baseTestnet',
-    rpc: 'https://goerli.base.org',
+    rpc: 'https://base-goerli.publicnode.com',
     chainId: 84531,
   },
   [ChainType.SEPOLIA]: {
@@ -26,6 +26,7 @@ export const providerRPC = {
 };
 
 const provider = (env: ChainType): JsonRpcProvider => {
+  // return ethers.getDefaultProvider(providerRPC[env].rpc);
   return new ethers.JsonRpcProvider(
     providerRPC[env].rpc,
     {

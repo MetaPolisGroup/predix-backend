@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
@@ -40,6 +39,9 @@ export class EventRoundListener implements OnApplicationBootstrap {
 
       // Update bets
       await this.betPrediction.updateBetWhenRoundIsLocked(epoch);
+
+      // Log
+      this.Logger.log(`Round ${epoch.toString()} has locked !`);
     });
   }
 
@@ -50,6 +52,9 @@ export class EventRoundListener implements OnApplicationBootstrap {
 
       // Update Bet
       await this.betPrediction.updateBetWhenRoundIsEnded(epoch);
+
+      // Log
+      this.Logger.log(`Round ${epoch.toString()} has ended !`);
     });
   }
 

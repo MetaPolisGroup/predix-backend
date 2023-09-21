@@ -13,7 +13,7 @@ export class DiceRoundService implements OnApplicationBootstrap {
   async onApplicationBootstrap() {
     if (process.env.CONSTANT_ENABLE_DICE === 'True') {
       await this.validateRoundInDb();
-      await this.updateCurrentRound();
+      // await this.updateCurrentRound();
     }
   }
 
@@ -85,6 +85,7 @@ export class DiceRoundService implements OnApplicationBootstrap {
   async getRoundFromChain(epoch: bigint): Promise<Dice> {
     const roundFromChain = await this.factory.diceContract.rounds(epoch);
     const now = new Date().getTime() / 1000;
+    const currentEpoch = await this.factory.diceContract.currentEpoch();
     const round: Dice = {
       epoch: +roundFromChain[0].toString(),
       startTimestamp: +roundFromChain[1].toString(),
@@ -101,7 +102,7 @@ export class DiceRoundService implements OnApplicationBootstrap {
       cancel: false,
     };
 
-    round.cancel = round.closed && round.totalAmount <= 0;
+    round.cancel = (round.closed && round.totalAmount <= 0) || (!round.closed && round.epoch < currentEpoch);
 
     return round;
   }

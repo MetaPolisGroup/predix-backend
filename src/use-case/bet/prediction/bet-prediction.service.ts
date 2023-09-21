@@ -169,9 +169,6 @@ export class BetPredictionService implements OnApplicationBootstrap {
         });
       }
     }
-
-    // Log
-    this.logger.log(`Round ${epoch.toString()} has locked !`);
   }
 
   async updateBetWhenRoundIsEnded(epoch: bigint) {
@@ -209,9 +206,6 @@ export class BetPredictionService implements OnApplicationBootstrap {
         await this.handleMoney.handlePoint(bet.amount, bet.user_address);
       }
     }
-
-    // Log
-    this.logger.log(`Round ${epoch.toString()} has ended !`);
   }
 
   private calculateResult(bet: Bet, round: Prediction): BetStatus {

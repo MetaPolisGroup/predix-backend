@@ -100,7 +100,7 @@ export class DiceService implements OnApplicationBootstrap {
 
     // Set cronjob to execute round  after interval time
     else {
-      const date = new Date((availableRound.startTimestamp + preferences.interval_seconds) * 1000);
+      const date = new Date((availableRound.startTimestamp + preferences.interval_seconds + 3) * 1000);
       this.createCronJob(date, availableRound.epoch, async () => {
         await this.executeRound();
       });
@@ -122,8 +122,9 @@ export class DiceService implements OnApplicationBootstrap {
       'executeRound',
       'New Dice round execute successfully!',
       'New Dice round executed failed! retry...',
-      async () => await this.executeRound(),
+
       undefined,
+      async () => await this.executeRound(),
       constant.GAS,
       d1,
       d2,
