@@ -15,7 +15,7 @@ export class PredictionRoundService implements OnApplicationBootstrap {
   async onApplicationBootstrap() {
     if (process.env.CONSTANT_ENABLE === 'True') {
       await this.validateRoundInDb();
-      // await this.updateCurrentRound();
+      await this.updateCurrentRound();
     }
   }
 
@@ -108,6 +108,7 @@ export class PredictionRoundService implements OnApplicationBootstrap {
   async getRoundFromChain(epoch: bigint): Promise<Prediction> {
     const roundFromChain = await this.factory.predictionContract.rounds(epoch);
     const now = new Date().getTime() / 1000;
+    const currentEpoch = await this.factory.predictionContract.currentEpoch();
     const preferences = await this.db.preferenceRepo.getFirstValueCollectionData();
     const round: Prediction = {
       epoch: +roundFromChain[0].toString(),
@@ -127,7 +128,10 @@ export class PredictionRoundService implements OnApplicationBootstrap {
       cancel: false,
     };
 
-    round.cancel = (!round.closed && now > round.closeTimestamp + preferences.buffer_seconds) || (round.closed && round.totalAmount <= 0);
+    round.cancel =
+      (!round.closed && now > round.closeTimestamp + preferences.buffer_seconds) ||
+      (round.closed && round.totalAmount <= 0) ||
+      (!round.locked && currentEpoch > round.epoch);
 
     return round;
   }

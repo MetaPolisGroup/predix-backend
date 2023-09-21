@@ -65,7 +65,7 @@ export class PredictionService implements OnApplicationBootstrap {
       this.logger.warn(`Only execute round after Genesis Start and Genesis Lock`);
       return;
     }
-    const preferences = await this.db.preferenceRepo.getFirstValueCollectionData();
+    const preferences = await this.db.preferenceRepo.getDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION);
 
     if (!preferences) {
       this.logger.error(`Preferences not found when set cronjob`);
