@@ -6,7 +6,7 @@ import { PredictionTaskService } from './prediction-task.service';
 
 @Module({
   imports: [LeaderboardModule],
-  providers: [ChainlinkTaskService, SnapshotService, PredictionTaskService],
+  providers: [ChainlinkTaskService, SnapshotService],
   exports: [ChainlinkTaskService],
 })
 export class TaskModule {}
