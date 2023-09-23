@@ -33,7 +33,7 @@ const provider = (env: ChainType): JsonRpcProvider => {
       chainId: providerRPC[env].chainId,
       name: providerRPC[env].name,
     },
-    { polling: true },
+    // { polling: true },
   );
 };
 export default provider;

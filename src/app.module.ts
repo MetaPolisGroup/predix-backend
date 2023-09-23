@@ -33,7 +33,7 @@ import { NFTController } from './nft.controller';
     SnapshotModule,
     UserModule,
     AuthModule,
-    // TaskModule,
+    TaskModule,
     EventListenerModule,
     ChartModule,
     LeaderboardModule,

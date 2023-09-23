@@ -13,7 +13,7 @@ export class DiceRoundService implements OnApplicationBootstrap {
   async onApplicationBootstrap() {
     if (process.env.CONSTANT_ENABLE_DICE === 'True') {
       await this.validateRoundInDb();
-      // await this.updateCurrentRound();
+      await this.updateCurrentRound();
     }
   }
 
