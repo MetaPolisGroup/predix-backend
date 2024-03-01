@@ -12,8 +12,8 @@ export class DiceRoundService implements OnApplicationBootstrap {
 
   async onApplicationBootstrap() {
     if (process.env.CONSTANT_ENABLE_DICE === 'True') {
-      await this.validateRoundInDb();
       await this.updateCurrentRound();
+      await this.validateRoundInDb();
     }
   }
 
@@ -111,12 +111,17 @@ export class DiceRoundService implements OnApplicationBootstrap {
     const currentEpoch = await this.factory.diceContract.currentEpoch();
 
     // Update Current round
+    if (currentEpoch <= 0) {
+      return;
+    }
     const currentRound = await this.getRoundFromChain(currentEpoch);
     await this.db.diceRepo.upsertDocumentData(currentRound.epoch.toString(), currentRound);
 
-    // Update Live round
-    const liveRound = await this.getRoundFromChain(BigInt(+currentEpoch.toString() - 1));
-    await this.db.diceRepo.upsertDocumentData(liveRound.epoch.toString(), liveRound);
+    if (currentEpoch > 1) {
+      // Update Live round
+      const liveRound = await this.getRoundFromChain(BigInt(+currentEpoch.toString() - 1));
+      await this.db.diceRepo.upsertDocumentData(liveRound.epoch.toString(), liveRound);
+    }
   }
 
   async validateRoundInDb() {

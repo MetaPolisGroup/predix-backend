@@ -17,7 +17,9 @@ export class DiceService implements OnApplicationBootstrap {
   private logger: Logger;
 
   async onApplicationBootstrap() {
-    await this.updateContractState();
+    if (process.env.CONSTANT_ENABLE_DICE === 'True') {
+      await this.updateDicePreference();
+    }
   }
 
   constructor(
@@ -132,7 +134,7 @@ export class DiceService implements OnApplicationBootstrap {
     );
   }
 
-  async updateContractState() {
+  async updateDicePreference() {
     const preference: Preferences = {
       fee: null,
       genesis_start: null,

@@ -4,7 +4,7 @@ import { betPosition, betStatus, collectionNames, LeaderBoard, Path, userType } 
 import { ChainType } from './chain';
 import provider from './provider';
 
-const CURRENT_NETWORK = ChainType.BASETESTNET;
+const CURRENT_NETWORK = ChainType.BASESEPOLIA;
 const constant = {
   GAS: 1000000,
   STORAGE_PATH: Path,

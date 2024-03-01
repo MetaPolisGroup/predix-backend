@@ -24,16 +24,17 @@ export class LeaderboardService {
           { field: 'user_address', operator: '==', value: betslip.user_address },
         ]);
         if (user) {
-          if (betslip.status === 'Win' || betslip.status === 'Winning Refund') {
+          if (betslip.status === constant.BET.STATUS.WIN || betslip.status === constant.BET.STATUS.WINNING_REFUND) {
             user.leaderboard.round_winning += 1;
             user.leaderboard.round_played += 1;
             user.leaderboard.total_amount += betslip.amount;
             user.leaderboard.net_winnings += betslip.winning_amount;
-          } else if (betslip.status === 'Lose' || betslip.status === 'Losing Refund') {
+          } else if (betslip.status === constant.BET.STATUS.LOSE || betslip.status === constant.BET.STATUS.LOSING_REFUND) {
             user.leaderboard.round_played += 1;
             user.leaderboard.net_winnings -= betslip.amount;
             user.leaderboard.total_amount += betslip.amount;
           }
+
           if (user.leaderboard.round_played !== 0 && user.leaderboard.round_winning !== 0) {
             user.leaderboard.win_rate = (user.leaderboard.round_winning / user.leaderboard.round_played) * 100;
           } else {

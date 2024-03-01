@@ -17,37 +17,37 @@ export class ChainlinkTaskService implements OnApplicationBootstrap {
     this.logger = new Logger(ChainlinkTaskService.name);
   }
 
-  @Cron('*/5 * * * * *')
-  async updatePriceFromChainlinkChart() {
-    const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
+  // @Cron('*/5 * * * * *')
+  // async updatePriceFromChainlinkChart() {
+  //   const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
 
-    if (!chainlinkPrice) {
-      this.logger.warn('No chainlink data !');
-      return;
-    }
+  //   if (!chainlinkPrice) {
+  //     this.logger.warn('No chainlink data !');
+  //     return;
+  //   }
 
-    const chart: Chart = {
-      created_at: parseInt(chainlinkPrice[2].toString()),
-      delete: false,
-      price: parseInt(chainlinkPrice[1].toString()),
-    };
+  //   const chart: Chart = {
+  //     created_at: parseInt(chainlinkPrice[2].toString()),
+  //     delete: false,
+  //     price: parseInt(chainlinkPrice[1].toString()),
+  //   };
 
-    await this.db.chartRepo.upsertDocumentData(parseInt(chainlinkPrice[2].toString()).toString(), chart);
-  }
+  //   await this.db.chartRepo.upsertDocumentData(parseInt(chainlinkPrice[2].toString()).toString(), chart);
+  // }
 
-  @Cron('*/5 * * * * *')
-  async updatePriceFromChainlink() {
-    const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
+  // @Cron('*/5 * * * * *')
+  // async updatePriceFromChainlink() {
+  //   const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
 
-    if (!chainlinkPrice) {
-      this.logger.warn('No chainlink data !');
-      return;
-    }
+  //   if (!chainlinkPrice) {
+  //     this.logger.warn('No chainlink data !');
+  //     return;
+  //   }
 
-    // Implement
-    await this.db.chainlinkRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.CHAINLINK, {
-      price: chainlinkPrice[1].toString(),
-      updated_at: new Date().getTime(),
-    });
-  }
+  //   // Implement
+  //   await this.db.chainlinkRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.CHAINLINK, {
+  //     price: chainlinkPrice[1].toString(),
+  //     updated_at: new Date().getTime(),
+  //   });
+  // }
 }

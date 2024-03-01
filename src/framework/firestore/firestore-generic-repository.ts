@@ -124,7 +124,7 @@ export class FirestoreGenericRepository<T extends DocumentData> implements IGene
 
     let tmp;
     if (startAfter) {
-      tmp = await this.collectionRef.doc(startAfter.id).get();
+      tmp = await this.collectionRef.doc(startAfter['id']).get();
     }
 
     const collectionSnapshot = startAfter ? await query.startAfter(tmp).limit(limit).get() : await query.limit(limit).get();

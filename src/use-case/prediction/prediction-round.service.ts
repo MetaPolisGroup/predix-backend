@@ -143,12 +143,16 @@ export class PredictionRoundService implements OnApplicationBootstrap {
     const currentRound = await this.getRoundFromChain(currentEpoch);
     await this.db.predictionRepo.upsertDocumentData(currentRound.epoch.toString(), currentRound);
 
-    // Update Live round
-    const liveRound = await this.getRoundFromChain(BigInt(+currentEpoch.toString() - 1));
-    await this.db.predictionRepo.upsertDocumentData(liveRound.epoch.toString(), liveRound);
+    if (currentEpoch > 1) {
+      // Update Live round
+      const liveRound = await this.getRoundFromChain(BigInt(+currentEpoch.toString() - 1));
+      await this.db.predictionRepo.upsertDocumentData(liveRound.epoch.toString(), liveRound);
+    }
 
-    const expiredRound = await this.getRoundFromChain(BigInt(+currentEpoch.toString() - 2));
-    await this.db.predictionRepo.upsertDocumentData(expiredRound.epoch.toString(), expiredRound);
+    if (currentEpoch > 2) {
+      const expiredRound = await this.getRoundFromChain(BigInt(+currentEpoch.toString() - 2));
+      await this.db.predictionRepo.upsertDocumentData(expiredRound.epoch.toString(), expiredRound);
+    }
   }
 
   async validateRoundInDb() {

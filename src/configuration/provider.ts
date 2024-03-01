@@ -18,10 +18,11 @@ export const providerRPC = {
     rpc: 'https://base-goerli.publicnode.com',
     chainId: 84531,
   },
-  [ChainType.SEPOLIA]: {
-    name: 'Sepolia',
-    rpc: 'https://rpc.sepolia.org',
-    chainId: 11155111,
+
+  [ChainType.BASESEPOLIA]: {
+    name: 'baseSepolia',
+    rpc: 'https://base-sepolia-rpc.publicnode.com',
+    chainId: 84532,
   },
 };
 

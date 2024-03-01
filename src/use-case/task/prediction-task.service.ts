@@ -17,33 +17,33 @@ export class PredictionTaskService implements OnApplicationBootstrap {
     this.logger = new Logger(PredictionTaskService.name);
   }
 
-  @Cron('*/2 * * * * *')
-  async updateBetAmount() {
-    const availableRound = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
-      {
-        field: 'locked',
-        operator: '==',
-        value: false,
-      },
-      {
-        field: 'cancel',
-        operator: '==',
-        value: false,
-      },
-    ]);
+  // @Cron('*/2 * * * * *')
+  // async updateBetAmount() {
+  //   const availableRound = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
+  //     {
+  //       field: 'locked',
+  //       operator: '==',
+  //       value: false,
+  //     },
+  //     {
+  //       field: 'cancel',
+  //       operator: '==',
+  //       value: false,
+  //     },
+  //   ]);
 
-    if (!availableRound) {
-      this.logger.warn('No available round when update bet amount !');
-      return;
-    }
+  //   if (!availableRound) {
+  //     this.logger.warn('No available round when update bet amount !');
+  //     return;
+  //   }
 
-    const round = await this.factory.predictionContract.rounds(availableRound.epoch);
-    const bullAmount = parseInt(round[9].toString());
-    const bearAmount = parseInt(round[10].toString());
+  //   const round = await this.factory.predictionContract.rounds(availableRound.epoch);
+  //   const bullAmount = parseInt(round[9].toString());
+  //   const bearAmount = parseInt(round[10].toString());
 
-    await this.db.predictionRepo.upsertDocumentData(availableRound.epoch.toString(), {
-      bearAmount,
-      bullAmount,
-    });
-  }
+  //   await this.db.predictionRepo.upsertDocumentData(availableRound.epoch.toString(), {
+  //     bearAmount,
+  //     bullAmount,
+  //   });
+  // }
 }
