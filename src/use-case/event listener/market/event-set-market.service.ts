@@ -52,7 +52,7 @@ export class EventMarketSetListener implements OnApplicationBootstrap {
       });
 
       // Genesis start
-      await this.prediction.genesisStartRound();
+      // await this.prediction.genesisStartRound();
     });
   }
 }
