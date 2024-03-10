@@ -1,13 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { CronJob } from 'cron';
-import { Contract, ethers } from 'ethers';
-import constant from 'src/configuration';
+import { Contract } from 'ethers';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 
 @Injectable()
 export class HelperService {
-  constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) {}
+  constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) { }
 
   createCronJob(logger: Logger, cj: { [id: string]: CronJob }, date: Date, id: number, message: string, cb?: () => Promise<void>) {
     const cronjob = new CronJob(date, async function () {
@@ -36,16 +35,20 @@ export class HelperService {
     callBackSuccess?: () => Promise<void>,
     callBackFailed?: () => Promise<void>,
     gasFee?: number,
+    multipleFeeTimes = 1,
     ...agrs: string[]
   ) {
+
     const gasLimit = await contract[functionName].estimateGas(...agrs);
     const gasPrice = await this.factory.provider.getFeeData();
+    const nonce = await this.factory.signer.getNonce("pending");
+    this.factory.signer.increment()
 
     const executeRoundTx = await contract[functionName](...agrs, {
       gasLimit,
-
-      maxFeePerGas: gasFee ? BigInt(gasFee) : gasPrice.maxFeePerGas,
-      maxPriorityFeePerGas: gasFee ? BigInt(gasFee) : gasPrice.maxPriorityFeePerGas,
+      nonce,
+      maxFeePerGas: gasFee ? BigInt(gasFee) : BigInt(Number(gasPrice.maxFeePerGas) * multipleFeeTimes),
+      maxPriorityFeePerGas: gasFee ? BigInt(gasFee) : BigInt(Number(gasPrice.maxPriorityFeePerGas) * multipleFeeTimes),
     });
 
     const executeRound = await this.factory.provider.waitForTransaction(executeRoundTx.hash as string);
@@ -61,5 +64,9 @@ export class HelperService {
       console.log(failedMsg);
       await callBackFailed?.();
     }
+  }
+
+  async createEventListener(contract: Contract, eventName: string, type: 'on' | 'off', callback: (...agrs) => Promise<void>) {
+    await contract[type](eventName, callback);
   }
 }
