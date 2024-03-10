@@ -29,8 +29,6 @@ export abstract class IGenericRepository<T> {
 
   abstract getDocumentData(documentId: string): Promise<T>;
 
-  abstract getDocumentRef(documentId: string): any;
-
   abstract createDocumentData(documentData: T): Promise<T>;
 
   abstract updateDocumentData(documentId: string, documentData: T): Promise<T>;

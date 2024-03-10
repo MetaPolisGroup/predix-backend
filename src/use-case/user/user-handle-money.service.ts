@@ -4,7 +4,7 @@ import { IDataServices } from 'src/core/abstract/data-services/data-service.abst
 
 @Injectable()
 export class UserHandleMoney {
-  constructor(private readonly db: IDataServices) {}
+  constructor(private readonly db: IDataServices) { }
 
   async handlePoint(amount: number, user_id: string) {
     const user = await this.db.userRepo.getDocumentData(user_id);
@@ -35,12 +35,15 @@ export class UserHandleMoney {
         await this.db.userRepo.upsertDocumentData(recommend_id, { point: after_point });
       }
     }
+
     const admin = await this.db.userRepo.getFirstValueCollectionDataByConditions([
       { field: 'type', operator: '==', value: constant.USER.TYPE.ADMIN },
     ]);
+
     if (!admin) {
       return true;
     }
+
     const after_point = amount * total_revenue_share + admin.point;
     await this.db.userRepo.upsertDocumentData(admin.id, { point: after_point });
     return true;

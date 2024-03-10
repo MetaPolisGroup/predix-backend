@@ -1,4 +1,4 @@
-import { Contract, JsonRpcProvider } from 'ethers';
+import { AlchemyProvider, Contract, NonceManager } from 'ethers';
 
 export abstract class ContractFactoryAbstract {
   // Firestore
@@ -15,5 +15,7 @@ export abstract class ContractFactoryAbstract {
 
   abstract aggregatorContract: Contract;
 
-  abstract provider: JsonRpcProvider;
+  abstract provider: AlchemyProvider;
+
+  abstract signer: NonceManager;
 }

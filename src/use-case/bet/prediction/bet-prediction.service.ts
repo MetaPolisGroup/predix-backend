@@ -12,7 +12,7 @@ import { UserHandleMoney } from 'src/use-case/user/user-handle-money.service';
 export class BetPredictionService implements OnApplicationBootstrap {
   private logger: Logger;
 
-  async onApplicationBootstrap() {}
+  async onApplicationBootstrap() { }
 
   constructor(private readonly db: IDataServices, private readonly handleMoney: UserHandleMoney) {
     this.logger = new Logger(BetPredictionService.name);
@@ -129,12 +129,12 @@ export class BetPredictionService implements OnApplicationBootstrap {
       bet.winning_amount = amount - (amount * (preferences.fee * 2)) / 10000;
     }
 
-    // Set winning amount = amount bet if no preferences
+    // Set winning amount = amount bet if no preferences => can't calculate fee
     else if (!preferences) {
       bet.winning_amount = amount;
     }
 
-    // Refund bet to use if bet amount being cut all
+    // Refund bet to user if bet amount being cut all
     else if (amount == 0) {
       bet.winning_amount = 0;
     }
@@ -172,6 +172,8 @@ export class BetPredictionService implements OnApplicationBootstrap {
   }
 
   async updateBetWhenRoundIsEnded(epoch: bigint) {
+
+    // Get round
     const round = await this.db.predictionRepo.getFirstValueCollectionDataByConditions([
       {
         field: 'epoch',
@@ -180,7 +182,7 @@ export class BetPredictionService implements OnApplicationBootstrap {
       },
     ]);
 
-    //Update bets
+    //Get bets
     const bets = await this.db.betRepo.getCollectionDataByConditions([
       {
         field: 'epoch',
@@ -189,7 +191,7 @@ export class BetPredictionService implements OnApplicationBootstrap {
       },
     ]);
 
-    // Update bet status & round
+    // Update bet status & round & result
     if (bets) {
       for (const bet of bets) {
         bet.round = round ? round : null;

@@ -14,8 +14,8 @@ export class PredictionRoundService implements OnApplicationBootstrap {
 
   async onApplicationBootstrap() {
     if (process.env.CONSTANT_ENABLE === 'True') {
-      await this.validateRoundInDb();
       await this.updateCurrentRound();
+      await this.validateRoundInDb();
     }
   }
 
@@ -32,7 +32,7 @@ export class PredictionRoundService implements OnApplicationBootstrap {
       return;
     }
 
-    // Update round
+    // Create round variable
     const round: Prediction = {
       epoch: parseInt(epoch.toString()),
       closeOracleId: 0,
@@ -128,20 +128,19 @@ export class PredictionRoundService implements OnApplicationBootstrap {
       cancel: false,
     };
 
-    round.cancel =
-      (!round.closed && now > round.closeTimestamp + preferences.buffer_seconds) ||
-      (round.closed && round.totalAmount <= 0) ||
-      (!round.locked && currentEpoch > round.epoch);
+    round.cancel = (round.closed && round.totalAmount <= 0) || (!round.locked && currentEpoch > round.epoch);
 
     return round;
   }
 
   async updateCurrentRound() {
-    const currentEpoch = await this.factory.predictionContract.currentEpoch();
+    const currentEpoch: bigint = await this.factory.predictionContract.currentEpoch();
 
     // Update Current round
-    const currentRound = await this.getRoundFromChain(currentEpoch);
-    await this.db.predictionRepo.upsertDocumentData(currentRound.epoch.toString(), currentRound);
+    if (currentEpoch > 0) {
+      const currentRound = await this.getRoundFromChain(currentEpoch);
+      await this.db.predictionRepo.upsertDocumentData(currentRound.epoch.toString(), currentRound);
+    }
 
     if (currentEpoch > 1) {
       // Update Live round

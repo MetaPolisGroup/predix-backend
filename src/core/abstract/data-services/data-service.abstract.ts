@@ -15,8 +15,6 @@ import { Dice } from 'src/core/entity/dice.entity';
 export abstract class IDataServices {
   // Firestore
 
-  abstract firestore: any;
-
   abstract userRepo: IGenericRepository<User>;
 
   abstract preferenceRepo: IGenericRepository<Preferences>;

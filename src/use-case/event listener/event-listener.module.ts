@@ -19,16 +19,17 @@ import { EventDiceSetListener } from './dice/event-set-dice.service';
 
 @Module({
   providers: [
+    // Predix
     EventBetListener,
     EventRoundListener,
     EventClaimListener,
     EventSetListener,
 
     // Market
-    EventMarketBetListener,
-    EventMarketClaimListener,
-    EventMarketSetListener,
-    EventMarketRoundListener,
+    // EventMarketBetListener,
+    // EventMarketClaimListener,
+    // EventMarketSetListener,
+    // EventMarketRoundListener,
 
     // Dice
     EventDiceBetListener,
@@ -40,4 +41,4 @@ import { EventDiceSetListener } from './dice/event-set-dice.service';
   imports: [PredictionModule, UserModule, BetModule, MarketModule, DiceModule],
   exports: [],
 })
-export class EventListenerModule {}
+export class EventListenerModule { }

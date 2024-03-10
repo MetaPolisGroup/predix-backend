@@ -44,7 +44,7 @@ export class DiceService implements OnApplicationBootstrap {
 
     cronjob.start();
 
-    this.logger.log(`Cronjob for round ${id} have been set !`);
+    this.logger.log(`Cronjob for round ${id} have been set at ${date.getHours()}:${date.getMinutes()} !`);
   }
 
   async setCronjob(availableRound: Dice) {
@@ -124,10 +124,10 @@ export class DiceService implements OnApplicationBootstrap {
       'executeRound',
       'New Dice round execute successfully!',
       'New Dice round executed failed! retry...',
-
       undefined,
       async () => await this.executeRound(),
       constant.GAS,
+      undefined,
       d1,
       d2,
       d3,
@@ -214,6 +214,7 @@ export class DiceService implements OnApplicationBootstrap {
       async () => await this.genesisStartRound(),
 
       constant.GAS,
+      undefined,
     );
   }
 
@@ -240,6 +241,7 @@ export class DiceService implements OnApplicationBootstrap {
       async () => await this.genesisStartRound(),
 
       constant.GAS,
+      undefined,
       d1,
       d2,
       d3,

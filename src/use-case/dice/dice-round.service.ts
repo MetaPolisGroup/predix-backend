@@ -22,7 +22,7 @@ export class DiceRoundService implements OnApplicationBootstrap {
   }
 
   async createNewRound(epoch: bigint) {
-    const preferences = await this.db.preferenceRepo.getDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION);
+    const preferences = await this.db.preferenceRepo.getDocumentData(constant.FIREBASE.DOCUMENT.PREFERENCE.DICE);
     const now = Math.round(new Date().getTime() / 1000);
 
     if (!preferences) {

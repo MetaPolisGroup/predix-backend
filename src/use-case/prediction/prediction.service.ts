@@ -22,6 +22,7 @@ export class PredictionService implements OnApplicationBootstrap {
   private limit = 2000;
 
   async onApplicationBootstrap() {
+
     if (process.env.CONSTANT_ENABLE === 'True') {
       await this.updateContractState();
     }
@@ -34,6 +35,9 @@ export class PredictionService implements OnApplicationBootstrap {
   ) {
     this.logger = new Logger(PredictionService.name);
   }
+
+
+
 
   async setCronjobExecute(availableRound: Prediction) {
     // Consts
@@ -72,12 +76,14 @@ export class PredictionService implements OnApplicationBootstrap {
       return;
     }
 
-    if (availableRound.lockTimestamp + preferences.buffer_seconds < now) {
-      this.logger.error('Round exceed buffer time !');
-      await this.pause();
-      return;
-    }
+    // if (availableRound.lockTimestamp + preferences.buffer_seconds < now) {
+    //   this.logger.error('Round exceed buffer time !');
+    //   await this.pause();
+    //   return;
+    // }
     //
+
+
     if (genesis_start && !genesis_lock) {
       if (availableRound.startTimestamp + preferences.interval_seconds < now) {
         await this.genesisLockRound();
@@ -111,7 +117,7 @@ export class PredictionService implements OnApplicationBootstrap {
         this.cronJobs,
         date,
         availableRound.epoch,
-        `Cronjob execute Predix for round ${availableRound.epoch} have been set`,
+        `Cronjob execute Predix for round ${availableRound.epoch} have been set at ${date.getHours()}:${date.getMinutes()}`,
         async () => {
           await this.executeRound();
         },
@@ -152,12 +158,14 @@ export class PredictionService implements OnApplicationBootstrap {
     await this.helper.executeContract(
       this.factory.predictionContract,
       'executeRound',
+
       'New round execute successfully!',
       'New round executed failed! retry...',
       undefined,
       async () => await this.executeRound(),
 
       constant.GAS,
+      undefined,
       chainLinkPrice[0],
       chainLinkPrice[1],
     );
@@ -165,7 +173,6 @@ export class PredictionService implements OnApplicationBootstrap {
 
   async updateContractState() {
     const preference: Preferences = {
-      buffer_seconds: null,
       fee: null,
       genesis_lock: null,
       genesis_start: null,
@@ -182,8 +189,6 @@ export class PredictionService implements OnApplicationBootstrap {
 
     const genesisLock = await this.factory.predictionContract.genesisLockOnce();
 
-    const bufferSeconds = await this.factory.predictionContract.bufferSeconds();
-
     const intervalSeconds = await this.factory.predictionContract.intervalSeconds();
 
     const treasuryFee = await this.factory.predictionContract.treasuryFee();
@@ -196,10 +201,6 @@ export class PredictionService implements OnApplicationBootstrap {
 
     if (genesisLock !== undefined) {
       preference.genesis_lock = genesisLock;
-    }
-
-    if (bufferSeconds !== undefined) {
-      preference.buffer_seconds = parseInt(bufferSeconds.toString());
     }
 
     if (intervalSeconds !== undefined) {
@@ -228,10 +229,6 @@ export class PredictionService implements OnApplicationBootstrap {
       this.logger.warn("Can't get Paused from contract !");
     }
 
-    if (!bufferSeconds) {
-      this.logger.warn("Can't get Buffer seconds from contract !");
-    }
-
     if (!treasuryFee) {
       this.logger.warn("Can't get Fee from contract !");
     }
@@ -253,8 +250,8 @@ export class PredictionService implements OnApplicationBootstrap {
         });
       },
       async () => await this.genesisStartRound(),
-
       constant.GAS,
+      undefined,
     );
   }
 
@@ -279,6 +276,7 @@ export class PredictionService implements OnApplicationBootstrap {
       async () => await this.genesisLockRound(),
 
       constant.GAS,
+      undefined,
       chainLinkPrice[0],
       chainLinkPrice[1],
     );
@@ -391,6 +389,7 @@ export class PredictionService implements OnApplicationBootstrap {
       undefined,
 
       constant.GAS,
+      undefined,
       epoch,
       amount,
     );
@@ -400,12 +399,12 @@ export class PredictionService implements OnApplicationBootstrap {
     await this.helper.executeContract(
       this.factory.predictionContract,
       'betBull',
-      `Autobot bet byll ${parseInt(amount) / 10 ** 18} PRX successfully on round ${epoch.toString()}!`,
-      `Autobot bet byll failed on round ${epoch.toString()}! `,
+      `Autobot bet bull ${parseInt(amount) / 10 ** 18} PRX successfully on round ${epoch.toString()}!`,
+      `Autobot bet bull failed on round ${epoch.toString()}! `,
       undefined,
       undefined,
-
       constant.GAS,
+      undefined,
       epoch,
       amount,
     );
@@ -419,8 +418,8 @@ export class PredictionService implements OnApplicationBootstrap {
       `Prediction contract pause failed !`,
       undefined,
       undefined,
-
       constant.GAS,
+      undefined,
     );
   }
 

@@ -8,4 +8,4 @@ import { HelperService } from './helper.service';
   imports: [],
   exports: [HelperService],
 })
-export class HelperModule {}
+export class HelperModule { }

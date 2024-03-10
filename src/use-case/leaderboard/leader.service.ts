@@ -4,13 +4,17 @@ import { IDataServices } from 'src/core/abstract/data-services/data-service.abst
 
 @Injectable()
 export class LeaderboardService {
-  constructor(private readonly db: IDataServices) {}
+  constructor(private readonly db: IDataServices) { }
 
   listenLeaderboard() {
     this.db.predictionRepo.listenToChangesWithConditionsAndOrderBy([{ field: 'closed', operator: '==', value: true }], [], async matchs => {
       for (const match of matchs) {
         if (match.type === 'added') {
           await this.updateLeaderboard(match.doc.epoch);
+          await this.winRate();
+          await this.roundPlayed();
+          await this.netWinnings();
+          await this.totalBnb();
         }
       }
     });
@@ -24,27 +28,23 @@ export class LeaderboardService {
           { field: 'user_address', operator: '==', value: betslip.user_address },
         ]);
         if (user) {
+          let { net_winnings, round_played, round_winning, total_amount, win_rate } = user.leaderboard
+          round_played += 1;
+          total_amount += betslip.amount;
           if (betslip.status === constant.BET.STATUS.WIN || betslip.status === constant.BET.STATUS.WINNING_REFUND) {
-            user.leaderboard.round_winning += 1;
-            user.leaderboard.round_played += 1;
-            user.leaderboard.total_amount += betslip.amount;
-            user.leaderboard.net_winnings += betslip.winning_amount;
+            round_winning += 1;
+            net_winnings += betslip.winning_amount;
           } else if (betslip.status === constant.BET.STATUS.LOSE || betslip.status === constant.BET.STATUS.LOSING_REFUND) {
-            user.leaderboard.round_played += 1;
-            user.leaderboard.net_winnings -= betslip.amount;
-            user.leaderboard.total_amount += betslip.amount;
+            net_winnings -= betslip.amount;
           }
 
-          if (user.leaderboard.round_played !== 0 && user.leaderboard.round_winning !== 0) {
-            user.leaderboard.win_rate = (user.leaderboard.round_winning / user.leaderboard.round_played) * 100;
+          if (round_played !== 0 && round_winning !== 0) {
+            win_rate = (round_winning / round_played) * 100;
           } else {
-            user.leaderboard.win_rate = 0;
+            win_rate = 0;
           }
           await this.db.userRepo.upsertDocumentData(user.id, user);
-          await this.winRate();
-          await this.roundPlayed();
-          await this.netWinnings();
-          await this.totalBnb();
+
         }
       }
     }

@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 import { DiceService } from 'src/use-case/dice/dice.service';
-import { PredictionService } from 'src/use-case/prediction/prediction.service';
 
 @Injectable()
 export class DiceSnapshotService implements OnApplicationBootstrap {
@@ -13,7 +13,7 @@ export class DiceSnapshotService implements OnApplicationBootstrap {
     }
   }
 
-  constructor(private readonly db: IDataServices, private readonly dice: DiceService) {
+  constructor(private readonly db: IDataServices, private readonly dice: DiceService, private readonly factory: ContractFactoryAbstract) {
     this.logger = new Logger(DiceSnapshotService.name);
   }
 
@@ -38,8 +38,11 @@ export class DiceSnapshotService implements OnApplicationBootstrap {
         },
       ],
       async changes => {
+
         for (const change of changes) {
+
           if (change.type === 'added') {
+
             await this.dice.setCronjob(change.doc);
           }
         }

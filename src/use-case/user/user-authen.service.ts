@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Request } from 'express';
 import constant from 'src/configuration';
-import { IMongoDbServices } from 'src/core/abstract/data-services/data-mongodb-service.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 import { CreateUserDto } from 'src/core/dtos/user/user.dto';
 import { User } from 'src/core/entity/user.enity';
 
 @Injectable()
 export class UserAuthenService {
-  constructor(private readonly db: IDataServices, private readonly mg: IMongoDbServices) {}
+  constructor(private readonly db: IDataServices) { }
 
   async create(dto: CreateUserDto, req: Request): Promise<User> {
     let user_tree_belong = [];
@@ -43,7 +42,7 @@ export class UserAuthenService {
     };
     await this.db.userRepo.upsertDocumentData(user.id, user);
     delete user.id;
-    await this.mg.userMongoRepo.create(user);
+
   }
 
   async memberTreeCommissions(recommend_id: string) {
