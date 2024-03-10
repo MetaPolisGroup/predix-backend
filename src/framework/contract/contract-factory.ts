@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Contract, JsonRpcProvider, ethers } from 'ethers';
+import { AlchemyProvider, Contract, NonceManager, ethers, } from 'ethers';
 import constant from 'src/configuration';
-import { providerRPC } from 'src/configuration/provider';
+import { ChainType } from 'src/configuration/chain';
+import { Chainlist } from 'src/configuration/chainlist';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 
 @Injectable()
@@ -14,7 +15,7 @@ export class ContractFactory implements ContractFactoryAbstract {
 
   readonly aggregatorContract: Contract;
 
-  readonly provider: JsonRpcProvider;
+  readonly provider: AlchemyProvider;
 
   readonly marketContract: Contract;
 
@@ -22,9 +23,15 @@ export class ContractFactory implements ContractFactoryAbstract {
 
   readonly diceContract: Contract;
 
+  readonly signer: NonceManager;
+
+
+
   constructor() {
     // Provider
-    this.provider = constant.PROVIDER;
+    this.provider = this.getAlchemyProvider();
+
+    this.signer = this.getWalletFromPrivateKey();
 
     // Prediction Contract
     this.predictionContract = this.getPredictionContract();
@@ -73,8 +80,23 @@ export class ContractFactory implements ContractFactoryAbstract {
     }
   }
 
+
+  private getWalletFromPrivateKey() {
+    const wallet = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY, this.provider);
+    const signer = new ethers.NonceManager(wallet)
+    return signer
+    // return wallet
+  }
+
+  private getWalletFromPrivateKey2() {
+    const wallet = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY2, this.provider);
+    const signer = new ethers.NonceManager(wallet)
+    return signer
+    // return wallet
+  }
+
   private getPredictionContract() {
-    const wallet = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY, constant.PROVIDER);
+    const wallet = this.getWalletFromPrivateKey()
 
     const predictionContract = new ethers.Contract(constant.ADDRESS.PREDICTION, constant.ABI.PREDICTION, wallet);
 
@@ -82,7 +104,7 @@ export class ContractFactory implements ContractFactoryAbstract {
   }
 
   private getTokenContract() {
-    const wallet = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY, constant.PROVIDER);
+    const wallet = this.getWalletFromPrivateKey()
 
     const tokenContract = new ethers.Contract(constant.ADDRESS.TOKEN, constant.ABI.TOKEN, wallet);
 
@@ -90,7 +112,7 @@ export class ContractFactory implements ContractFactoryAbstract {
   }
 
   private getMarketContract() {
-    const wallet = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY, constant.PROVIDER);
+    const wallet = this.getWalletFromPrivateKey()
 
     const marketContract = new ethers.Contract(constant.ADDRESS.MARKET, constant.ABI.MARKET, wallet);
 
@@ -98,7 +120,8 @@ export class ContractFactory implements ContractFactoryAbstract {
   }
 
   private getDiceContract() {
-    const wallet = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY, constant.PROVIDER);
+
+    const wallet = this.getWalletFromPrivateKey2()
 
     const diceContract = new ethers.Contract(constant.ADDRESS.DICE, constant.ABI.DICE, wallet);
 
@@ -106,7 +129,7 @@ export class ContractFactory implements ContractFactoryAbstract {
   }
 
   private getNftContract() {
-    const wallet = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY, constant.PROVIDER);
+    const wallet = this.getWalletFromPrivateKey()
 
     const nftcontract = new ethers.Contract(constant.ADDRESS.NFT, constant.ABI.NFT, wallet);
 
@@ -114,15 +137,23 @@ export class ContractFactory implements ContractFactoryAbstract {
   }
 
   private getAggregatorContract() {
-    const aggregatorContract = new ethers.Contract(constant.ADDRESS.AGGREGATOR, constant.ABI.AGGREGATOR, this.getMainetProvider());
+    const aggregatorContract = new ethers.Contract(constant.ADDRESS.AGGREGATOR, constant.ABI.AGGREGATOR, this.getProvider(ChainType.BSC));
 
     return aggregatorContract;
   }
 
-  getMainetProvider() {
-    const mainetProvider = new ethers.JsonRpcProvider(providerRPC['bsc'].rpc, {
-      chainId: providerRPC['bsc'].chainId,
-      name: providerRPC['bsc'].name,
+  getAlchemyProvider() {
+    const provider = new AlchemyProvider({
+      chainId: 84532,
+      name: "base-sepolia",
+    }, process.env.ALCHEMY_API_KEY);
+    return provider
+  }
+
+  getProvider(chain: ChainType) {
+    const mainetProvider = new ethers.JsonRpcProvider(Chainlist[chain].rpc, {
+      chainId: Chainlist[chain].chainId,
+      name: Chainlist[chain].name,
     });
     return mainetProvider;
   }
