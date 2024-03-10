@@ -2,11 +2,10 @@ import { predictionABI, tokenABI, rawAggregatorABI, marketABI, diceABI, nftABI, 
 import { predictionAddr, tokenAddr, marketAddr, diceAddr, nftAddr, faucetAddr } from './address';
 import { betPosition, betStatus, collectionNames, LeaderBoard, Path, userType } from './constant';
 import { ChainType } from './chain';
-import provider from './provider';
 
 const CURRENT_NETWORK = ChainType.BASESEPOLIA;
 const constant = {
-  GAS: 1000000,
+  GAS: undefined,
   STORAGE_PATH: Path,
   FIREBASE: {
     NAME: 'FirestoreDataservices',
@@ -17,7 +16,7 @@ const constant = {
         MARKET: 'market',
         DICE: 'dice',
       },
-      CHAINLINK: 'yxyBQpwTC7EyziO7NDia',
+      CHAINLINK: 'ChainLink',
     },
   },
   BET: {
@@ -27,6 +26,7 @@ const constant = {
   REVENUE_SHARE: 5,
   REVENUE_SHARE_USER: 0,
   COMMISSIONS: 0,
+
   STORAGE: {
     ACTION: 'read' as 'read' | 'write' | 'delete' | 'resumable',
     EXPIRED_DATE: {
@@ -54,7 +54,6 @@ const constant = {
     FAUCET: faucetABI[CURRENT_NETWORK],
     AGGREGATOR: rawAggregatorABI,
   },
-  PROVIDER: provider(CURRENT_NETWORK),
   USER: {
     TYPE: userType,
   },

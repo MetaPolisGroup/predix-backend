@@ -1,8 +1,8 @@
-import { AbstractProvider, JsonRpcProvider, ethers } from 'ethers';
 import { ChainType } from './chain';
 
+
 // 2. Define network configurations
-export const providerRPC = {
+export const Chainlist = {
   [ChainType.BSCTESTNET]: {
     name: 'bscTestnet',
     rpc: 'https://data-seed-prebsc-1-s1.binance.org:8545/',
@@ -26,15 +26,6 @@ export const providerRPC = {
   },
 };
 
-const provider = (env: ChainType): JsonRpcProvider => {
-  // return ethers.getDefaultProvider(providerRPC[env].rpc);
-  return new ethers.JsonRpcProvider(
-    providerRPC[env].rpc,
-    {
-      chainId: providerRPC[env].chainId,
-      name: providerRPC[env].name,
-    },
-    // { polling: true },
-  );
-};
-export default provider;
+
+
+

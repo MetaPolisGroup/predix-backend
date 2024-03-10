@@ -9,7 +9,7 @@ import { LeaderboardService } from './use-case/leaderboard/leader.service';
 import { ethers } from 'ethers';
 import constant from './configuration';
 import { PredictionService } from './use-case/prediction/prediction.service';
-import { IMongoDbServices } from './core/abstract/data-services/data-mongodb-service.abstract';
+
 
 @Controller()
 export class AppController {
@@ -18,14 +18,10 @@ export class AppController {
     private readonly userService: UserAuthenService,
     private readonly factory: ContractFactoryAbstract,
     private readonly leaderboard: LeaderboardService,
-    private readonly dbMongo: IMongoDbServices,
     private readonly prediction: PredictionService,
-  ) {}
+  ) { }
 
-  @Get()
-  async test() {
-    return this.dbMongo.userMongoRepo.create({ user_address: '123123123' });
-  }
+
 
   @Get('execute')
   async ex() {
@@ -111,34 +107,34 @@ export class AppController {
     }
   }
 
-  @Get('mint')
-  async mint() {
-    const wallet = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY, constant.PROVIDER);
+  // @Get('mint')
+  // async mint() {
+  //   const wallet = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY, this.factory);
 
-    const token = new ethers.Contract(constant.ADDRESS.TOKEN, constant.ABI.TOKEN, wallet);
+  //   const token = new ethers.Contract(constant.ADDRESS.TOKEN, constant.ABI.TOKEN, wallet);
 
-    const gasLimit = await token.mint.estimateGas('0x66405F84DaC6DE3aFF921d77174B0E0C46Eb2aBA', '1000000000000000000000000000');
-    const gasPrice = await this.factory.provider.getFeeData();
+  //   const gasLimit = await token.mint.estimateGas('0x66405F84DaC6DE3aFF921d77174B0E0C46Eb2aBA', '1000000000000000000000000000');
+  //   const gasPrice = await this.factory.provider.getFeeData();
 
-    const executeRoundTx = await token.mint('0x66405F84DaC6DE3aFF921d77174B0E0C46Eb2aBA', '1000000000000000000000000000', {
-      gasLimit,
-      gasPrice: gasPrice.gasPrice,
-      maxFeePerGas: gasPrice.maxFeePerGas,
-      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
-    });
+  //   const executeRoundTx = await token.mint('0x66405F84DaC6DE3aFF921d77174B0E0C46Eb2aBA', '1000000000000000000000000000', {
+  //     gasLimit,
+  //     gasPrice: gasPrice.gasPrice,
+  //     maxFeePerGas: gasPrice.maxFeePerGas,
+  //     maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
+  //   });
 
-    const executeRound = await this.factory.provider.waitForTransaction(executeRoundTx.hash as string);
+  //   const executeRound = await this.factory.provider.waitForTransaction(executeRoundTx.hash as string);
 
-    // Execute round success
-    if (executeRound.status === 1) {
-      console.log(`execute successfully!`);
-    }
+  //   // Execute round success
+  //   if (executeRound.status === 1) {
+  //     console.log(`execute successfully!`);
+  //   }
 
-    // Execute round failed
-    else {
-      console.log(` executed failed! `);
-    }
-  }
+  //   // Execute round failed
+  //   else {
+  //     console.log(` executed failed! `);
+  //   }
+  // }
 
   @Get('fix-data')
   async testQueryFirestore() {

@@ -1,7 +1,7 @@
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import { AllExceptionsFilter } from './core/exception handler/all-exceptions-filter';
+import { AllExceptionsFilter } from './framework/exception handler/all-exceptions-filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
