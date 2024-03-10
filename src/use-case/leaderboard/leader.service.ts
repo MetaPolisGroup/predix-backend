@@ -6,19 +6,7 @@ import { IDataServices } from 'src/core/abstract/data-services/data-service.abst
 export class LeaderboardService {
   constructor(private readonly db: IDataServices) { }
 
-  listenLeaderboard() {
-    this.db.predictionRepo.listenToChangesWithConditionsAndOrderBy([{ field: 'closed', operator: '==', value: true }], [], async matchs => {
-      for (const match of matchs) {
-        if (match.type === 'added') {
-          await this.updateLeaderboard(match.doc.epoch);
-          await this.winRate();
-          await this.roundPlayed();
-          await this.netWinnings();
-          await this.totalBnb();
-        }
-      }
-    });
-  }
+
 
   async updateLeaderboard(round: number) {
     const betslips = await this.db.betRepo.getCollectionDataByConditions([{ field: 'epoch', operator: '==', value: round }]);
