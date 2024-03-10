@@ -120,8 +120,8 @@ export class FirestoreDataServices implements IDataServices, OnApplicationBootst
     // };
     const serviceAccount: admin.ServiceAccount = {
       projectId: process.env.FIRESTORE_PROJECT_ID,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY
-        ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/gm, "\n")
+      privateKey: process.env.FIRESTORE_PRIVATE_KEY
+        ? process.env.FIRESTORE_PRIVATE_KEY.replace(/\\n/gm, "\n")
         : undefined,
       clientEmail: process.env.FIRESTORE_CLIENT_EMAIL,
     };
