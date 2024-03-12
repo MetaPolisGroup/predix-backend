@@ -56,8 +56,6 @@ export class PredictionRoundService implements OnApplicationBootstrap {
     };
     await this.db.predictionRepo.upsertDocumentData(epoch.toString(), round);
 
-    // Log
-    this.logger.log(`Round ${epoch.toString()} has started !`);
   }
 
   async updateLockRound(epoch: bigint, roundId: bigint, price: bigint) {
