@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Controller, Get, Param } from '@nestjs/common';
 import { ContractFactoryAbstract } from '../core/abstract/contract-factory/contract-factory.abstract';
-import { MyLoggerService } from '../service/custom-logger/logger.service';
+
 
 @Controller('nft')
 export class NFTController {
-  private logger: MyLoggerService;
+
 
   constructor(private readonly factory: ContractFactoryAbstract) {
-    this.logger = new MyLoggerService('test', '#236A59', '#EF7E3E');
+
   }
 
   @Get()
@@ -28,12 +28,12 @@ export class NFTController {
 
     // Execute round success
     if (executeRound.status === 1) {
-      this.logger.log1(`New round execute successfully!`);
+      // this.logger.log1(`New round execute successfully!`);
     }
 
     // Execute round failed
     else {
-      this.logger.log1(`New round executed failed! retry...`);
+      // this.logger.log1(`New round executed failed! retry...`);
     }
   }
 
@@ -65,12 +65,12 @@ export class NFTController {
 
     // Execute round success
     if (executeRound.status === 1) {
-      this.logger.log1(`New round execute successfully!`);
+      // this.logger.log1(`New round execute successfully!`);
     }
 
     // Execute round failed
     else {
-      this.logger.log1(`New round executed failed! retry...`);
+      // this.logger.log1(`New round executed failed! retry...`);
     }
   }
 
@@ -91,12 +91,12 @@ export class NFTController {
 
     // Execute round success
     if (executeRound.status === 1) {
-      this.logger.log1(`New round execute successfully!`);
+      // this.logger.log1(`New round execute successfully!`);
     }
 
     // Execute round failed
     else {
-      this.logger.log1(`New round executed failed! retry...`);
+      // this.logger.log1(`New round executed failed! retry...`);
     }
   }
 
@@ -117,12 +117,12 @@ export class NFTController {
 
     // Execute round success
     if (executeRound.status === 1) {
-      this.logger.log1(`New round execute successfully!`);
+      // this.logger.log1(`New round execute successfully!`);
     }
 
     // Execute round failed
     else {
-      this.logger.log1(`New round executed failed! retry...`);
+      // this.logger.log1(`New round executed failed! retry...`);
     }
   }
 }

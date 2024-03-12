@@ -1,13 +1,15 @@
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { formatEther } from 'ethers';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
+import { ILoggerFactory } from 'src/core/abstract/logger/logger-factory.abstract';
+import { ILogger } from 'src/core/abstract/logger/logger.abstract';
 import { HelperService } from 'src/use-case/helper/helper.service';
 
 @Injectable()
 export class EventDiceClaimListener implements OnApplicationBootstrap {
-  private logger: Logger;
+  private logger: ILogger;
 
   private readonly boundHandleClaim = this.handleClaim.bind(this);
 
@@ -16,8 +18,9 @@ export class EventDiceClaimListener implements OnApplicationBootstrap {
     private readonly factory: ContractFactoryAbstract,
     private readonly db: IDataServices,
     private readonly helper: HelperService,
+    private readonly logFactory: ILoggerFactory
   ) {
-    this.logger = new Logger(EventDiceClaimListener.name);
+    this.logger = this.logFactory.diceLogger
   }
 
   /**

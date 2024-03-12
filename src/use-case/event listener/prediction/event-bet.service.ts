@@ -1,12 +1,14 @@
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { Cron } from '@nestjs/schedule';
 import { BetPredictionService } from 'src/use-case/bet/prediction/bet-prediction.service';
 import { HelperService } from 'src/use-case/helper/helper.service';
+import { ILoggerFactory } from 'src/core/abstract/logger/logger-factory.abstract';
+import { ILogger } from 'src/core/abstract/logger/logger.abstract';
 
 @Injectable()
 export class EventBetListener implements OnApplicationBootstrap {
-  private logger: Logger;
+
 
   private readonly boundHandleEventBetBear = this.handleEventBetBear.bind(this);
   private readonly boundHandleEventBetBull = this.handleEventBetBull.bind(this);
@@ -17,11 +19,16 @@ export class EventBetListener implements OnApplicationBootstrap {
     private readonly factory: ContractFactoryAbstract,
     private readonly betPrediction: BetPredictionService,
     private readonly helper: HelperService,
+    private readonly logFactory: ILoggerFactory,
   ) {
-    this.logger = new Logger(EventBetListener.name);
+
+
+
   }
 
+
   async onApplicationBootstrap() {
+
     if (process.env.CONSTANT_ENABLE === 'True') {
       await this.createOrRemoveEventBetListeners("on");
     }

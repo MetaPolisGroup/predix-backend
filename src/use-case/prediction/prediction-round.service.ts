@@ -1,16 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { CronJob } from 'cron';
 import constant from 'src/configuration';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
+import { ILoggerFactory } from 'src/core/abstract/logger/logger-factory.abstract';
+import { ILogger } from 'src/core/abstract/logger/logger.abstract';
 import { Prediction } from 'src/core/entity/prediction.enity';
-import { ContractFactory } from 'src/framework/contract/contract-factory';
 
 @Injectable()
 export class PredictionRoundService implements OnApplicationBootstrap {
-  private logger: Logger;
+  private logger: ILogger;
 
   async onApplicationBootstrap() {
     if (process.env.CONSTANT_ENABLE === 'True') {
@@ -19,8 +20,11 @@ export class PredictionRoundService implements OnApplicationBootstrap {
     }
   }
 
-  constructor(private readonly db: IDataServices, private readonly factory: ContractFactoryAbstract) {
-    this.logger = new Logger(PredictionRoundService.name);
+  constructor(private readonly db: IDataServices,
+    private readonly factory: ContractFactoryAbstract,
+    private readonly logFactory: ILoggerFactory
+  ) {
+    this.logger = this.logFactory.predictionLogger
   }
 
   async createNewRound(epoch: bigint) {

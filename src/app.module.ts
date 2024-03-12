@@ -17,6 +17,7 @@ import { DiceController } from './controller/dice.controller';
 import { PredixController } from './controller/predix.controller';
 import { HelperModule } from './use-case/helper/helper.module';
 import { NFTController } from './controller/nft.controller';
+import { LoggerFactoryModule } from './service/custom-logger/logger.service.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { NFTController } from './controller/nft.controller';
     DataServicesModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     ContractFactoryModule,
+    LoggerFactoryModule,
     HelperModule,
     PredictionModule,
     DiceModule,

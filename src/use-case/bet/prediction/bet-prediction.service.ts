@@ -10,12 +10,12 @@ import { UserHandleMoney } from 'src/use-case/user/user-handle-money.service';
 
 @Injectable()
 export class BetPredictionService implements OnApplicationBootstrap {
-  private logger: Logger;
+
 
   async onApplicationBootstrap() { }
 
   constructor(private readonly db: IDataServices, private readonly handleMoney: UserHandleMoney) {
-    this.logger = new Logger(BetPredictionService.name);
+
   }
 
   async userBetBear(sender: string, epoch: bigint, amount: bigint) {

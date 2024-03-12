@@ -2,13 +2,15 @@ import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
+import { ILoggerFactory } from 'src/core/abstract/logger/logger-factory.abstract';
+import { ILogger } from 'src/core/abstract/logger/logger.abstract';
 import { BetPredictionService } from 'src/use-case/bet/prediction/bet-prediction.service';
 import { HelperService } from 'src/use-case/helper/helper.service';
 import { PredictionRoundService } from 'src/use-case/prediction/prediction-round.service';
 
 @Injectable()
 export class EventRoundListener implements OnApplicationBootstrap {
-  private logger: Logger;
+  private logger: ILogger;
 
 
   private readonly boundHandleStartRound = this.handleStartRound.bind(this);
@@ -23,8 +25,9 @@ export class EventRoundListener implements OnApplicationBootstrap {
     private readonly predictionRound: PredictionRoundService,
     private readonly betPrediction: BetPredictionService,
     private readonly helper: HelperService,
+    private readonly logFactory: ILoggerFactory
   ) {
-    this.logger = new Logger(EventRoundListener.name);
+    this.logger = this.logFactory.predictionLogger
   }
 
   async onApplicationBootstrap() {
@@ -84,6 +87,7 @@ export class EventRoundListener implements OnApplicationBootstrap {
    */
   async handleStartRound(epoch: bigint) {
     await this.predictionRound.createNewRound(epoch);
+    this.logger.log(`Round ${epoch.toString()} has started !`);
   }
 
   /**

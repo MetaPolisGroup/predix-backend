@@ -1,12 +1,14 @@
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
+import { ILoggerFactory } from 'src/core/abstract/logger/logger-factory.abstract';
+import { ILogger } from 'src/core/abstract/logger/logger.abstract';
 import { HelperService } from 'src/use-case/helper/helper.service';
 import { PredictionService } from 'src/use-case/prediction/prediction.service';
 
 @Injectable()
 export class PredictionSnapshotService implements OnApplicationBootstrap {
-  private logger: Logger;
+  private logger: ILogger;
 
   onApplicationBootstrap() {
 
@@ -19,8 +21,11 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
     }
   }
 
-  constructor(private readonly db: IDataServices, private readonly prediction: PredictionService, private readonly factory: ContractFactoryAbstract) {
-    this.logger = new Logger(PredictionSnapshotService.name);
+  constructor(private readonly db: IDataServices,
+    private readonly prediction: PredictionService,
+    private readonly factory: ContractFactoryAbstract,
+    private readonly logFactory: ILoggerFactory) {
+    this.logger = this.logFactory.predictionLogger
 
   }
 

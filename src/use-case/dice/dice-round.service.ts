@@ -4,11 +4,13 @@ import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import constant from 'src/configuration';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
+import { ILoggerFactory } from 'src/core/abstract/logger/logger-factory.abstract';
+import { ILogger } from 'src/core/abstract/logger/logger.abstract';
 import { Dice } from 'src/core/entity/dice.entity';
 
 @Injectable()
 export class DiceRoundService implements OnApplicationBootstrap {
-  private logger: Logger;
+  logger: ILogger
 
   async onApplicationBootstrap() {
     if (process.env.CONSTANT_ENABLE_DICE === 'True') {
@@ -17,8 +19,8 @@ export class DiceRoundService implements OnApplicationBootstrap {
     }
   }
 
-  constructor(private readonly db: IDataServices, private readonly factory: ContractFactoryAbstract) {
-    this.logger = new Logger(DiceRoundService.name);
+  constructor(private readonly db: IDataServices, private readonly factory: ContractFactoryAbstract, private readonly logFactory: ILoggerFactory) {
+    this.logger = this.logFactory.diceLogger
   }
 
   async createNewRound(epoch: bigint) {
@@ -48,8 +50,7 @@ export class DiceRoundService implements OnApplicationBootstrap {
     };
     await this.db.diceRepo.upsertDocumentData(epoch.toString(), round);
 
-    // Log
-    this.logger.log(`Dice round ${epoch.toString()} has started !`);
+
   }
 
   async updateEndRound(epoch: bigint, dice1: bigint, dice2: bigint, dice3: bigint) {

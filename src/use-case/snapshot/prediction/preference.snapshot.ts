@@ -4,7 +4,7 @@ import { PredictionService } from 'src/use-case/prediction/prediction.service';
 
 @Injectable()
 export class PreferenceSnapshotService implements OnApplicationBootstrap {
-  private logger: Logger;
+
 
   onApplicationBootstrap() {
     if (process.env.CONSTANT_ENABLE === 'True') {
@@ -13,7 +13,7 @@ export class PreferenceSnapshotService implements OnApplicationBootstrap {
   }
 
   constructor(private readonly db: IDataServices, private readonly prediction: PredictionService) {
-    this.logger = new Logger(PreferenceSnapshotService.name);
+
   }
 
   genesisSnapshot() {

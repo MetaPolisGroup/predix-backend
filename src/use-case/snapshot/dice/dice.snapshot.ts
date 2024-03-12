@@ -1,11 +1,13 @@
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
+import { ILoggerFactory } from 'src/core/abstract/logger/logger-factory.abstract';
+import { ILogger } from 'src/core/abstract/logger/logger.abstract';
 import { DiceService } from 'src/use-case/dice/dice.service';
 
 @Injectable()
 export class DiceSnapshotService implements OnApplicationBootstrap {
-  private logger: Logger;
+  private logger: ILogger;
 
   onApplicationBootstrap() {
     if (process.env.CONSTANT_ENABLE_DICE === 'True') {
@@ -13,8 +15,13 @@ export class DiceSnapshotService implements OnApplicationBootstrap {
     }
   }
 
-  constructor(private readonly db: IDataServices, private readonly dice: DiceService, private readonly factory: ContractFactoryAbstract) {
-    this.logger = new Logger(DiceSnapshotService.name);
+  constructor(private readonly db: IDataServices,
+    private readonly dice: DiceService,
+    private readonly factory: ContractFactoryAbstract,
+    private readonly logFactory: ILoggerFactory
+  ) {
+
+    this.logger = this.logFactory.diceLogger
   }
 
   availableRoundSnapshot() {

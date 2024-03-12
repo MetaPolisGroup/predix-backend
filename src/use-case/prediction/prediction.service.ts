@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { CronJob } from 'cron';
 import constant from 'src/configuration';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
@@ -8,6 +8,8 @@ import { IDataServices } from 'src/core/abstract/data-services/data-service.abst
 import { Prediction } from 'src/core/entity/prediction.enity';
 import { Preferences } from 'src/core/entity/preferences.entity';
 import { HelperService } from '../helper/helper.service';
+import { ILoggerFactory } from 'src/core/abstract/logger/logger-factory.abstract';
+import { ILogger } from 'src/core/abstract/logger/logger.abstract';
 
 @Injectable()
 export class PredictionService implements OnApplicationBootstrap {
@@ -15,7 +17,7 @@ export class PredictionService implements OnApplicationBootstrap {
 
   private cronJobsBet: { [id: string]: CronJob } = {};
 
-  private logger: Logger;
+  private logger: ILogger;
 
   private s = 20;
 
@@ -32,8 +34,9 @@ export class PredictionService implements OnApplicationBootstrap {
     private readonly factory: ContractFactoryAbstract,
     private readonly db: IDataServices,
     private readonly helper: HelperService,
+    private readonly logFactory: ILoggerFactory
   ) {
-    this.logger = new Logger(PredictionService.name);
+    this.logger = this.logFactory.predictionLogger
   }
 
 

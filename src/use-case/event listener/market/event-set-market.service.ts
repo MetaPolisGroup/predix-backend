@@ -1,15 +1,17 @@
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import constant from 'src/configuration';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
+import { ILoggerFactory } from 'src/core/abstract/logger/logger-factory.abstract';
+import { ILogger } from 'src/core/abstract/logger/logger.abstract';
 import { PredictionService } from 'src/use-case/prediction/prediction.service';
 
 @Injectable()
 export class EventMarketSetListener implements OnApplicationBootstrap {
-  private logger: Logger;
+  private logger: ILogger;
 
   async onApplicationBootstrap() {
-    if (process.env.CONSTANT_ENABLE === 'True') {
+    if (process.env.CONSTANT_ENABLE_MARKET === 'True') {
       await this.listenSetFee();
       await this.listenPause();
       await this.listenUnPause();
@@ -20,8 +22,9 @@ export class EventMarketSetListener implements OnApplicationBootstrap {
     private readonly factory: ContractFactoryAbstract,
     private readonly db: IDataServices,
     private readonly prediction: PredictionService,
+    private readonly logFactory: ILoggerFactory
   ) {
-    this.logger = new Logger(EventMarketSetListener.name);
+    this.logger = this.logFactory.marketLogger
   }
 
   async listenSetFee() {

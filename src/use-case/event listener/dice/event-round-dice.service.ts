@@ -1,15 +1,17 @@
 /* eslint-disable no-unused-vars */
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
+import { ILoggerFactory } from 'src/core/abstract/logger/logger-factory.abstract';
+import { ILogger } from 'src/core/abstract/logger/logger.abstract';
 import { BetDiceService } from 'src/use-case/bet/dice/bet-dice.service';
 import { DiceRoundService } from 'src/use-case/dice/dice-round.service';
 import { HelperService } from 'src/use-case/helper/helper.service';
 
 @Injectable()
 export class EventDiceRoundListener implements OnApplicationBootstrap {
-  private logger: Logger;
+  private logger: ILogger;
 
   private readonly boundHandleStartRound = this.handleStartRound.bind(this);
   private readonly boundHandleEndRound = this.handleEndRound.bind(this);
@@ -20,17 +22,17 @@ export class EventDiceRoundListener implements OnApplicationBootstrap {
     private readonly db: IDataServices,
     private readonly diceRound: DiceRoundService,
     private readonly betDice: BetDiceService,
-    private readonly helper: HelperService
-  ) { }
+    private readonly helper: HelperService,
+    private readonly logFactory: ILoggerFactory
+  ) {
+
+    this.logger = this.logFactory.diceLogger
+  }
 
   /**
    * Function is executed when the application boots up.
    */
   async onApplicationBootstrap() {
-    // await this.factory.diceContract.on("StartRound", async () => { })
-    this.logger = new Logger(EventDiceRoundListener.name);
-
-
     if (process.env.CONSTANT_ENABLE_DICE === 'True') {
       await this.createOrRemoveDiceListeners("on");
     }
@@ -45,13 +47,10 @@ export class EventDiceRoundListener implements OnApplicationBootstrap {
    */
   // @Cron('*/2 * * * *')
   async renewDiceListeners() {
-    console.log();
 
     await this.createOrRemoveDiceListeners("off");
-
-    console.log();
     await this.createOrRemoveDiceListeners("on");
-    console.log();
+
   }
 
   // ===============================
@@ -95,6 +94,7 @@ export class EventDiceRoundListener implements OnApplicationBootstrap {
    */
   private async handleStartRound(epoch: bigint) {
     await this.diceRound.createNewRound(epoch);
+    this.logger.log(`Round ${epoch.toString()} has started !`);
   }
 
   /**
@@ -107,7 +107,7 @@ export class EventDiceRoundListener implements OnApplicationBootstrap {
   private async handleEndRound(epoch: bigint, dice1: bigint, dice2: bigint, dice3: bigint) {
     await this.diceRound.updateEndRound(epoch, dice1, dice2, dice3);
     await this.betDice.updateBetWhenRoundIsEnded(epoch);
-    // this.logger.log(`Round ${epoch.toString()} has ended !`);
+    this.logger.log(`Round ${epoch.toString()} has ended !`);
   }
 
   /**

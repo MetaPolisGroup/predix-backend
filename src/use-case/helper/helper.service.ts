@@ -1,14 +1,15 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CronJob } from 'cron';
 import { Contract } from 'ethers';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
+import { ILogger } from 'src/core/abstract/logger/logger.abstract';
 
 @Injectable()
 export class HelperService {
   constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) { }
 
-  createCronJob(logger: Logger, cj: { [id: string]: CronJob }, date: Date, id: number, message: string, cb?: () => Promise<void>) {
+  createCronJob(logger: ILogger, cj: { [id: string]: CronJob }, date: Date, id: number, message: string, cb?: () => Promise<void>) {
     const cronjob = new CronJob(date, async function () {
       await cb?.();
     });

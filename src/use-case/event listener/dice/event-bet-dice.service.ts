@@ -1,12 +1,14 @@
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
+import { ILoggerFactory } from 'src/core/abstract/logger/logger-factory.abstract';
+import { ILogger } from 'src/core/abstract/logger/logger.abstract';
 import { BetDiceService } from 'src/use-case/bet/dice/bet-dice.service';
 import { HelperService } from 'src/use-case/helper/helper.service';
 
 @Injectable()
 export class EventDiceBetListener implements OnApplicationBootstrap {
-  private logger: Logger;
+  private logger: ILogger;
 
   private readonly boundHandleBetBear = this.handleBetBear.bind(this);
   private readonly boundHandleBetBull = this.handleBetBull.bind(this);
@@ -16,10 +18,11 @@ export class EventDiceBetListener implements OnApplicationBootstrap {
     private readonly factory: ContractFactoryAbstract,
     private readonly betDice: BetDiceService,
     private readonly helper: HelperService,
+    private readonly logFactory: ILoggerFactory,
   ) { }
 
   async onApplicationBootstrap() {
-    this.logger = new Logger(EventDiceBetListener.name);
+    this.logger = this.logFactory.diceLogger
     if (process.env.CONSTANT_ENABLE_DICE === 'True') {
       await this.createOrRemoveDiceListeners("on");
     }

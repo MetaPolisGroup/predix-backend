@@ -1,17 +1,17 @@
 import { CollectionReference, DocumentData, Firestore, Query, UpdateData, WhereFilterOp } from '@google-cloud/firestore';
-import { Logger } from '@nestjs/common';
 import { collectionsName } from 'src/configuration/type/firebase/firebase.type';
 import { IGenericRepository } from 'src/core/abstract/data-services/generic-repository.abstract';
 import { DocumentChange, DocumentChangeOrigin } from 'src/core/abstract/data-services/snapshot/Query.abstract';
+import { CustomLogger } from '../logger/logger.framework';
 
 export class FirestoreGenericRepository<T extends DocumentData> implements IGenericRepository<T> {
   readonly collectionRef: CollectionReference<T>;
 
-  private Logger: Logger;
+  private Logger: CustomLogger;
 
   constructor(readonly firestore: Firestore, readonly collectionName: collectionsName) {
     this.collectionRef = this.firestore.collection(this.collectionName) as CollectionReference<T>;
-    this.Logger = new Logger(FirestoreGenericRepository.name);
+    this.Logger = new CustomLogger("Firebase", "EA3323");
   }
 
   private fixDataFromCollection(collectionSnapshot: DocumentData): T[] {

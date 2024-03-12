@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { CronJob } from 'cron';
 import constant from 'src/configuration';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
@@ -9,12 +9,14 @@ import { Dice } from 'src/core/entity/dice.entity';
 import { Prediction } from 'src/core/entity/prediction.enity';
 import { Preferences } from 'src/core/entity/preferences.entity';
 import { HelperService } from '../helper/helper.service';
+import { ILoggerFactory } from 'src/core/abstract/logger/logger-factory.abstract';
+import { ILogger } from 'src/core/abstract/logger/logger.abstract';
 
 @Injectable()
 export class DiceService implements OnApplicationBootstrap {
   private cronJobs: { [id: string]: CronJob } = {};
 
-  private logger: Logger;
+  private logger: ILogger;
 
   async onApplicationBootstrap() {
     if (process.env.CONSTANT_ENABLE_DICE === 'True') {
@@ -26,8 +28,9 @@ export class DiceService implements OnApplicationBootstrap {
     private readonly factory: ContractFactoryAbstract,
     private readonly db: IDataServices,
     private readonly helper: HelperService,
+    private readonly logFactory: ILoggerFactory,
   ) {
-    this.logger = new Logger(DiceService.name);
+    this.logger = this.logFactory.diceLogger
   }
 
   private createCronJob(date: Date, id: number, cb?: () => Promise<void>): void {
@@ -36,7 +39,7 @@ export class DiceService implements OnApplicationBootstrap {
     });
 
     if (this.cronJobs[id] && this.cronJobs[id].running) {
-      this.logger.log(`Cronjob for round ${id} have already set !`);
+      this.logger.log(`Cronjob for round ${id} have already set at ${date.getHours()}:${date.getMinutes()}!`);
       return;
     }
 

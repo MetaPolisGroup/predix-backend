@@ -9,12 +9,12 @@ import { Market } from 'src/core/entity/market.entity';
 
 @Injectable()
 export class BetMarketService implements OnApplicationBootstrap {
-  private logger: Logger;
 
-  async onApplicationBootstrap() {}
+
+  async onApplicationBootstrap() { }
 
   constructor(private readonly db: IDataServices) {
-    this.logger = new Logger(BetMarketService.name);
+
   }
 
   async userBetBear(sender: string, epoch: bigint, amount: bigint) {
@@ -188,8 +188,7 @@ export class BetMarketService implements OnApplicationBootstrap {
       }
     }
 
-    // Log
-    this.logger.log(`Round ${epoch.toString()} has ended !`);
+
   }
 
   private calculateResult(bet: Bet, round: Market): BetStatus {

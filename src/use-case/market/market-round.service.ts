@@ -1,17 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
+import { ILoggerFactory } from 'src/core/abstract/logger/logger-factory.abstract';
+import { ILogger } from 'src/core/abstract/logger/logger.abstract';
 import { Market } from 'src/core/entity/market.entity';
 
 @Injectable()
 export class MarketRoundService implements OnApplicationBootstrap {
-  private logger: Logger;
+  private logger: ILogger;
 
-  async onApplicationBootstrap() {}
+  async onApplicationBootstrap() { }
 
-  constructor(private readonly db: IDataServices) {
-    this.logger = new Logger(MarketRoundService.name);
+  constructor(private readonly db: IDataServices, private readonly logFactory: ILoggerFactory) {
+    this.logger = this.logFactory.marketLogger
   }
 
   async createNewRound(epoch: bigint) {
@@ -32,8 +34,6 @@ export class MarketRoundService implements OnApplicationBootstrap {
     };
     await this.db.marketRepo.upsertDocumentData(epoch.toString(), game);
 
-    // Log
-    this.logger.log(`Round ${epoch.toString()} has started !`);
   }
 
   async updateEndRound(epoch: bigint, result: bigint) {

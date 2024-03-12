@@ -3,12 +3,14 @@ import { Cron } from '@nestjs/schedule';
 import constant from 'src/configuration';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
+import { ILoggerFactory } from 'src/core/abstract/logger/logger-factory.abstract';
+import { ILogger } from 'src/core/abstract/logger/logger.abstract';
 import { DiceService } from 'src/use-case/dice/dice.service';
 import { HelperService } from 'src/use-case/helper/helper.service';
 
 @Injectable()
 export class EventDiceSetListener implements OnApplicationBootstrap {
-  private logger: Logger;
+  private logger: ILogger;
 
   private readonly boundHandlePause = this.handlePause.bind(this);
   private readonly boundHandleUnPause = this.handleUnPause.bind(this);
@@ -20,8 +22,9 @@ export class EventDiceSetListener implements OnApplicationBootstrap {
     private readonly db: IDataServices,
     private readonly dice: DiceService,
     private readonly helper: HelperService,
+    private readonly logFactory: ILoggerFactory
   ) {
-    this.logger = new Logger(EventDiceSetListener.name);
+    this.logger = this.logFactory.diceLogger
   }
 
   /**

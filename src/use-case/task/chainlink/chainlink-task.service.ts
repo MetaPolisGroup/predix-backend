@@ -1,20 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import constant from 'src/configuration';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
+import { ILoggerFactory } from 'src/core/abstract/logger/logger-factory.abstract';
+import { ILogger } from 'src/core/abstract/logger/logger.abstract';
 import { Chart } from 'src/core/entity/chart.entity';
 
 @Injectable()
 export class ChainlinkTaskService implements OnApplicationBootstrap {
-  private logger: Logger;
+  private logger: ILogger;
 
   async onApplicationBootstrap() { }
 
-  constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) {
-    this.logger = new Logger(ChainlinkTaskService.name);
+  constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices, private readonly logFactory: ILoggerFactory) {
+    this.logger = this.logFactory.chainlinkLogger
   }
 
   @Cron('*/5 * * * * *')
@@ -22,7 +24,7 @@ export class ChainlinkTaskService implements OnApplicationBootstrap {
     const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
 
     if (!chainlinkPrice) {
-      this.logger.warn('No chainlink data !');
+      this.logger.warn('No chainlink data to update chart !');
       return;
     }
 
@@ -40,7 +42,7 @@ export class ChainlinkTaskService implements OnApplicationBootstrap {
     const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
 
     if (!chainlinkPrice) {
-      this.logger.warn('No chainlink data !');
+      this.logger.warn('No chainlink data to update price !');
       return;
     }
 

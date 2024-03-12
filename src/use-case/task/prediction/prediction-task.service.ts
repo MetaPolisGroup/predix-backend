@@ -7,12 +7,12 @@ import { IDataServices } from 'src/core/abstract/data-services/data-service.abst
 
 @Injectable()
 export class PredictionTaskService implements OnApplicationBootstrap {
-  private logger: Logger;
+
 
   async onApplicationBootstrap() { }
 
   constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) {
-    this.logger = new Logger(PredictionTaskService.name);
+
   }
 
   @Cron('*/2 * * * * *')
@@ -31,7 +31,7 @@ export class PredictionTaskService implements OnApplicationBootstrap {
     ]);
 
     if (!availableRound) {
-      this.logger.warn('No available round when update bet amount !');
+
       return;
     }
 

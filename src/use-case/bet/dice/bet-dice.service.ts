@@ -11,12 +11,12 @@ import { UserHandleMoney } from 'src/use-case/user/user-handle-money.service';
 
 @Injectable()
 export class BetDiceService implements OnApplicationBootstrap {
-  private logger: Logger;
 
-  async onApplicationBootstrap() {}
+
+  async onApplicationBootstrap() { }
 
   constructor(private readonly db: IDataServices, private readonly handleMoney: UserHandleMoney) {
-    this.logger = new Logger(BetDiceService.name);
+
   }
 
   async userBetBear(sender: string, epoch: bigint, amount: bigint) {
@@ -190,8 +190,7 @@ export class BetDiceService implements OnApplicationBootstrap {
       }
     }
 
-    // Log
-    this.logger.log(`Dice round ${epoch.toString()} has ended !`);
+
   }
 
   private calculateResult(bet: Bet, round: Dice): BetStatus {
