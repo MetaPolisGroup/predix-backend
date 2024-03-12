@@ -56,13 +56,13 @@ export class HelperService {
 
     // Execute round success
     if (executeRound.status === 1) {
-      console.log(successMsg);
+      // console.log(successMsg);
       await callBackSuccess?.();
     }
 
     // Execute round failed
     else {
-      console.log(failedMsg);
+      // console.log(failedMsg);
       await callBackFailed?.();
     }
   }
