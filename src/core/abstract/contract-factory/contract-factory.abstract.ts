@@ -15,6 +15,8 @@ export abstract class ContractFactoryAbstract {
 
   abstract aggregatorContract: Contract;
 
+  abstract faucetContract: Contract;
+
   abstract provider: AlchemyProvider;
 
   abstract signer: NonceManager;

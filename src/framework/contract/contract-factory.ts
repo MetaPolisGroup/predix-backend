@@ -21,6 +21,8 @@ export class ContractFactory implements ContractFactoryAbstract {
 
   readonly nftContract: Contract;
 
+  readonly faucetContract: Contract;
+
   readonly diceContract: Contract;
 
   readonly signer: NonceManager;
@@ -35,6 +37,9 @@ export class ContractFactory implements ContractFactoryAbstract {
 
     // Prediction Contract
     this.predictionContract = this.getPredictionContract();
+
+    // Faucet Contract
+    this.faucetContract = this.getFaucetContract();
 
     // Token Contract
     this.tokenContract = this.getTokenContract();
@@ -109,6 +114,14 @@ export class ContractFactory implements ContractFactoryAbstract {
     const tokenContract = new ethers.Contract(constant.ADDRESS.TOKEN, constant.ABI.TOKEN, wallet);
 
     return tokenContract;
+  }
+
+  private getFaucetContract() {
+    const wallet = this.getWalletFromPrivateKey2()
+
+    const faucetContract = new ethers.Contract(constant.ADDRESS.FAUCET, constant.ABI.FAUCET, wallet);
+
+    return faucetContract;
   }
 
   private getMarketContract() {
