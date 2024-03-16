@@ -6,9 +6,9 @@ import { UserAuthenService } from './use-case/user/user-authen.service';
 import { Request } from 'express';
 import { ContractFactoryAbstract } from './core/abstract/contract-factory/contract-factory.abstract';
 import { LeaderboardService } from './use-case/leaderboard/leader.service';
-import { ethers } from 'ethers';
 import constant from './configuration';
 import { PredictionService } from './use-case/prediction/prediction.service';
+
 
 
 @Controller()
@@ -22,6 +22,11 @@ export class AppController {
   ) { }
 
 
+  @Get("time")
+  time() {
+    const date = new Date()
+    return `${date.getDay()}/${date.getHours()}/${date.getMinutes()}`
+  }
 
   @Get('execute')
   async ex() {
@@ -163,6 +168,7 @@ export class AppController {
   async exampleUser(@Req() req: Request) {
     const users = await this.db.userRepo.getCollectionData();
     for (let i = 0; i < 1000; i++) {
+
       const user = users[Math.floor(Math.random() * users.length)];
       await this.userService.create({ user_address: `test${i}`, nickname: `test${i}`, recommend_id: user.id }, req);
     }
