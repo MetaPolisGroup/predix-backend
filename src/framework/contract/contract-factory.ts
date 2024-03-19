@@ -100,6 +100,13 @@ export class ContractFactory implements ContractFactoryAbstract {
     // return wallet
   }
 
+  private getWalletFromPrivateKey3() {
+    const wallet = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY3, this.provider);
+    const signer = new ethers.NonceManager(wallet)
+    return signer
+    // return wallet
+  }
+
   private getPredictionContract() {
     const wallet = this.getWalletFromPrivateKey()
 
@@ -125,7 +132,7 @@ export class ContractFactory implements ContractFactoryAbstract {
   }
 
   private getMarketContract() {
-    const wallet = this.getWalletFromPrivateKey()
+    const wallet = this.getWalletFromPrivateKey3()
 
     const marketContract = new ethers.Contract(constant.ADDRESS.MARKET, constant.ABI.MARKET, wallet);
 

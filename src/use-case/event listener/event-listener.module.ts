@@ -26,10 +26,10 @@ import { EventDiceSetListener } from './dice/event-set-dice.service';
     EventSetListener,
 
     // Market
-    // EventMarketBetListener,
-    // EventMarketClaimListener,
-    // EventMarketSetListener,
-    // EventMarketRoundListener,
+    EventMarketBetListener,
+    EventMarketClaimListener,
+    EventMarketSetListener,
+    EventMarketRoundListener,
 
     // Dice
     EventDiceBetListener,
