@@ -11,45 +11,49 @@ import { Chart } from 'src/core/entity/chart.entity';
 
 @Injectable()
 export class ChainlinkTaskService implements OnApplicationBootstrap {
-  private logger: ILogger;
+    private logger: ILogger;
 
-  async onApplicationBootstrap() { }
+    async onApplicationBootstrap() {}
 
-  constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices, private readonly logFactory: ILoggerFactory) {
-    this.logger = this.logFactory.chainlinkLogger
-  }
-
-  @Cron('*/5 * * * * *')
-  async updatePriceFromChainlinkChart() {
-    const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
-
-    if (!chainlinkPrice) {
-      this.logger.warn('No chainlink data to update chart !');
-      return;
+    constructor(
+        private readonly factory: ContractFactoryAbstract,
+        private readonly db: IDataServices,
+        private readonly logFactory: ILoggerFactory,
+    ) {
+        this.logger = this.logFactory.chainlinkLogger;
     }
 
-    const chart: Chart = {
-      created_at: parseInt(chainlinkPrice[2].toString()),
-      delete: false,
-      price: parseInt(chainlinkPrice[1].toString()),
-    };
+    // @Cron('*/5 * * * * *')
+    // async updatePriceFromChainlinkChart() {
+    //   const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
 
-    await this.db.chartRepo.upsertDocumentData(parseInt(chainlinkPrice[2].toString()).toString(), chart);
-  }
+    //   if (!chainlinkPrice) {
+    //     this.logger.warn('No chainlink data to update chart !');
+    //     return;
+    //   }
 
-  @Cron('*/5 * * * * *')
-  async updatePriceFromChainlink() {
-    const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
+    //   const chart: Chart = {
+    //     created_at: parseInt(chainlinkPrice[2].toString()),
+    //     delete: false,
+    //     price: parseInt(chainlinkPrice[1].toString()),
+    //   };
 
-    if (!chainlinkPrice) {
-      this.logger.warn('No chainlink data to update price !');
-      return;
-    }
+    //   await this.db.chartRepo.upsertDocumentData(parseInt(chainlinkPrice[2].toString()).toString(), chart);
+    // }
 
-    // Implement
-    await this.db.chainlinkRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.CHAINLINK, {
-      price: chainlinkPrice[1].toString(),
-      updated_at: new Date().getTime(),
-    });
-  }
+    // @Cron('*/5 * * * * *')
+    // async updatePriceFromChainlink() {
+    //   const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
+
+    //   if (!chainlinkPrice) {
+    //     this.logger.warn('No chainlink data to update price !');
+    //     return;
+    //   }
+
+    //   // Implement
+    //   await this.db.chainlinkRepo.upsertDocumentData(constant.FIREBASE.DOCUMENT.CHAINLINK, {
+    //     price: chainlinkPrice[1].toString(),
+    //     updated_at: new Date().getTime(),
+    //   });
+    // }
 }
