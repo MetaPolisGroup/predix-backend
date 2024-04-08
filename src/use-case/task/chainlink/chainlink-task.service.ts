@@ -23,23 +23,23 @@ export class ChainlinkTaskService implements OnApplicationBootstrap {
         this.logger = this.logFactory.chainlinkLogger;
     }
 
-    // @Cron('*/5 * * * * *')
-    // async updatePriceFromChainlinkChart() {
-    //   const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
+    @Cron('*/5 * * * * *')
+    async updatePriceFromChainlinkChart() {
+        const chainlinkPrice = await this.factory.aggregatorContract.latestRoundData();
 
-    //   if (!chainlinkPrice) {
-    //     this.logger.warn('No chainlink data to update chart !');
-    //     return;
-    //   }
+        if (!chainlinkPrice) {
+            this.logger.warn('No chainlink data to update chart !');
+            return;
+        }
 
-    //   const chart: Chart = {
-    //     created_at: parseInt(chainlinkPrice[2].toString()),
-    //     delete: false,
-    //     price: parseInt(chainlinkPrice[1].toString()),
-    //   };
+        const chart: Chart = {
+            created_at: parseInt(chainlinkPrice[2].toString()),
+            delete: false,
+            price: parseInt(chainlinkPrice[1].toString()),
+        };
 
-    //   await this.db.chartRepo.upsertDocumentData(parseInt(chainlinkPrice[2].toString()).toString(), chart);
-    // }
+        await this.db.chartRepo.upsertDocumentData(parseInt(chainlinkPrice[2].toString()).toString(), chart);
+    }
 
     // @Cron('*/5 * * * * *')
     // async updatePriceFromChainlink() {
