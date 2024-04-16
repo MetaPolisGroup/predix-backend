@@ -3,9 +3,9 @@ import { HelperService } from './helper.service';
 
 @Global()
 @Module({
-  providers: [HelperService],
-  controllers: [],
-  imports: [],
-  exports: [HelperService],
+    providers: [HelperService],
+    controllers: [],
+    imports: [],
+    exports: [HelperService],
 })
-export class HelperModule { }
+export class HelperModule {}

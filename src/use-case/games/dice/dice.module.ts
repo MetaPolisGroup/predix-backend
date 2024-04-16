@@ -3,9 +3,9 @@ import { DiceService } from './dice.service';
 import { DiceRoundService } from './dice-round.service';
 
 @Module({
-  providers: [DiceService, DiceRoundService],
-  controllers: [],
-  imports: [],
-  exports: [DiceService, DiceRoundService],
+    providers: [DiceService, DiceRoundService],
+    controllers: [],
+    imports: [],
+    exports: [DiceService, DiceRoundService],
 })
 export class DiceModule {}
