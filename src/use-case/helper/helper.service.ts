@@ -1,73 +1,112 @@
 import { Injectable } from '@nestjs/common';
 import { CronJob } from 'cron';
-import { Contract } from 'ethers';
+import { CronJob as MyCronjob } from 'src/core/types/cronjob.type';
+import { ethers } from 'ethers';
+import { uniqueNamesGenerator, Config, starWars } from 'unique-names-generator';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
-import { ILogger } from 'src/core/abstract/logger/logger.abstract';
 
 @Injectable()
 export class HelperService {
-  constructor(private readonly factory: ContractFactoryAbstract, private readonly db: IDataServices) { }
+    constructor(
+        private readonly factory: ContractFactoryAbstract,
+        private readonly db: IDataServices,
+    ) {}
 
-  createCronJob(logger: ILogger, cj: { [id: string]: CronJob }, date: Date, id: number, message: string, cb?: () => Promise<void>) {
-    const cronjob = new CronJob(date, async function () {
-      await cb?.();
-    });
+    createCronJob(log: () => void, date: Date, cb?: () => Promise<void> | void): MyCronjob {
+        const cronjob = new CronJob(
+            date,
+            async function () {
+                await cb?.();
+            },
+            null,
+            true,
+        );
 
-    if (cj[id] && cj[id].running) {
-      logger.log(`Cronjob for round ${id} have already set !`);
-      return;
+        log();
+
+        const myCronjob: MyCronjob = {
+            date,
+            running: true,
+        };
+
+        return myCronjob;
     }
 
-    cj[id] = cronjob;
-
-    cronjob.start();
-
-    logger.log(message);
-
-    return cj;
-  }
-
-  async executeContract(
-    contract: Contract,
-    functionName: string,
-    successMsg = 'Execute successfully !',
-    failedMsg = 'Execute failed !',
-    callBackSuccess?: () => Promise<void>,
-    callBackFailed?: () => Promise<void>,
-    gasFee?: number,
-    multipleFeeTimes = 1,
-    ...agrs: string[]
-  ) {
-
-    const gasLimit = await contract[functionName].estimateGas(...agrs);
-    const gasPrice = await this.factory.provider.getFeeData();
-    const nonce = await this.factory.signer.getNonce("pending");
-    this.factory.signer.increment()
-
-    const executeRoundTx = await contract[functionName](...agrs, {
-      gasLimit,
-      nonce,
-      maxFeePerGas: gasFee ? BigInt(gasFee) : BigInt(Number(gasPrice.maxFeePerGas) * multipleFeeTimes),
-      maxPriorityFeePerGas: gasFee ? BigInt(gasFee) : BigInt(Number(gasPrice.maxPriorityFeePerGas) * multipleFeeTimes),
-    });
-
-    const executeRound = await this.factory.provider.waitForTransaction(executeRoundTx.hash as string);
-
-    // Execute round success
-    if (executeRound.status === 1) {
-      // console.log(successMsg);
-      await callBackSuccess?.();
+    createWallets() {
+        const wallet = ethers.Wallet.createRandom();
+        return wallet;
     }
 
-    // Execute round failed
-    else {
-      // console.log(failedMsg);
-      await callBackFailed?.();
-    }
-  }
+    randomName(): string {
+        const config: Config = {
+            dictionaries: [starWars],
+        };
 
-  async createEventListener(contract: Contract, eventName: string, type: 'on' | 'off', callback: (...agrs) => Promise<void>) {
-    await contract[type](eventName, callback);
-  }
+        const characterName: string = uniqueNamesGenerator(config);
+
+        return characterName;
+    }
+
+    randomNumber(from: number, to: number): number {
+        // Ensure `from` is smaller than or equal to `to`
+        if (from > to) {
+            throw Error("'from' value must be smaller than or equal to 'to' value");
+        }
+        const d = 1 + 1;
+        // Generate a random integer between `from` and `to`
+        return Math.round(Math.random() * (to - from + 1)) + from;
+    }
+
+    getRandomDateFromNowTo(to: number) {
+        const now = new Date().getTime() / 1000;
+        const randomTimestamp = this.randomNumber(now, to);
+        const date = new Date(randomTimestamp * 1000);
+
+        return date;
+    }
+
+    getRandomDateFromTo(from: number, to: number) {
+        const randomTimestamp = this.randomNumber(from, to);
+        const date = new Date(randomTimestamp * 1000);
+
+        return date;
+    }
+
+    getNowTimeStampsSeconds() {
+        return Math.round(new Date().getTime() / 1000);
+    }
+
+    getNowTimeStampsMiliseconds() {
+        return new Date().getTime();
+    }
+
+    isInThePast(timeStamp: number) {
+        const now = this.getNowTimeStampsSeconds();
+        if (now > timeStamp) {
+            return true;
+        }
+        return false;
+    }
+
+    toWei(amount: number) {
+        return ethers.parseUnits(amount.toString()).toString();
+    }
+
+    toEtherNumber(amount: bigint): number {
+        return +ethers.formatEther(amount.toString());
+    }
+
+    parseUnit(amount: number, unit: number) {
+        return Number(ethers.parseUnits(amount.toString(), unit));
+    }
+
+    formatChainlinkPrice(amount: bigint) {
+        return Number(amount) / 10 ** 8;
+    }
+
+    getTimestampAtBeginningOfDayInSeconds() {
+        const now = new Date();
+        return Math.round(new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0).getTime() / 1000);
+    }
 }

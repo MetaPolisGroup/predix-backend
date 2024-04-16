@@ -1,23 +1,24 @@
-import { AlchemyProvider, Contract, NonceManager } from 'ethers';
+import { ContractGenericAbstract } from "./contract-generic.abstract";
+import { ContractMultiWalletsAbstract } from "./contract-multiwallets.abstract";
 
 export abstract class ContractFactoryAbstract {
-  // Firestore
+    // Predix
 
-  abstract predictionContract: Contract;
+    abstract predictionContract: ContractGenericAbstract;
 
-  abstract tokenContract: Contract;
+    abstract predictionBotContract: ContractMultiWalletsAbstract;
 
-  abstract marketContract: Contract;
+    // Torken
 
-  abstract diceContract: Contract;
+    abstract tokenContract: ContractMultiWalletsAbstract;
 
-  abstract nftContract: Contract;
+    abstract marketContract: ContractGenericAbstract;
 
-  abstract aggregatorContract: Contract;
+    abstract diceContract: ContractGenericAbstract;
 
-  abstract faucetContract: Contract;
+    abstract nftContract: ContractGenericAbstract;
 
-  abstract provider: AlchemyProvider;
+    abstract aggregatorContract: ContractGenericAbstract;
 
-  abstract signer: NonceManager;
+    abstract faucetContract: ContractMultiWalletsAbstract;
 }

@@ -1,180 +1,127 @@
-import { Injectable } from '@nestjs/common';
-import { AlchemyProvider, Contract, NonceManager, ethers, } from 'ethers';
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import { AlchemyProvider, ethers } from 'ethers';
+
 import constant from 'src/configuration';
 import { ChainType } from 'src/configuration/chain';
 import { Chainlist } from 'src/configuration/chainlist';
 import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
+import { ContractGeneric } from './contract-generic.framwork';
+import { ContractMultiWallets } from './contract-multiwallets.framework';
 
 @Injectable()
-export class ContractFactory implements ContractFactoryAbstract {
-  //Firestore
+export class ContractFactory implements ContractFactoryAbstract, OnApplicationBootstrap {
+    //Predix
 
-  readonly predictionContract: Contract;
+    readonly predictionContract: ContractGeneric;
 
-  readonly tokenContract: Contract;
+    readonly predictionBotContract: ContractMultiWallets;
 
-  readonly aggregatorContract: Contract;
+    readonly tokenContract: ContractMultiWallets;
 
-  readonly provider: AlchemyProvider;
+    readonly aggregatorContract: ContractGeneric;
 
-  readonly marketContract: Contract;
+    readonly marketContract: ContractGeneric;
 
-  readonly nftContract: Contract;
+    readonly nftContract: ContractGeneric;
 
-  readonly faucetContract: Contract;
+    readonly faucetContract: ContractMultiWallets;
 
-  readonly diceContract: Contract;
+    readonly diceContract: ContractGeneric;
 
-  readonly signer: NonceManager;
-
-
-
-  constructor() {
     // Provider
-    this.provider = this.getAlchemyProvider();
+    readonly provider: AlchemyProvider;
 
-    this.signer = this.getWalletFromPrivateKey();
+    constructor() {
+        // Provider
+        this.provider = this.getAlchemyProvider();
 
-    // Prediction Contract
-    this.predictionContract = this.getPredictionContract();
+        // Prediction Contracts
+        constant.ADDRESS.PREDICTION;
+        this.predictionContract = new ContractGeneric(
+            constant.ADDRESS.PREDICTION,
+            constant.ABI.PREDICTION,
+            process.env.PREDIX_OPERATOR_PRIVATEKEY,
+            this.provider,
+        );
 
-    // Faucet Contract
-    this.faucetContract = this.getFaucetContract();
+        this.predictionBotContract = new ContractMultiWallets(
+            constant.ADDRESS.PREDICTION,
+            constant.ABI.PREDICTION,
+            process.env.PREDIX_OPERATOR_PRIVATEKEY,
+            this.provider,
+        );
 
-    // Token Contract
-    this.tokenContract = this.getTokenContract();
+        // Dice Contract
+        this.diceContract = new ContractGeneric(
+            constant.ADDRESS.DICE,
+            constant.ABI.DICE,
+            process.env.DICE_OPERATOR_PRIVATEKEY,
+            this.provider,
+        );
 
-    // Market Contract
-    this.marketContract = this.getMarketContract();
+        // Market Contract
+        this.marketContract = new ContractGeneric(
+            constant.ADDRESS.MARKET,
+            constant.ABI.MARKET,
+            process.env.MARKET_OPERATOR_PRIVATEKEY,
+            this.provider,
+        );
 
-    // Dice Contract
-    this.diceContract = this.getDiceContract();
+        // //NFT contract
+        this.nftContract = new ContractGeneric(
+            constant.ADDRESS.NFT,
+            constant.ABI.NFT,
+            process.env.PREDIX_OPERATOR_PRIVATEKEY,
+            this.provider,
+        );
 
-    // Aggregator contract
-    this.aggregatorContract = this.getAggregatorContract();
+        // Faucet Contract
+        this.faucetContract = new ContractMultiWallets(
+            constant.ADDRESS.FAUCET,
+            constant.ABI.FAUCET,
+            process.env.PREDIX_BOTS_OPERATOR_PRIVATEKEY,
+            this.provider,
+        );
 
-    //Nft contract
-    this.nftContract = this.getNftContract();
+        // Token Contract
+        this.tokenContract = new ContractMultiWallets(
+            constant.ADDRESS.TOKEN,
+            constant.ABI.TOKEN,
+            process.env.PREDIX_BOTS_OPERATOR_PRIVATEKEY,
+            this.provider,
+        );
 
-    if (!this.provider) {
-      throw new Error('Provider not found !');
+        // Aggregator contract
+        this.aggregatorContract = new ContractGeneric(
+            constant.ADDRESS.AGGREGATOR,
+            constant.ABI.AGGREGATOR,
+            process.env.PREDIX_OPERATOR_PRIVATEKEY,
+            this.getProvider(ChainType.BSC),
+        );
     }
 
-    if (!this.tokenContract) {
-      throw new Error('Prediction contract create failed !');
+    async onApplicationBootstrap() {}
+
+    getAlchemyProvider() {
+        if (this.provider) {
+            return this.provider;
+        }
+        const provider = new AlchemyProvider(
+            {
+                chainId: 84532,
+                name: 'base-sepolia',
+            },
+            process.env.ALCHEMY_API_KEY,
+        );
+        return provider;
     }
 
-    if (!this.marketContract) {
-      throw new Error('Prediction contract create failed !');
+    getProvider(chain: ChainType) {
+        const provider = new ethers.JsonRpcProvider(Chainlist[chain].rpc, {
+            chainId: Chainlist[chain].chainId,
+            name: Chainlist[chain].name,
+        });
+        return provider;
     }
-
-    if (!this.diceContract) {
-      throw new Error('Dice contract create failed !');
-    }
-
-    if (!this.predictionContract) {
-      throw new Error('Prediction contract create failed !');
-    }
-
-    if (!this.aggregatorContract) {
-      throw new Error('Prediction Aggregator contract create failed !');
-    }
-
-    if (!this.nftContract) {
-      throw new Error('NFT contract create failed !');
-    }
-  }
-
-
-  private getWalletFromPrivateKey() {
-    const wallet = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY, this.provider);
-    const signer = new ethers.NonceManager(wallet)
-    return signer
-    // return wallet
-  }
-
-  private getWalletFromPrivateKey2() {
-    const wallet = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY2, this.provider);
-    const signer = new ethers.NonceManager(wallet)
-    return signer
-    // return wallet
-  }
-
-  private getWalletFromPrivateKey3() {
-    const wallet = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY3, this.provider);
-    const signer = new ethers.NonceManager(wallet)
-    return signer
-    // return wallet
-  }
-
-  private getPredictionContract() {
-    const wallet = this.getWalletFromPrivateKey()
-
-    const predictionContract = new ethers.Contract(constant.ADDRESS.PREDICTION, constant.ABI.PREDICTION, wallet);
-
-    return predictionContract;
-  }
-
-  private getTokenContract() {
-    const wallet = this.getWalletFromPrivateKey()
-
-    const tokenContract = new ethers.Contract(constant.ADDRESS.TOKEN, constant.ABI.TOKEN, wallet);
-
-    return tokenContract;
-  }
-
-  private getFaucetContract() {
-    const wallet = this.getWalletFromPrivateKey2()
-
-    const faucetContract = new ethers.Contract(constant.ADDRESS.FAUCET, constant.ABI.FAUCET, wallet);
-
-    return faucetContract;
-  }
-
-  private getMarketContract() {
-    const wallet = this.getWalletFromPrivateKey3()
-
-    const marketContract = new ethers.Contract(constant.ADDRESS.MARKET, constant.ABI.MARKET, wallet);
-
-    return marketContract;
-  }
-
-  private getDiceContract() {
-
-    const wallet = this.getWalletFromPrivateKey2()
-
-    const diceContract = new ethers.Contract(constant.ADDRESS.DICE, constant.ABI.DICE, wallet);
-
-    return diceContract;
-  }
-
-  private getNftContract() {
-    const wallet = this.getWalletFromPrivateKey()
-
-    const nftcontract = new ethers.Contract(constant.ADDRESS.NFT, constant.ABI.NFT, wallet);
-
-    return nftcontract;
-  }
-
-  private getAggregatorContract() {
-    const aggregatorContract = new ethers.Contract(constant.ADDRESS.AGGREGATOR, constant.ABI.AGGREGATOR, this.getProvider(ChainType.BSC));
-
-    return aggregatorContract;
-  }
-
-  getAlchemyProvider() {
-    const provider = new AlchemyProvider({
-      chainId: 84532,
-      name: "base-sepolia",
-    }, process.env.ALCHEMY_API_KEY);
-    return provider
-  }
-
-  getProvider(chain: ChainType) {
-    const mainetProvider = new ethers.JsonRpcProvider(Chainlist[chain].rpc, {
-      chainId: Chainlist[chain].chainId,
-      name: Chainlist[chain].name,
-    });
-    return mainetProvider;
-  }
 }

@@ -8,41 +8,52 @@ import { Bet } from 'src/core/entity/bet.entity';
 import { Chainlink } from 'src/core/entity/chainlink.entity';
 import { Leaderboard } from 'src/core/entity/leaderboard.entity';
 import { Chart } from 'src/core/entity/chart.entity';
-import { Preferences } from 'src/core/entity/preferences.entity';
+import { BotPreferences, Preferences } from 'src/core/entity/preferences.entity';
 import { Market } from 'src/core/entity/market.entity';
 import { Dice } from 'src/core/entity/dice.entity';
+import { Wallet } from 'src/core/entity/wallet.entity';
+import { Statistic } from 'src/core/entity/statistic.entity';
+import { Manipulation } from 'src/core/entity/manipulation.entity';
 
 export abstract class IDataServices {
-  // Firestore
+    // Firestore
 
-  abstract userRepo: IGenericRepository<User>;
+    abstract userRepo: IGenericRepository<User>;
 
-  abstract preferenceRepo: IGenericRepository<Preferences>;
+    abstract preferenceRepo: IGenericRepository<Preferences>;
 
-  abstract chartRepo: IGenericRepository<Chart>;
+    abstract botPreferenceRepo: IGenericRepository<BotPreferences>;
 
-  abstract cashHistoryRepo: IGenericRepository<CashHistory>;
+    abstract chartRepo: IGenericRepository<Chart>;
 
-  abstract pointHistoryRepo: IGenericRepository<PointHistory>;
+    abstract cashHistoryRepo: IGenericRepository<CashHistory>;
 
-  abstract productRepo: IGenericRepository<Product>;
+    abstract pointHistoryRepo: IGenericRepository<PointHistory>;
 
-  abstract chainlinkRepo: IGenericRepository<Chainlink>;
+    abstract productRepo: IGenericRepository<Product>;
 
-  abstract leaderboardRepo: IGenericRepository<Leaderboard>;
+    abstract chainlinkRepo: IGenericRepository<Chainlink>;
 
-  // Bets
+    abstract leaderboardRepo: IGenericRepository<Leaderboard>;
 
-  abstract betRepo: IGenericRepository<Bet>;
+    abstract walletRepo: IGenericRepository<Wallet>;
 
-  abstract betDiceRepo: IGenericRepository<Bet>;
+    abstract statisticRepo: IGenericRepository<Statistic>;
 
-  abstract betMarketRepo: IGenericRepository<Bet>;
+    abstract manipulationRepo: IGenericRepository<Manipulation>;
 
-  //  Games
-  abstract predictionRepo: IGenericRepository<Prediction>;
+    // Bets
 
-  abstract diceRepo: IGenericRepository<Dice>;
+    abstract betRepo: IGenericRepository<Bet>;
 
-  abstract marketRepo: IGenericRepository<Market>;
+    abstract betDiceRepo: IGenericRepository<Bet>;
+
+    abstract betMarketRepo: IGenericRepository<Bet>;
+
+    //  Games
+    abstract predictionRepo: IGenericRepository<Prediction>;
+
+    abstract diceRepo: IGenericRepository<Dice>;
+
+    abstract marketRepo: IGenericRepository<Market>;
 }
