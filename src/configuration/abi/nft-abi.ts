@@ -1206,8 +1206,8 @@ const rawNftABI = `[
   ]`;
 
 export const nftABI = {
-  [ChainType.BSCTESTNET]: rawNftABI,
-  [ChainType.BASETESTNET]: rawNftABI,
-  [ChainType.BASESEPOLIA]: rawNftABI,
-  [ChainType.BSC]: rawNftABI,
+    [ChainType.BSCTESTNET]: rawNftABI,
+    [ChainType.BASETESTNET]: rawNftABI,
+    [ChainType.BASESEPOLIA]: rawNftABI,
+    [ChainType.BSC]: rawNftABI,
 };

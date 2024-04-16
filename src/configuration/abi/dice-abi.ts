@@ -1125,8 +1125,8 @@ const rawDiceABI = `[
 ]`;
 
 export const diceABI = {
-  [ChainType.BSCTESTNET]: rawDiceABI,
-  [ChainType.BASETESTNET]: rawDiceABI,
-  [ChainType.BASESEPOLIA]: rawDiceABI,
-  [ChainType.BSC]: rawDiceABI,
+    [ChainType.BSCTESTNET]: rawDiceABI,
+    [ChainType.BASETESTNET]: rawDiceABI,
+    [ChainType.BASESEPOLIA]: rawDiceABI,
+    [ChainType.BSC]: rawDiceABI,
 };

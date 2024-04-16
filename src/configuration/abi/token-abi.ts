@@ -444,8 +444,8 @@ const rawTokenABI = `[
 ]`;
 
 export const tokenABI = {
-  [ChainType.BSCTESTNET]: rawTokenABI,
-  [ChainType.BASETESTNET]: rawTokenABI,
-  [ChainType.BASESEPOLIA]: rawTokenABI,
-  [ChainType.BSC]: rawTokenABI,
+    [ChainType.BSCTESTNET]: rawTokenABI,
+    [ChainType.BASETESTNET]: rawTokenABI,
+    [ChainType.BASESEPOLIA]: rawTokenABI,
+    [ChainType.BSC]: rawTokenABI,
 };

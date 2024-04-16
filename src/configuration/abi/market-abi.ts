@@ -845,8 +845,8 @@ const rawMarketABI = `[
   ]`;
 
 export const marketABI = {
-  [ChainType.BSCTESTNET]: rawMarketABI,
-  [ChainType.BASETESTNET]: rawMarketABI,
-  [ChainType.BASESEPOLIA]: rawMarketABI,
-  [ChainType.BSC]: rawMarketABI,
+    [ChainType.BSCTESTNET]: rawMarketABI,
+    [ChainType.BASETESTNET]: rawMarketABI,
+    [ChainType.BASESEPOLIA]: rawMarketABI,
+    [ChainType.BSC]: rawMarketABI,
 };
