@@ -3,11 +3,12 @@ import { UserAuthenService } from './user-authen.service';
 import { UserController } from 'src/controller/user.controller';
 import { UserService } from './user.service';
 import { UserHandleMoney } from './user-handle-money.service';
+import { BotUserService } from './bot/bot-user.service';
 
 @Module({
-  controllers: [UserController],
-  providers: [UserAuthenService, UserService, UserHandleMoney],
-  imports: [],
-  exports: [UserAuthenService, UserHandleMoney],
+    controllers: [UserController],
+    providers: [UserAuthenService, UserService, UserHandleMoney, BotUserService],
+    imports: [],
+    exports: [UserAuthenService, UserHandleMoney, BotUserService, UserService],
 })
-export class UserModule { }
+export class UserModule {}
