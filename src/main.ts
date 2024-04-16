@@ -4,26 +4,25 @@ import { ValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from './framework/exception handler/all-exceptions-filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
-  const httpAdapter = app.get(HttpAdapterHost);
+    const app = await NestFactory.create(AppModule, { cors: true });
+    const httpAdapter = app.get(HttpAdapterHost);
 
-  // Global Exception Filters
-  app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
+    // Global Exception Filters
+    app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
 
-  // Global Validation Pipe
-  app.useGlobalPipes(
-    new ValidationPipe({
-      enableDebugMessages: true,
-      transform: true,
-      whitelist: true,
-      transformOptions: {
-        enableImplicitConversion: true, // allow conversion underneath
-      },
-    }),
-  );
+    // Global Validation Pipe
+    app.useGlobalPipes(
+        new ValidationPipe({
+            enableDebugMessages: true,
+            transform: true,
+            whitelist: true,
+            transformOptions: {
+                enableImplicitConversion: true, // allow conversion underneath
+            },
+        }),
+    );
 
-  // await app.listen(process.env.PORT ? process.env.PORT : 3000);
-  await app.listen(3000);
+    await app.listen(process.env.PORT ? process.env.PORT : 3000);
 }
 
 bootstrap();

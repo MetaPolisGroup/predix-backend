@@ -11,4 +11,4 @@ import { LoggerFactory } from './logger-factory.framework';
     ],
     exports: [ILoggerFactory],
 })
-export class LoggerFactoryFramework { }
+export class LoggerFactoryFramework {}

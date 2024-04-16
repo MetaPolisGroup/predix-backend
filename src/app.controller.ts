@@ -1,195 +1,105 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Controller, Get, Req } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { IDataServices } from './core/abstract/data-services/data-service.abstract';
-import { User } from './core/entity/user.enity';
 import { UserAuthenService } from './use-case/user/user-authen.service';
-import { Request } from 'express';
 import { ContractFactoryAbstract } from './core/abstract/contract-factory/contract-factory.abstract';
 import { LeaderboardService } from './use-case/leaderboard/leader.service';
-import constant from './configuration';
-import { PredictionService } from './use-case/prediction/prediction.service';
-
-
+import { PredixOperatorContract } from './use-case/contracts/predix/prediction-operator.service';
+import { HelperService } from './use-case/helper/helper.service';
+import { WalletService } from './use-case/wallet/wallet.service';
+import { PredixFakeBotService } from './consumer/bots/prediction/predix-fake-bot.service';
+import { FaucetService } from './use-case/faucet/faucet.service';
+import { NativeTokenService } from './use-case/token/native-token/native-token.service';
+import { PredixBotContract } from './use-case/contracts/predix/prediction-bot.service';
+import { PredictionRoundService } from './use-case/games/prediction/prediction-round.service';
+import { PredixStatisticService } from './use-case/statistic/predix/predix-statistic.service';
+import { ManipulationService } from './use-case/manipulation/manipulation.service';
+import { ManipulationUsecases } from './use-case/manipulation/manipulation.usecases';
 
 @Controller()
 export class AppController {
-  constructor(
-    private readonly db: IDataServices,
-    private readonly userService: UserAuthenService,
-    private readonly factory: ContractFactoryAbstract,
-    private readonly leaderboard: LeaderboardService,
-    private readonly prediction: PredictionService,
-  ) { }
+    constructor(
+        private readonly userService: UserAuthenService,
+        private readonly factory: ContractFactoryAbstract,
+        private readonly leaderboard: LeaderboardService,
+        private readonly prediction: PredixOperatorContract,
+        private readonly predixRound: PredictionRoundService,
+        private readonly helper: HelperService,
+        private readonly walletService: WalletService,
+        private readonly predixStatistic: PredixStatisticService,
+        private readonly predixManipulate: ManipulationService,
+        private readonly predixManipulateUsecase: ManipulationUsecases,
 
+        private readonly predixFakeBot: PredixFakeBotService,
+        private readonly predixBot: PredixBotContract,
+        private readonly nativeToken: NativeTokenService,
+        private readonly faucetService: FaucetService,
+        private readonly db: IDataServices,
+    ) {}
 
-  @Get("time")
-  time() {
-    const date = new Date()
-    return `${date.getDay()}/${date.getHours()}/${date.getMinutes()}`
-  }
-
-  @Get('execute')
-  async ex() {
-    await this.prediction.executeRound();
-  }
-
-  @Get('startgame')
-  async startgame() {
-    const gasLimit = await this.factory.marketContract.startGame.estimateGas('2');
-    const gasPrice = await this.factory.provider.getFeeData();
-
-    const executeRoundTx = await this.factory.marketContract.startGame('2', {
-      gasLimit,
-      gasPrice: gasPrice.gasPrice,
-      maxFeePerGas: gasPrice.maxFeePerGas,
-      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
-    });
-
-    const executeRound = await this.factory.provider.waitForTransaction(executeRoundTx.hash as string);
-
-    // Execute round success
-    if (executeRound.status === 1) {
-      console.log(`execute successfully!`);
-    }
-
-    // Execute round failed
-    else {
-      console.log(` executed failed! `);
-    }
-  }
-
-  @Get('bet')
-  async bet() {
-    // const gasLimit = await this.factory.marketContract.betBear.estimateGas('2', '200');
-    // const gasPrice = await this.factory.provider.getFeeData();
-
-    // const executeRoundTx = await this.factory.marketContract.betBear('2', '200', {
-    //   gasLimit,
-    //   gasPrice: gasPrice.gasPrice,
-    //   maxFeePerGas: gasPrice.maxFeePerGas,
-    //   maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
-    // });
-
-    // const executeRound = await this.factory.provider.waitForTransaction(executeRoundTx.hash as string);
-
-    // // Execute round success
-    // if (executeRound.status === 1) {
-    //   console.log(`execute successfully!`);
-    // }
-
-    // // Execute round failed
-    // else {
-    //   console.log(` executed failed! `);
-    // }
-    await this.prediction.automaticBotBet(2000);
-  }
-
-  @Get('approve')
-  async approve() {
-    const gasLimit = await this.factory.tokenContract.approve.estimateGas(
-      '0x01B17739d4F86922d74E0488D03F5D14b4A0ed5c',
-      '100000000000000000000',
-    );
-    const gasPrice = await this.factory.provider.getFeeData();
-
-    const executeRoundTx = await this.factory.tokenContract.approve('0x01B17739d4F86922d74E0488D03F5D14b4A0ed5c', '100000000000000000000', {
-      gasLimit,
-      gasPrice: gasPrice.gasPrice,
-      maxFeePerGas: gasPrice.maxFeePerGas,
-      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
-    });
-
-    const executeRound = await this.factory.provider.waitForTransaction(executeRoundTx.hash as string);
-
-    // Execute round success
-    if (executeRound.status === 1) {
-      console.log(`execute successfully!`);
-    }
-
-    // Execute round failed
-    else {
-      console.log(` executed failed! `);
-    }
-  }
-
-  // @Get('mint')
-  // async mint() {
-  //   const wallet = new ethers.Wallet(process.env.OWNER_ADDRESS_PRIVATEKEY, this.factory);
-
-  //   const token = new ethers.Contract(constant.ADDRESS.TOKEN, constant.ABI.TOKEN, wallet);
-
-  //   const gasLimit = await token.mint.estimateGas('0x66405F84DaC6DE3aFF921d77174B0E0C46Eb2aBA', '1000000000000000000000000000');
-  //   const gasPrice = await this.factory.provider.getFeeData();
-
-  //   const executeRoundTx = await token.mint('0x66405F84DaC6DE3aFF921d77174B0E0C46Eb2aBA', '1000000000000000000000000000', {
-  //     gasLimit,
-  //     gasPrice: gasPrice.gasPrice,
-  //     maxFeePerGas: gasPrice.maxFeePerGas,
-  //     maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
-  //   });
-
-  //   const executeRound = await this.factory.provider.waitForTransaction(executeRoundTx.hash as string);
-
-  //   // Execute round success
-  //   if (executeRound.status === 1) {
-  //     console.log(`execute successfully!`);
-  //   }
-
-  //   // Execute round failed
-  //   else {
-  //     console.log(` executed failed! `);
-  //   }
-  // }
-
-  @Get('fix-data')
-  async testQueryFirestore() {
-    const me: User = await this.db.userRepo.getDocumentData('0xf3284BBF9Ebc7C05d2750FbF1232903cA33BF22C');
-
-    const users = await this.db.userRepo.getCollectionDataByConditions([
-      { field: 'user_tree_commissions', operator: 'array-contains', value: me.id },
-    ]);
-    if (users) {
-      const arr: User[] = [];
-      users.map(user => {
-        if (user.user_tree_belong[0] === me.id) {
-          arr.push(user);
+    @Get('addWhitelist')
+    async tim() {
+        const wallets = await this.walletService.getAllWallets();
+        const walletList: string[] = [];
+        for (const wallet of wallets) {
+            walletList.push(wallet.address);
         }
-      });
+        await this.faucetService.addWhitelistAndWait(walletList);
 
-      // return arr.map(item => item.id);
-
-      return users.map(user => user.id);
+        return 'ok';
     }
 
-    return false;
-  }
-
-  @Get('/example-user')
-  async exampleUser(@Req() req: Request) {
-    const users = await this.db.userRepo.getCollectionData();
-    for (let i = 0; i < 1000; i++) {
-
-      const user = users[Math.floor(Math.random() * users.length)];
-      await this.userService.create({ user_address: `test${i}`, nickname: `test${i}`, recommend_id: user.id }, req);
+    @Get('bet')
+    async transfer() {
+        this.predixBot.betBearByPrivatekey(
+            'b9f41189480eb483895469f79583755bdd35a5bcfe6077581fb70f4c31973211',
+            (await this.predixRound.getCurrentRound()).epoch,
+            30,
+        );
+        this.predixBot.betBullByPrivatekey(
+            '4420c3c1829b186f14fea2e7d85f8a3cee95bad40d7cfd973cbebcd36753bd39',
+            (await this.predixRound.getCurrentRound()).epoch,
+            1,
+        );
     }
-  }
 
-  @Get('/change-example-user')
-  async changeExampleUser(@Req() req: Request) {
-    const users = await this.db.userRepo.getCollectionData();
-    for (const user of users) {
-      for (let i = 0; i <= user.user_tree_belong.length; i++) {
-        if (user.user_tree_belong[i] === '0x5f84f858895BCC8261f1723B93D2C26a8cF16738') {
-          user.user_tree_belong[i] = '0xFf8b990Dd2d6Fb35fF627C01173958Eda197518A';
-        }
-      }
-      for (let i = 0; i <= user.user_tree_commissions.length; i++) {
-        if (user.user_tree_commissions[i] === '0x5f84f858895BCC8261f1723B93D2C26a8cF16738') {
-          user.user_tree_commissions[i] = '0xFf8b990Dd2d6Fb35fF627C01173958Eda197518A';
-        }
-      }
-      user.ref = '0xFf8b990Dd2d6Fb35fF627C01173958Eda197518A';
-      await this.db.userRepo.upsertDocumentData(user.id, user);
+    @Get('bot')
+    async bot() {
+        const round = await this.predixRound.getCurrentRound();
+        this.predixFakeBot.runFakeBots(round, 1);
     }
-  }
+
+    @Get('botbear/:amount')
+    async botbear(@Param('amount') amount: string) {
+        const round = await this.predixRound.getCurrentRound();
+        this.predixFakeBot.botBetBear(round, +amount);
+    }
+
+    @Get('botbull/:amount')
+    async botbull(@Param('amount') amount: string) {
+        const round = await this.predixRound.getCurrentRound();
+        this.predixFakeBot.botBetBull(round, +amount);
+    }
+
+    @Get('getRound/:id')
+    async set(@Param('id') round: string) {
+        return this.db.predictionRepo.getDocumentData(round);
+    }
+
+    @Get('statistic')
+    async statistic() {
+        return this.predixStatistic.getCurrentStatistic();
+    }
+
+    @Get('mani/:epoch')
+    async getManipulation(@Param('epoch') epoch: number) {
+        return this.predixManipulateUsecase.getManipulationByEpoch(epoch);
+    }
+
+    @Get('price')
+    async price() {
+        const chainLinkPrice = await this.factory.aggregatorContract.readContract('latestRoundData');
+        const price = this.helper.toEtherNumber(chainLinkPrice[1] as bigint);
+        return price.toFixed(2);
+    }
 }

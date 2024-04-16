@@ -10,21 +10,31 @@ import { UserService } from 'src/use-case/user/user.service';
 
 @Controller('user')
 export class UserController {
-  constructor(
-    private readonly userAuthService: UserAuthenService,
-    private readonly helper: HelperService,
-    private readonly userService: UserService,
-    private readonly factory: ContractFactoryAbstract
-  ) { }
+    constructor(
+        private readonly userAuthService: UserAuthenService,
+        private readonly helper: HelperService,
+        private readonly userService: UserService,
+        private readonly factory: ContractFactoryAbstract,
+    ) {}
 
-  @Post('/create')
-  async createByRef(@Body() dto: CreateUserDto, @Req() req: Request) {
-    return await this.userAuthService.create(dto, req);
-  }
+    @Post('/create')
+    async createByRef(@Body() dto: CreateUserDto, @Req() req: Request) {
+        return this.userAuthService.create(dto, req);
+    }
 
-  @Post('/faucet')
-  async faucet(@Body() dto: FaucetDto) {
-    await this.helper.executeContract(this.factory.faucetContract, "drip", undefined, undefined, undefined, undefined, undefined, undefined, dto.address);
-    return true
-  }
+    // @Post('/faucet')
+    // async faucet(@Body() dto: FaucetDto) {
+    //     await this.helper.executeContract(
+    //         this.factory.faucetContract,
+    //         'drip',
+    //         undefined,
+    //         undefined,
+    //         undefined,
+    //         undefined,
+    //         undefined,
+    //         undefined,
+    //         dto.address,
+    //     );
+    //     return true;
+    // }
 }

@@ -4,9 +4,9 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 
 @Module({
-  controllers: [],
-  providers: [AuthService, AuthGuard],
-  imports: [JwtModule.register({ global: true, secret: 'ponzi' })],
-  exports: [AuthService, AuthGuard],
+    controllers: [],
+    providers: [AuthService, AuthGuard],
+    imports: [JwtModule.register({ global: true, secret: 'ponzi' })],
+    exports: [AuthService, AuthGuard],
 })
 export class AuthModule {}

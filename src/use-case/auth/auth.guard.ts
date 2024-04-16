@@ -5,9 +5,12 @@ import { AuthService } from './auth.service';
 
 @Injectable()
 export class AuthGuard {
-  constructor(private readonly jwt: JwtService, private readonly authService: AuthService) {}
+    constructor(
+        private readonly jwt: JwtService,
+        private readonly authService: AuthService,
+    ) {}
 
-  canActivate(context: ExecutionContext) {
-    const req = context.switchToHttp().getRequest();
-  }
+    canActivate(context: ExecutionContext) {
+        const req = context.switchToHttp().getRequest();
+    }
 }

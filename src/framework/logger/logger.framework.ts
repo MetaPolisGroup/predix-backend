@@ -1,7 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { ILogger } from 'src/core/abstract/logger/logger.abstract';
 
-
 export class CustomLogger implements ILogger {
     private logger: Logger;
 
@@ -11,9 +10,9 @@ export class CustomLogger implements ILogger {
         this.logger = new Logger(name);
         this.color = color;
     }
+
     log(message: string, context?: string): void {
         if (context) {
-
             this.logger.log(this.hexToAnsi(this.color, message), context);
         } else {
             this.logger.log(this.hexToAnsi(this.color, message));
@@ -22,7 +21,6 @@ export class CustomLogger implements ILogger {
 
     error(message: string, context?: string) {
         if (context) {
-
             this.logger.error(this.hexToAnsi(this.color, message), context);
         } else {
             this.logger.error(this.hexToAnsi(this.color, message));
@@ -31,7 +29,6 @@ export class CustomLogger implements ILogger {
 
     warn(message: string, context?: string) {
         if (context) {
-
             this.logger.warn(this.hexToAnsi(this.color, message), context);
         } else {
             this.logger.warn(this.hexToAnsi(this.color, message));
@@ -40,14 +37,11 @@ export class CustomLogger implements ILogger {
 
     debug(message: string, context?: string) {
         if (context) {
-
             this.logger.debug(this.hexToAnsi(this.color, message), context);
         } else {
             this.logger.debug(this.hexToAnsi(this.color, message));
         }
     }
-
-
 
     private hexToAnsi(hexColor: string, message: string) {
         // Ensure the input is a valid 6-digit hex color code
