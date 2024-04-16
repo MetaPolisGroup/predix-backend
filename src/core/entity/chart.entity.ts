@@ -1,9 +1,5 @@
-export class Chart {
-  id?: string;
+import { Generic } from './generic.entity';
 
-  price: number;
-
-  created_at: number;
-
-  delete: boolean;
+export class Chart extends Generic {
+    price: number;
 }

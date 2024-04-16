@@ -1,25 +1,27 @@
-export class Market {
-  // Infos
-  epoch: number;
+import { Generic } from './generic.entity';
 
-  startTimestamp: number;
+export class Market extends Generic {
+    // Infos
+    epoch: number;
 
-  closeTimestamp: number;
+    include: boolean;
 
-  result: 'Up' | 'Down ' | 'Waiting';
+    startTimestamp: number;
 
-  // Amounts
+    closeTimestamp: number;
 
-  totalAmount: number;
+    result: 'Up' | 'Down ' | 'Waiting';
 
-  bullAmount: number;
+    // Amounts
 
-  bearAmount: number;
+    totalAmount: number;
 
-  // States
-  cancel: boolean;
+    bullAmount: number;
 
-  closed: boolean;
+    bearAmount: number;
 
-  delele: boolean;
+    // States
+    cancel: boolean;
+
+    closed: boolean;
 }

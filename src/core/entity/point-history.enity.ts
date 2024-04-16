@@ -1,13 +1,11 @@
-export class PointHistory {
-  user_id: string;
+import { Generic } from './generic.entity';
 
-  point: string;
+export class PointHistory extends Generic {
+    user_id: string;
 
-  division: string;
+    point: string;
 
-  note: string;
+    division: string;
 
-  created_at: number;
-
-  update_at: number;
+    note: string;
 }

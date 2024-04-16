@@ -1,18 +1,15 @@
 import { LeaderBoardType } from 'src/configuration/type/leaderboard/leaderboard.type';
 import { LeaderBoardUser } from './user.enity';
+import { Generic } from './generic.entity';
 
-export class Leaderboard {
-  id?: string;
+export class Leaderboard extends Generic {
+    user_list: {
+        leaderboard: LeaderBoardUser;
 
-  user_list: {
-    leaderboard: LeaderBoardUser;
+        user_id: string;
 
-    user_id: string;
+        nickname: string;
+    }[];
 
-    nickname: string;
-  }[];
-
-  type: LeaderBoardType;
-
-  updated_at: number;
+    type: LeaderBoardType;
 }

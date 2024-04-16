@@ -1,30 +1,32 @@
-export class Dice {
-  epoch: number;
+import { Generic } from './generic.entity';
 
-  startTimestamp: number;
+export class Dice extends Generic {
+    epoch: number;
 
-  closeTimestamp: number;
+    include: boolean;
 
-  //   Result
-  dice1: number;
+    startTimestamp: number;
 
-  dice2: number;
+    closeTimestamp: number;
 
-  dice3: number;
+    //   Result
+    dice1: number;
 
-  sum: number;
+    dice2: number;
 
-  // Amounts
-  totalAmount: number;
+    dice3: number;
 
-  bullAmount: number;
+    sum: number;
 
-  bearAmount: number;
+    // Amounts
+    totalAmount: number;
 
-  //   States
-  cancel: boolean;
+    bullAmount: number;
 
-  closed: boolean;
+    bearAmount: number;
 
-  delele: boolean;
+    //   States
+    cancel: boolean;
+
+    closed: boolean;
 }

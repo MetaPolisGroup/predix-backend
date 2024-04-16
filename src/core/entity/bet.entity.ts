@@ -2,31 +2,37 @@ import { BetStatus, Position } from 'src/configuration/type';
 import { Prediction } from './prediction.enity';
 import { Market } from './market.entity';
 import { Dice } from './dice.entity';
+import { Generic } from './generic.entity';
+import { User } from './user.enity';
 
-export class Bet {
-  id?: string;
+export class Bet extends Generic {
+    epoch: number;
 
-  epoch: number;
+    hash?: string;
 
-  position: Position;
+    position: Position;
 
-  user_address: string;
+    user_address: string;
 
-  claimed: boolean;
+    amount: number;
 
-  refund: number;
+    after_refund_amount: number;
 
-  winning_amount: number;
+    claimed: boolean;
 
-  amount: number;
+    claim_amount: number;
 
-  claimed_amount: number;
+    refund: number;
 
-  status: BetStatus;
+    winning_amount: number;
 
-  round: Prediction | Market | Dice;
+    net: number;
 
-  created_at: number;
+    net_after_fee: number;
 
-  delete: boolean;
+    status: BetStatus;
+
+    user: User;
+
+    round: Prediction | Market | Dice;
 }

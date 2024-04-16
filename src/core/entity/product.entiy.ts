@@ -1,11 +1,13 @@
-export class Product {
-  name: string;
+import { Generic } from './generic.entity';
 
-  price: string;
+export class Product extends Generic {
+    name: string;
 
-  description?: string;
+    price: string;
 
-  created_at: number;
+    description?: string;
 
-  update_at: number;
+    created_at: number;
+
+    update_at: number;
 }

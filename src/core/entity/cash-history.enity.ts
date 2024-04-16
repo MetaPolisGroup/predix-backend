@@ -1,17 +1,15 @@
-export class CashHistory {
-  user_id: string;
+import { Generic } from './generic.entity';
 
-  product: string;
+export class CashHistory extends Generic {
+    user_id: string;
 
-  point: string;
+    product: string;
 
-  amount: string;
+    point: string;
 
-  division: string;
+    amount: string;
 
-  note: string;
+    division: string;
 
-  created_at: number;
-
-  update_at: number;
+    note: string;
 }

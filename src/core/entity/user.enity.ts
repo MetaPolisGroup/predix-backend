@@ -1,44 +1,78 @@
-export class User {
-  id?: string;
+import { Generic } from './generic.entity';
 
-  user_address?: string;
+export class User extends Generic {
+    address: string;
 
-  point: number;
+    total_bets: number;
 
-  ip: string;
+    total_bets_won: number;
 
-  nickname?: string;
+    total_bets_lost: number;
 
-  leaderboard?: LeaderBoardUser;
+    total_bets_mmount: number;
 
-  user_tree_belong?: string[];
+    total_betsUp: number;
 
-  user_tree_commissions?: string[];
+    total_betsUp_won: number;
 
-  created_at: number;
+    total_betsUp_lost: number;
 
-  updated_at: number;
+    total_betsUp_mmount: number;
 
-  type: UserType;
+    total_betsDown: number;
 
-  ref: string;
+    total_betsDown_won: number;
+
+    total_betsDown_lost: number;
+
+    total_betsDown_amount: number;
+
+    total_claimed_times: number;
+
+    total_claimed_amount: number;
+
+    commission: number;
+
+    total_commission_claimed_times: number;
+
+    total_commission_claimed_amount: number;
+
+    win_rate: number;
+
+    average_bet_amount: number;
+
+    net: number;
+
+    ip: string;
+
+    nickname?: string;
+
+    leaderboard?: LeaderBoardUser;
+
+    user_tree_belong?: string[];
+
+    user_tree_commissions?: string[];
+
+    type: UserType;
+
+    ref: string;
 }
 
 export interface IUserToken {
-  nickname: string;
-  id: string;
+    nickname: string;
+    id: string;
 }
 
-export type UserType = 'Admin' | 'Normal';
+export type UserType = 'Admin' | 'Normal' | 'Bot' | 'God';
 
 export class LeaderBoardUser {
-  round_played: number;
+    round_played: number;
 
-  round_winning: number;
+    round_winning: number;
 
-  net_winnings: number;
+    net_winnings: number;
 
-  win_rate: number;
+    win_rate: number;
 
-  total_amount: number;
+    total_amount: number;
 }

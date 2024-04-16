@@ -1,7 +1,23 @@
-export class Chainlink {
-  id?: string;
+import { Generic } from './generic.entity';
 
-  price: number;
+export class Chainlink extends Generic {
+    price: number;
+}
 
-  updated_at: number;
+export class ExecuteData {
+    roundId: number;
+
+    price: number;
+}
+
+export class ChainlinkData {
+    roundId: number;
+
+    answer: number;
+
+    started_at: number;
+
+    updated_at: number;
+
+    answered_in_Round: number;
 }

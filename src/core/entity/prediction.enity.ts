@@ -1,31 +1,46 @@
-export class Prediction {
-  epoch: number;
+import { Position } from 'src/configuration/type';
+import { Generic } from './generic.entity';
 
-  startTimestamp: number;
+export class PredictionOnChain extends Generic {
+    epoch: number;
 
-  lockTimestamp: number;
+    startTimestamp: number;
 
-  closeTimestamp: number;
+    lockTimestamp: number;
 
-  lockOracleId: number;
+    closeTimestamp: number;
 
-  closeOracleId: number;
+    lockPrice: number;
 
-  lockPrice: number;
+    closePrice: number;
 
-  cancel: boolean;
+    lockOracleId: number;
 
-  closePrice: number;
+    closeOracleId: number;
 
-  totalAmount: number;
+    total_amount: number;
 
-  bullAmount: number;
+    up_amount: number;
 
-  bearAmount: number;
-
-  closed: boolean;
-
-  locked: boolean;
-
-  delele: boolean;
+    down_amount: number;
 }
+
+export class Prediction extends PredictionOnChain {
+    include: boolean;
+
+    result: RoundResults;
+
+    cancel: boolean;
+
+    total_bets: number;
+
+    total_bets_up: number;
+
+    total_bets_down: number;
+
+    closed: boolean;
+
+    locked: boolean;
+}
+
+export type RoundResults = 'DRAW' | 'WAIT' | Position;
