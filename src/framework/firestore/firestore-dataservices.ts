@@ -1,5 +1,5 @@
-import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
-import * as admin from "firebase-admin"
+import { Injectable, OnApplicationBootstrap, OnModuleInit } from '@nestjs/common';
+import * as admin from 'firebase-admin';
 import { Bucket } from '@google-cloud/storage';
 import constant from 'src/configuration';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
@@ -13,115 +13,156 @@ import { Bet } from 'src/core/entity/bet.entity';
 import { Chainlink } from 'src/core/entity/chainlink.entity';
 import { Leaderboard } from 'src/core/entity/leaderboard.entity';
 import { Chart } from 'src/core/entity/chart.entity';
-import { Preferences } from 'src/core/entity/preferences.entity';
+import { BotPreferences, Preferences } from 'src/core/entity/preferences.entity';
 import { Market } from 'src/core/entity/market.entity';
 import { Dice } from 'src/core/entity/dice.entity';
+import { Wallet } from 'src/core/entity/wallet.entity';
+import { Statistic } from 'src/core/entity/statistic.entity';
+import { Manipulation } from 'src/core/entity/manipulation.entity';
 
 @Injectable()
-export class FirestoreDataServices implements IDataServices, OnApplicationBootstrap {
-  //Firestore
-  firestore: admin.firestore.Firestore;
-
-  userRepo: FirestoreGenericRepository<User>;
-
-  chartRepo: FirestoreGenericRepository<Chart>;
-
-  cashHistoryRepoRepo: FirestoreGenericRepository<CashHistory>;
-
-  pointHistoryRepo: FirestoreGenericRepository<PointHistory>;
-
-  productRepo: FirestoreGenericRepository<Product>;
-
-  cashHistoryRepo: FirestoreGenericRepository<CashHistory>;
-
-  chainlinkRepo: FirestoreGenericRepository<Chainlink>;
-
-  leaderboardRepo: FirestoreGenericRepository<Leaderboard>;
-
-  preferenceRepo: FirestoreGenericRepository<Preferences>;
-
-  // Prediction
-
-  predictionRepo: FirestoreGenericRepository<Prediction>;
-
-  betRepo: FirestoreGenericRepository<Bet>;
-
-  // Dice
-  diceRepo: FirestoreGenericRepository<Dice>;
-
-  betDiceRepo: FirestoreGenericRepository<Bet>;
-
-  // Market
-  betMarketRepo: FirestoreGenericRepository<Bet>;
-
-  marketRepo: FirestoreGenericRepository<Market>;
-
-  constructor() { }
-
-  onApplicationBootstrap(): void {
-
-    // Initialize DB
-    const serviceAccount = this.getServiceAccount()
-    const app = admin.initializeApp(
-      {
-        credential: admin.credential.cert(serviceAccount),
-        storageBucket: constant.STORAGE.BUCKET,
-      },
-      constant.FIREBASE.NAME,
-    );
-    const firestore = app.firestore();
-    firestore.settings({ ignoreUndefinedProperties: true });
-    const bucket: Bucket = app.storage().bucket();
-
+export class FirestoreDataServices implements IDataServices, OnModuleInit {
     //Firestore
-    this.firestore = firestore;
+    firestore: admin.firestore.Firestore;
 
-    // Repositories
-    this.userRepo = new FirestoreGenericRepository<User>(firestore, constant.FIREBASE.COLLECTIONS.USERS);
+    userRepo: FirestoreGenericRepository<User>;
 
-    this.cashHistoryRepoRepo = new FirestoreGenericRepository<CashHistory>(firestore, constant.FIREBASE.COLLECTIONS.CASH_HISTORIES);
+    chartRepo: FirestoreGenericRepository<Chart>;
 
-    this.pointHistoryRepo = new FirestoreGenericRepository<PointHistory>(firestore, constant.FIREBASE.COLLECTIONS.POINT_HISTORIES);
+    cashHistoryRepoRepo: FirestoreGenericRepository<CashHistory>;
 
-    this.productRepo = new FirestoreGenericRepository<Product>(firestore, constant.FIREBASE.COLLECTIONS.PRODUCTS);
+    pointHistoryRepo: FirestoreGenericRepository<PointHistory>;
 
-    this.chartRepo = new FirestoreGenericRepository<Chart>(firestore, constant.FIREBASE.COLLECTIONS.CHARTS);
+    productRepo: FirestoreGenericRepository<Product>;
 
-    this.chainlinkRepo = new FirestoreGenericRepository<Chainlink>(firestore, constant.FIREBASE.COLLECTIONS.CHAINLINKS);
+    cashHistoryRepo: FirestoreGenericRepository<CashHistory>;
 
-    this.leaderboardRepo = new FirestoreGenericRepository<Leaderboard>(firestore, constant.FIREBASE.COLLECTIONS.LEADERBOARD);
+    chainlinkRepo: FirestoreGenericRepository<Chainlink>;
 
-    this.preferenceRepo = new FirestoreGenericRepository<Preferences>(firestore, constant.FIREBASE.COLLECTIONS.PREFERENCES);
+    leaderboardRepo: FirestoreGenericRepository<Leaderboard>;
 
+    preferenceRepo: FirestoreGenericRepository<Preferences>;
+
+    botPreferenceRepo: FirestoreGenericRepository<BotPreferences>;
+
+    walletRepo: FirestoreGenericRepository<Wallet>;
+
+    statisticRepo: FirestoreGenericRepository<Statistic>;
+
+    manipulationRepo: FirestoreGenericRepository<Manipulation>;
     // Prediction
 
-    this.predictionRepo = new FirestoreGenericRepository<Prediction>(firestore, constant.FIREBASE.COLLECTIONS.PREDICTIONS);
+    predictionRepo: FirestoreGenericRepository<Prediction>;
 
-    this.betRepo = new FirestoreGenericRepository<Bet>(firestore, constant.FIREBASE.COLLECTIONS.BETS);
+    betRepo: FirestoreGenericRepository<Bet>;
 
     // Dice
-    this.diceRepo = new FirestoreGenericRepository<Dice>(firestore, constant.FIREBASE.COLLECTIONS.DICES);
+    diceRepo: FirestoreGenericRepository<Dice>;
 
-    this.betDiceRepo = new FirestoreGenericRepository<Bet>(firestore, constant.FIREBASE.COLLECTIONS.BETS_DICE);
+    betDiceRepo: FirestoreGenericRepository<Bet>;
+
     // Market
+    betMarketRepo: FirestoreGenericRepository<Bet>;
 
-    this.betMarketRepo = new FirestoreGenericRepository<Bet>(firestore, constant.FIREBASE.COLLECTIONS.BETS_MARKET);
+    marketRepo: FirestoreGenericRepository<Market>;
 
-    this.marketRepo = new FirestoreGenericRepository<Market>(firestore, constant.FIREBASE.COLLECTIONS.MARKETS);
-  }
+    constructor() {}
 
+    onModuleInit(): void {
+        // Initialize DB
+        const serviceAccount = this.getServiceAccount();
+        const app = admin.initializeApp(
+            {
+                credential: admin.credential.cert(serviceAccount),
+                storageBucket: constant.STORAGE.BUCKET,
+            },
+            constant.FIREBASE.NAME,
+        );
+        const firestore = app.firestore();
+        firestore.settings({ ignoreUndefinedProperties: true });
+        const bucket: Bucket = app.storage().bucket();
 
-  private getServiceAccount() {
+        //Firestore
+        this.firestore = firestore;
 
-    const serviceAccount: admin.ServiceAccount = {
-      projectId: process.env.FIRESTORE_PROJECT_ID,
-      privateKey: process.env.FIRESTORE_PRIVATE_KEY
-        ? process.env.FIRESTORE_PRIVATE_KEY.replace(/\\n/gm, "\n")
-        : undefined,
-      clientEmail: process.env.FIRESTORE_CLIENT_EMAIL,
-    };
+        // Repositories
+        this.userRepo = new FirestoreGenericRepository<User>(firestore, constant.FIREBASE.COLLECTIONS.USERS);
 
-    return serviceAccount
+        this.cashHistoryRepoRepo = new FirestoreGenericRepository<CashHistory>(
+            firestore,
+            constant.FIREBASE.COLLECTIONS.CASH_HISTORIES,
+        );
 
-  }
+        this.pointHistoryRepo = new FirestoreGenericRepository<PointHistory>(
+            firestore,
+            constant.FIREBASE.COLLECTIONS.POINT_HISTORIES,
+        );
+
+        this.productRepo = new FirestoreGenericRepository<Product>(firestore, constant.FIREBASE.COLLECTIONS.PRODUCTS);
+
+        this.chartRepo = new FirestoreGenericRepository<Chart>(firestore, constant.FIREBASE.COLLECTIONS.CHARTS);
+
+        this.chainlinkRepo = new FirestoreGenericRepository<Chainlink>(
+            firestore,
+            constant.FIREBASE.COLLECTIONS.CHAINLINKS,
+        );
+
+        this.leaderboardRepo = new FirestoreGenericRepository<Leaderboard>(
+            firestore,
+            constant.FIREBASE.COLLECTIONS.LEADERBOARD,
+        );
+
+        this.preferenceRepo = new FirestoreGenericRepository<Preferences>(
+            firestore,
+            constant.FIREBASE.COLLECTIONS.PREFERENCES,
+        );
+
+        this.botPreferenceRepo = new FirestoreGenericRepository<BotPreferences>(
+            firestore,
+            constant.FIREBASE.COLLECTIONS.BOT_PREFERENCES,
+        );
+
+        this.walletRepo = new FirestoreGenericRepository<Wallet>(firestore, constant.FIREBASE.COLLECTIONS.WALLETS);
+
+        this.statisticRepo = new FirestoreGenericRepository<Statistic>(
+            firestore,
+            constant.FIREBASE.COLLECTIONS.STATISTICS,
+        );
+
+        this.manipulationRepo = new FirestoreGenericRepository<Manipulation>(
+            firestore,
+            constant.FIREBASE.COLLECTIONS.MANIPULATIONS,
+        );
+
+        // Prediction
+
+        this.predictionRepo = new FirestoreGenericRepository<Prediction>(
+            firestore,
+            constant.FIREBASE.COLLECTIONS.PREDICTIONS,
+        );
+
+        this.betRepo = new FirestoreGenericRepository<Bet>(firestore, constant.FIREBASE.COLLECTIONS.BETS);
+
+        // Dice
+        this.diceRepo = new FirestoreGenericRepository<Dice>(firestore, constant.FIREBASE.COLLECTIONS.DICES);
+
+        this.betDiceRepo = new FirestoreGenericRepository<Bet>(firestore, constant.FIREBASE.COLLECTIONS.BETS_DICE);
+        // Market
+
+        this.betMarketRepo = new FirestoreGenericRepository<Bet>(firestore, constant.FIREBASE.COLLECTIONS.BETS_MARKET);
+
+        this.marketRepo = new FirestoreGenericRepository<Market>(firestore, constant.FIREBASE.COLLECTIONS.MARKETS);
+    }
+
+    private getServiceAccount() {
+        const serviceAccount: admin.ServiceAccount = {
+            projectId: process.env.FIRESTORE_PROJECT_ID,
+            privateKey: process.env.FIRESTORE_PRIVATE_KEY
+                ? process.env.FIRESTORE_PRIVATE_KEY.replace(/\\n/gm, '\n')
+                : undefined,
+            clientEmail: process.env.FIRESTORE_CLIENT_EMAIL,
+        };
+
+        return serviceAccount;
+    }
 }

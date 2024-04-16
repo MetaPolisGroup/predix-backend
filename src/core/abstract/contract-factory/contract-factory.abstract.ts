@@ -1,5 +1,5 @@
-import { ContractGenericAbstract } from "./contract-generic.abstract";
-import { ContractMultiWalletsAbstract } from "./contract-multiwallets.abstract";
+import { ContractGenericAbstract } from './contract-generic.abstract';
+import { ContractMultiWalletsAbstract } from './contract-multiwallets.abstract';
 
 export abstract class ContractFactoryAbstract {
     // Predix
