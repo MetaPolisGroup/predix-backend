@@ -59,7 +59,7 @@ export class ManipulationService {
         const r = this.randomFromZeroToZeroPointFive();
         const price = +(round.lockPrice - r).toFixed(8);
         return {
-            position: 'UP',
+            position: 'DOWN',
             manipulated_closed_price: price,
         };
     }
