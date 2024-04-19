@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, OnApplicationBootstrap, Param } from '@nestjs/common';
 import { IDataServices } from './core/abstract/data-services/data-service.abstract';
 import { UserAuthenService } from './use-case/user/user-authen.service';
 import { ContractFactoryAbstract } from './core/abstract/contract-factory/contract-factory.abstract';
@@ -15,9 +15,10 @@ import { PredictionRoundService } from './use-case/games/prediction/prediction-r
 import { PredixStatisticService } from './use-case/statistic/predix/predix-statistic.service';
 import { ManipulationService } from './use-case/manipulation/manipulation.service';
 import { ManipulationUsecases } from './use-case/manipulation/manipulation.usecases';
+import { BetPredictionService } from './use-case/bet/prediction/bet-prediction.service';
 
 @Controller()
-export class AppController {
+export class AppController implements OnApplicationBootstrap {
     constructor(
         private readonly userService: UserAuthenService,
         private readonly factory: ContractFactoryAbstract,
@@ -37,6 +38,39 @@ export class AppController {
         private readonly db: IDataServices,
     ) {}
 
+    async onApplicationBootstrap() {
+        // await this.clearBetsToday();
+        // await this.clearRoundsToday();
+    }
+
+    async clearBetsToday() {
+        const bets = await this.db.betRepo.getCollectionDataByConditions([
+            {
+                field: 'created_at',
+                operator: '>=',
+                value: this.helper.getTimestampAtBeginningOfDayInSeconds(),
+            },
+        ]);
+
+        for (const bet of bets) {
+            await this.db.betRepo.deleteDocumentData(bet.id);
+        }
+    }
+
+    async clearRoundsToday() {
+        const rounds = await this.db.predictionRepo.getCollectionDataByConditions([
+            {
+                field: 'created_at',
+                operator: '>=',
+                value: this.helper.getTimestampAtBeginningOfDayInSeconds(),
+            },
+        ]);
+
+        for (const round of rounds) {
+            await this.db.predictionRepo.deleteDocumentData(round.id);
+        }
+    }
+
     @Get('addWhitelist')
     async tim() {
         const wallets = await this.walletService.getAllWallets();
@@ -47,20 +81,6 @@ export class AppController {
         await this.faucetService.addWhitelistAndWait(walletList);
 
         return 'ok';
-    }
-
-    @Get('bet')
-    async transfer() {
-        this.predixBot.betBearByPrivatekey(
-            'b9f41189480eb483895469f79583755bdd35a5bcfe6077581fb70f4c31973211',
-            (await this.predixRound.getCurrentRound()).epoch,
-            30,
-        );
-        this.predixBot.betBullByPrivatekey(
-            '4420c3c1829b186f14fea2e7d85f8a3cee95bad40d7cfd973cbebcd36753bd39',
-            (await this.predixRound.getCurrentRound()).epoch,
-            1,
-        );
     }
 
     @Get('bot')
