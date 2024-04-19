@@ -104,6 +104,7 @@ export class ManipulationUsecases {
             total_user_bet_down: 0,
             total_user_bet_up: 0,
             round,
+            statistic: null,
             chainlink_price: null,
             manipulated_closed_price: null,
             prophecy_result,

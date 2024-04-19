@@ -1,6 +1,7 @@
 import { Position } from 'src/configuration/type/bet';
 import { Generic } from './generic.entity';
 import { Prediction } from './prediction.enity';
+import { Statistic } from './statistic.entity';
 
 export class Manipulation extends Generic {
     epoch: number;
@@ -30,6 +31,8 @@ export class Manipulation extends Generic {
     chainlink_price: number;
 
     round: Prediction;
+
+    statistic: Statistic;
 }
 
 export class ChartStructure {
