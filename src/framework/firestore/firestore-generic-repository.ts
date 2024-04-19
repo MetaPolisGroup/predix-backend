@@ -1,4 +1,10 @@
+import { collectionsName } from 'src/configuration/type/firebase/firebase.type';
+import { IGenericRepository } from 'src/core/abstract/data-services/generic-repository.abstract';
+import { DocumentChange, DocumentChangeOrigin } from 'src/core/abstract/data-services/snapshot/Query.abstract';
+import { CustomLogger } from '../logger/logger.framework';
+import { Generic } from 'src/core/entity/generic.entity';
 import {
+    AggregateField,
     CollectionReference,
     DocumentData,
     Firestore,
@@ -6,12 +12,7 @@ import {
     QueryDocumentSnapshot,
     UpdateData,
     WhereFilterOp,
-} from '@google-cloud/firestore';
-import { collectionsName } from 'src/configuration/type/firebase/firebase.type';
-import { IGenericRepository } from 'src/core/abstract/data-services/generic-repository.abstract';
-import { DocumentChange, DocumentChangeOrigin } from 'src/core/abstract/data-services/snapshot/Query.abstract';
-import { CustomLogger } from '../logger/logger.framework';
-import { Generic } from 'src/core/entity/generic.entity';
+} from 'firebase-admin/firestore';
 
 export class FirestoreGenericRepository<T extends Generic> implements IGenericRepository<T> {
     readonly collectionRef: CollectionReference<T>;
@@ -40,6 +41,45 @@ export class FirestoreGenericRepository<T extends Generic> implements IGenericRe
         }
 
         return query;
+    }
+
+    async getSumByConditions(conditions: { field: string; operator: WhereFilterOp; value: any }[], sumField: string) {
+        let query: Query<T> = this.collectionRef;
+
+        query = this.queryBuilder(query, conditions);
+
+        const sumAggregateQuery = query.aggregate({
+            total: AggregateField.sum(sumField),
+        });
+
+        return (await sumAggregateQuery.get()).data().total;
+    }
+
+    async getCountByConditions(conditions: { field: string; operator: WhereFilterOp; value: any }[]) {
+        let query: Query<T> = this.collectionRef;
+
+        query = this.queryBuilder(query, conditions);
+
+        const sumAggregateQuery = query.aggregate({
+            total: AggregateField.count(),
+        });
+
+        return (await sumAggregateQuery.get()).data().total;
+    }
+
+    async getAverageByConditions(
+        conditions: { field: string; operator: WhereFilterOp; value: any }[],
+        avgField: string,
+    ) {
+        let query: Query<T> = this.collectionRef;
+
+        query = this.queryBuilder(query, conditions);
+
+        const sumAggregateQuery = query.aggregate({
+            total: AggregateField.average(avgField),
+        });
+
+        return (await sumAggregateQuery.get()).data().total;
     }
 
     private fixDataFromCollection(collectionSnapshot: QueryDocumentSnapshot<T>[]): T[] {

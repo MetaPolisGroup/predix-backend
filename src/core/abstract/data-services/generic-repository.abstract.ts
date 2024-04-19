@@ -17,33 +17,47 @@ type Value<TObj, TString extends string> = TString extends keyof TObj
           : never
       : never;
 
-type ConditionArray<T, E extends Fields<T, keyof T>> = { field: E; operator: WhereFilterOp; value: Value<T, E> };
+type ConditionArray<T, E extends string> = { field: E; operator: WhereFilterOp; value: Value<T, E> };
+
+type OnlyNumber<TObj, TKey> = TKey extends keyof TObj ? (TObj[TKey] extends number ? TKey : never) : never;
 
 export abstract class IGenericRepository<T> {
     abstract getCollectionData(): Promise<T[]>;
 
+    abstract getSumByConditions<E extends Fields<T, keyof T>>(
+        conditions: ConditionArray<T, NoInfer<E>>[],
+        sumField: NoInfer<OnlyNumber<T, E>>,
+    );
+
+    abstract getCountByConditions<E extends Fields<T, keyof T>>(conditions: ConditionArray<T, NoInfer<E>>[]);
+
+    abstract getAverageByConditions<E extends Fields<T, keyof T>>(
+        conditions: ConditionArray<T, NoInfer<E>>[],
+        avgField: NoInfer<OnlyNumber<T, E>>,
+    );
+
     abstract getFirstValueCollectionData(): Promise<T>;
 
     abstract getCollectionDataByConditions<E extends Fields<T, keyof T>>(
-        conditions: ConditionArray<T, E>[],
+        conditions: ConditionArray<T, NoInfer<E>>[],
     ): Promise<T[]>;
 
     abstract getFirstValueCollectionDataByConditions<E extends Fields<T, keyof T>>(
-        conditions: ConditionArray<T, E>[],
+        conditions: ConditionArray<T, NoInfer<E>>[],
     ): Promise<T>;
 
     abstract getCollectionDataByConditionsAndOrderBy<E extends Fields<T, keyof T>>(
-        conditions: ConditionArray<T, E>[],
+        conditions: ConditionArray<T, NoInfer<E>>[],
         orderBy: { field: string; option: 'asc' | 'desc' }[],
     ): Promise<T[]>;
 
     abstract getFirstValueCollectionDataByConditionsAndOrderBy<E extends Fields<T, keyof T>>(
-        conditions: ConditionArray<T, E>[],
+        conditions: ConditionArray<T, NoInfer<E>>[],
         orderBy: { field: string; option?: 'asc' | 'desc' }[],
     ): Promise<T>;
 
     abstract getCollectionDataByConditionsOrderByStartAfterAndLimit<E extends Fields<T, keyof T>>(
-        conditions: ConditionArray<T, E>[],
+        conditions: ConditionArray<T, NoInfer<E>>[],
         orderBy: { field: string; option: 'asc' | 'desc' }[],
         startAfter: T,
         limit: number,
@@ -66,18 +80,18 @@ export abstract class IGenericRepository<T> {
     abstract listenToChanges(callback: (changes: DocumentChange<T>[]) => Promise<void> | void): () => void;
 
     abstract listenToChangesWithConditions<E extends Fields<T, keyof T>>(
-        conditions: ConditionArray<T, E>[],
+        conditions: ConditionArray<T, NoInfer<E>>[],
         callback: (changes: DocumentChange<T>[]) => Promise<void> | void,
     ): () => void;
 
     abstract listenToChangesWithConditionsAndOrderBy<E extends Fields<T, keyof T>>(
-        conditions: ConditionArray<T, E>[],
+        conditions: ConditionArray<T, NoInfer<E>>[],
         orderBys: { field: string; option?: 'asc' | 'desc' }[],
         callback: (changes: DocumentChange<T>[]) => Promise<void> | void,
     ): () => void;
 
     abstract listenToChangesWithConditionsOrigin<E extends Fields<T, keyof T>>(
-        conditions: ConditionArray<T, E>[],
+        conditions: ConditionArray<T, NoInfer<E>>[],
         callback: (changes: DocumentChange<T>[]) => Promise<void> | void,
     ): () => void;
 

@@ -1,6 +1,7 @@
-import { Injectable, OnApplicationBootstrap, OnModuleInit } from '@nestjs/common';
-import * as admin from 'firebase-admin';
-import { Bucket } from '@google-cloud/storage';
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { initializeApp, cert, ServiceAccount } from 'firebase-admin/app';
+import { Firestore, getFirestore } from 'firebase-admin/firestore';
+
 import constant from 'src/configuration';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 import { User } from 'src/core/entity/user.enity';
@@ -23,7 +24,7 @@ import { Manipulation } from 'src/core/entity/manipulation.entity';
 @Injectable()
 export class FirestoreDataServices implements IDataServices, OnModuleInit {
     //Firestore
-    firestore: admin.firestore.Firestore;
+    firestore: Firestore;
 
     userRepo: FirestoreGenericRepository<User>;
 
@@ -71,16 +72,15 @@ export class FirestoreDataServices implements IDataServices, OnModuleInit {
     onModuleInit(): void {
         // Initialize DB
         const serviceAccount = this.getServiceAccount();
-        const app = admin.initializeApp(
+        const app = initializeApp(
             {
-                credential: admin.credential.cert(serviceAccount),
+                credential: cert(serviceAccount),
                 storageBucket: constant.STORAGE.BUCKET,
             },
             constant.FIREBASE.NAME,
         );
-        const firestore = app.firestore();
+        const firestore = getFirestore(app);
         firestore.settings({ ignoreUndefinedProperties: true });
-        const bucket: Bucket = app.storage().bucket();
 
         //Firestore
         this.firestore = firestore;
@@ -155,7 +155,7 @@ export class FirestoreDataServices implements IDataServices, OnModuleInit {
     }
 
     private getServiceAccount() {
-        const serviceAccount: admin.ServiceAccount = {
+        const serviceAccount: ServiceAccount = {
             projectId: process.env.FIRESTORE_PROJECT_ID,
             privateKey: process.env.FIRESTORE_PRIVATE_KEY
                 ? process.env.FIRESTORE_PRIVATE_KEY.replace(/\\n/gm, '\n')
