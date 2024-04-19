@@ -1,15 +1,11 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import constant from 'src/configuration';
-import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
-import { ContractGenericAbstract } from 'src/core/abstract/contract-factory/contract-generic.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 import { ILoggerFactory } from 'src/core/abstract/logger/logger-factory.abstract';
 import { ILogger } from 'src/core/abstract/logger/logger.abstract';
-import { Prediction } from 'src/core/entity/prediction.enity';
-
+import { Prediction, PredictionOnChain } from 'src/core/entity/prediction.enity';
 import { HelperService } from 'src/use-case/helper/helper.service';
 import { PreferenceService } from 'src/use-case/preference/preference.service';
-import { UserService } from 'src/use-case/user/user.service';
 import { Bet } from 'src/core/entity/bet.entity';
 import { PredixOperatorContract } from 'src/use-case/contracts/predix/prediction-operator.service';
 
@@ -21,10 +17,8 @@ export class PredictionRoundService implements OnApplicationBootstrap {
         private readonly db: IDataServices,
         private readonly helper: HelperService,
         private readonly preference: PreferenceService,
-        private readonly factory: ContractFactoryAbstract,
         private readonly logFactory: ILoggerFactory,
         private readonly predixOperator: PredixOperatorContract,
-        private readonly userService: UserService,
     ) {
         this.logger = this.logFactory.predictionLogger;
     }
@@ -32,8 +26,7 @@ export class PredictionRoundService implements OnApplicationBootstrap {
     async onApplicationBootstrap() {
         if (process.env.CONSTANT_ENABLE === 'True') {
             await this.updateContractState();
-            await this.updateThreeLatestRounds();
-            // await this.validateAllNoCancelRound();
+            await this.updateThreeLatestRounds(await this.predixOperator.getCurrentEpoch());
         }
     }
 
@@ -130,7 +123,12 @@ export class PredictionRoundService implements OnApplicationBootstrap {
         return this.db.predictionRepo.upsertDocumentData(round.epoch.toString(), round);
     }
 
-    async includeRoundCheckToCalculateVolume(bets: Bet[], epoch: number, total_amount: number, index = 0) {
+    async includeRoundCheckToCalculateVolume(
+        bets: Bet[],
+        epoch: number,
+        total_amount: number,
+        index = 0,
+    ): Promise<Bet[]> {
         if (!bets || total_amount <= 0 || index >= bets.length) {
             return bets;
         }
@@ -146,25 +144,6 @@ export class PredictionRoundService implements OnApplicationBootstrap {
         return bets;
     }
 
-    // async validateRound(epoch: number): Promise<object> {
-    //     const now = this.helper.getNowTimeStampsSeconds();
-    //     const currentEpoch = await this.predixOperator.getCurrentEpoch();
-    //     const roundFromChain = await this.predixOperator.getRound(epoch);
-    //     const bets = await this.
-    //     const include = await this.includeRoundCheckToCalculateVolume()
-
-    //     const round: Prediction = {
-    //         ...roundFromChain,
-    //         include : this.includeRoundCheckToCalculateVolume()
-    //         cancel: null,
-    //         locked: roundFromChain.lockOracleId !== 0 && roundFromChain.lockTimestamp < now,
-    //         closed: roundFromChain.closeOracleId !== 0 && roundFromChain.closeTimestamp < now,
-
-    //     };
-    //     round.cancel = (round.closed && round.total_amount <= 0) || (!round.locked && currentEpoch > round.epoch);
-    //     return round;
-    // }
-
     async updateEndRound(round: Prediction, roundId: number, price: number) {
         // Update round
         const excess = round.closePrice - round.lockPrice;
@@ -178,41 +157,29 @@ export class PredictionRoundService implements OnApplicationBootstrap {
         await this.db.predictionRepo.upsertDocumentData(round.epoch.toString(), round);
     }
 
-    async updateThreeLatestRounds() {
-        const currentEpoch = await this.predixOperator.getCurrentEpoch();
-
-        // Update Current round
-        if (currentEpoch > 0) {
-            const currentRound = await this.predixOperator.getRound(currentEpoch);
-            await this.db.predictionRepo.upsertDocumentData(currentEpoch.toString(), currentRound);
+    async updateThreeLatestRounds(currentEpoch: number, index = 0) {
+        if (currentEpoch <= index || index > 3) {
+            return;
         }
+        const epoch = currentEpoch - index;
+        const round = await this.predixOperator.getRound(epoch);
+        const roundOnDb = await this.getRoundByEpoch(epoch);
+        const validRound = this.validateRound(roundOnDb, round, this.helper.getNowTimeStampsSeconds());
 
-        if (currentEpoch > 1) {
-            // Update Live round
-            const liveRound = await this.predixOperator.getRound(currentEpoch - 1);
-            await this.db.predictionRepo.upsertDocumentData((currentEpoch - 1).toString(), liveRound);
-        }
+        await this.db.predictionRepo.upsertDocumentData(epoch.toString(), validRound);
 
-        if (currentEpoch > 2) {
-            const expiredRound = await this.predixOperator.getRound(currentEpoch - 2);
-            await this.db.predictionRepo.upsertDocumentData((currentEpoch - 2).toString(), expiredRound);
-        }
+        await this.updateThreeLatestRounds(currentEpoch, index + 1);
     }
 
-    // async validateAllNoCancelRound() {
-    //     const rounds = await this.db.predictionRepo.getCollectionDataByConditions([
-    //         {
-    //             field: 'cancel',
-    //             operator: '==',
-    //             value: false,
-    //         },
-    //     ]);
-    //     if (rounds) {
-    //         for (const r of rounds) {
-    //             await this.db.predictionRepo.upsertDocumentData(r.epoch.toString(), { cancel: true });
-    //         }
-    //     }
-    // }
+    validateRound(round: Prediction, roundFromChain: PredictionOnChain, now: number) {
+        const { lockOracleId, lockTimestamp, closeOracleId, closeTimestamp } = roundFromChain;
+
+        round.locked = lockOracleId !== 0 && lockTimestamp < now;
+        round.closed = closeOracleId !== 0 && closeTimestamp < now;
+        round.cancel = round.closed && round.total_amount <= 0;
+
+        return { ...round, ...roundFromChain } as Prediction;
+    }
 
     async getCurrentRound() {
         const currentRound = await this.db.predictionRepo.getFirstValueCollectionDataByConditionsAndOrderBy(
@@ -240,14 +207,12 @@ export class PredictionRoundService implements OnApplicationBootstrap {
 
     async getRoundByEpoch(epoch: number) {
         const round = await this._getRoundByEpoch(epoch);
-        const roundFromChain = await this.predixOperator.getRound(epoch);
+        const roundOnChain = await this.predixOperator.getRound(epoch);
 
         if (!round) {
             this.logger.error(`Round ${epoch.toString()} not found from DB!`);
         }
-        const d: Prediction = { ...round, ...roundFromChain };
-
-        return d;
+        return { ...round, ...roundOnChain } as Prediction;
     }
 
     async getIncludeRoundFrom(from: number) {
