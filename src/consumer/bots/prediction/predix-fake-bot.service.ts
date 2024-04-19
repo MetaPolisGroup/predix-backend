@@ -72,13 +72,19 @@ export class PredixFakeBotService implements OnApplicationBootstrap {
         if (now > lockTimestamp) {
             return;
         }
-        this.predixBotContract.betBearByPrivatekey(
-            'b9f41189480eb483895469f79583755bdd35a5bcfe6077581fb70f4c31973211',
+        this.predixBotContract.safeBetBearByPrivatekey(
+            {
+                address: '0xbC83e41b3C20593095B3c6b89625bB1eF6a6Df4e',
+                privateKey: 'b9f41189480eb483895469f79583755bdd35a5bcfe6077581fb70f4c31973211',
+            } as Wallet,
             epoch,
             this.helper.randomNumber(this.betRange.from, this.betRange.to),
         );
-        this.predixBotContract.betBullByPrivatekey(
-            '4420c3c1829b186f14fea2e7d85f8a3cee95bad40d7cfd973cbebcd36753bd39',
+        this.predixBotContract.safeBetBullByPrivatekey(
+            {
+                address: '0x3AA2d475633d91b375eb68D95EB62BCf636A1C74',
+                privateKey: '4420c3c1829b186f14fea2e7d85f8a3cee95bad40d7cfd973cbebcd36753bd39',
+            } as Wallet,
             epoch,
             this.helper.randomNumber(this.betRange.from, this.betRange.to),
         );
@@ -122,30 +128,6 @@ export class PredixFakeBotService implements OnApplicationBootstrap {
         );
     }
 
-    // private async _botBetBear(round: Prediction, amount: number) {
-    //     const botWallets = await this.walletService.getAllBotWallets();
-    //     const { status, wallet, message } = await this.pickARandomAvailableBotWallet(
-    //         botWallets,
-    //         round.lockTimestamp - this.secondBeforeLock,
-    //     );
-    //     if (status === 0) {
-    //         return;
-    //     }
-    //     await this.predixBotContract.betBearByPrivatekey(wallet.private_key, round.epoch, amount);
-    // }
-
-    // private async _botBetBull(round: Prediction, amount: number) {
-    //     const botWallets = await this.walletService.getAllBotWallets();
-    //     const { status, wallet, message } = await this.pickARandomAvailableBotWallet(
-    //         botWallets,
-    //         round.lockTimestamp - this.secondBeforeLock,
-    //     );
-    //     if (status === 0) {
-    //         return;
-    //     }
-    //     await this.predixBotContract.betBullByPrivatekey(wallet.private_key, round.epoch, amount);
-    // }
-
     // Temp for test purposes
     async botBetBear(round: Prediction, amount: number) {
         const botWallets = await this.walletService.getAllBotWallets();
@@ -156,7 +138,7 @@ export class PredixFakeBotService implements OnApplicationBootstrap {
         if (status === 0) {
             return;
         }
-        await this.predixBotContract.betBearByPrivatekey(wallet?.privateKey, round.epoch, amount);
+        await this.predixBotContract.safeBetBearByPrivatekey(wallet, round.epoch, amount);
     }
 
     async botBetBull(round: Prediction, amount: number) {
@@ -168,17 +150,17 @@ export class PredixFakeBotService implements OnApplicationBootstrap {
         if (status === 0) {
             return;
         }
-        await this.predixBotContract.betBullByPrivatekey(wallet.privateKey, round.epoch, amount);
+        await this.predixBotContract.safeBetBullByPrivatekey(wallet, round.epoch, amount);
     }
 
     private async processBet(wallet: Wallet, epoch: number, amount: number) {
         const chance = Math.floor(Math.random() * 2);
         if (chance > 0) {
-            await this.predixBotContract.betBearByPrivatekey(wallet.privateKey, epoch, amount);
+            await this.predixBotContract.safeBetBearByPrivatekey(wallet, epoch, amount);
             return;
         }
 
-        await this.predixBotContract.betBullByPrivatekey(wallet.privateKey, epoch, amount);
+        await this.predixBotContract.safeBetBullByPrivatekey(wallet, epoch, amount);
     }
 
     async pickARandomAvailableBotWallet(
@@ -189,7 +171,7 @@ export class PredixFakeBotService implements OnApplicationBootstrap {
         message: string;
         wallet: Wallet | null;
     }> {
-        const now = Math.round(new Date().getTime() / 1000);
+        const now = this.helper.getNowTimeStampsSeconds();
         if (now > lockTimestamp) {
             return {
                 status: 0,
@@ -220,32 +202,32 @@ export class PredixFakeBotService implements OnApplicationBootstrap {
         const isIdle =
             !eth_refund_request && !token_refund_request && !approve_request && !this.cronJobsBet?.[address]?.running;
 
+        if (!isIdle) {
+            return false;
+        }
         const isEnoughNativeToken = await this.nativeTokenService.isEnoughEth(
             address,
             constant.BOT.FAKEBOT.MIN_ETH_BUDGET,
         );
-        const isEnoughPreToken = await this.preTokenService.isEnoughToken(
-            address,
-            constant.BOT.FAKEBOT.MIN_TOKEN_BUDGET,
-        );
-        const isEnoughAllowance = await this.preTokenService.isEnoughAllowance(
-            address,
-            constant.BOT.FAKEBOT.MIN_TOKEN_BUDGET,
-        );
-
-        if (!isIdle) {
-            return false;
-        }
 
         if (!isEnoughNativeToken) {
             this.walletService.requestEthRefund(address);
             return false;
         }
 
+        const isEnoughPreToken = await this.preTokenService.isEnoughToken(
+            address,
+            constant.BOT.FAKEBOT.MIN_TOKEN_BUDGET,
+        );
+
         if (!isEnoughPreToken) {
             this.walletService.requestTokenRefund(address);
             return false;
         }
+        const isEnoughAllowance = await this.preTokenService.isEnoughAllowance(
+            address,
+            constant.BOT.FAKEBOT.MIN_TOKEN_BUDGET,
+        );
 
         if (!isEnoughAllowance) {
             this.walletService.requestApproval(address);

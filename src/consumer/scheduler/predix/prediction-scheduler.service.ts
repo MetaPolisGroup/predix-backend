@@ -65,7 +65,7 @@ export class PredictionSchedulerService {
         this.roundCronJobs[epoch] = this.helper.createCronJob(
             () =>
                 this.logger.log(
-                    `Cronjob execute round ${epoch} have been set at ${date.getHours()}:${date.getMinutes()}`,
+                    `Cronjob execute round ${epoch} have been set at ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`,
                 ),
             date,
             async () => {
@@ -80,7 +80,7 @@ export class PredictionSchedulerService {
         this.roundCronJobs[epoch] = this.helper.createCronJob(
             () =>
                 this.logger.log(
-                    `Cronjob Genesis lock round ${epoch} have been set at ${date.getHours()}:${date.getSeconds()}`,
+                    `Cronjob Genesis lock round ${epoch} have been set at ${date.getHours()}:${date.getSeconds()}:${date.getSeconds()}`,
                 ),
             date,
             async () => {

@@ -16,6 +16,7 @@ import { PredixBetSnapshotService } from './bet/predix-bet/predix-bet.snapshot';
 import { ManipulationModule } from '../../use-case/manipulation/manipulation.module';
 import { UserModule } from '../../use-case/user/user.module';
 import { BetModule } from '../../use-case/bet/bet.module';
+import { ControlPanelModule } from 'src/use-case/control-panel/control-panel.module';
 
 @Module({
     providers: [
@@ -44,6 +45,7 @@ import { BetModule } from '../../use-case/bet/bet.module';
     controllers: [],
     imports: [
         ContractFactoryModule,
+        ControlPanelModule,
         PredictionModule,
         DiceModule,
         LeaderboardModule,

@@ -1,5 +1,4 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
-import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/contract-factory.abstract';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 import { DocumentChange } from 'src/core/abstract/data-services/snapshot/Query.abstract';
 import { ILoggerFactory } from 'src/core/abstract/logger/logger-factory.abstract';
@@ -15,6 +14,8 @@ import { BetPredictionService } from 'src/use-case/bet/prediction/bet-prediction
 import { PreferenceService } from 'src/use-case/preference/preference.service';
 import { ManipulationService } from 'src/use-case/manipulation/manipulation.service';
 import { ManipulationUsecases } from 'src/use-case/manipulation/manipulation.usecases';
+import { PredixBotControlService } from 'src/use-case/control-panel/predix/predix-bot-control.service';
+import { PredixControlService } from 'src/use-case/control-panel/predix/predix-control.services';
 
 @Injectable()
 export class PredictionSnapshotService implements OnApplicationBootstrap {
@@ -33,17 +34,20 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
         private readonly predixStatistic: PredixStatisticService,
         private readonly predixBet: BetPredictionService,
         private readonly preference: PreferenceService,
+        private readonly predixControl: PredixControlService,
+        private readonly predixBotControl: PredixBotControlService,
     ) {
         this.logger = this.logFactory.predictionLogger;
     }
 
     onApplicationBootstrap() {
-        if (process.env.CONSTANT_ENABLE === 'True') {
+        if (this.predixControl.PredixEnable() && this.predixControl.InPlayTime(9, 23)) {
             this.newRoundSnapshot(async change => {
                 if (change.type !== 'added') {
                     return;
                 }
 
+                // schedule execute round
                 await this.predixScheduler.newRoundHandler(change.doc);
 
                 // Check Prophecy
@@ -52,8 +56,11 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
                     this.predixManipulateUsecase.createManipulateionRecord(change.doc, prophecy);
                 }
 
-                this.predixFakeBotService.runFakeBots(change.doc, 2);
-                this.predixFakeBotService.FakeUserBet(change.doc);
+                // Run Bots
+                if (this.predixBotControl.PredixBotEnable()) {
+                    this.predixFakeBotService.runFakeBots(change.doc, 2);
+                    this.predixFakeBotService.FakeUserBet(change.doc);
+                }
             });
 
             this.roundLockSnapshot(async change => {
@@ -80,10 +87,6 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
                     await this.preference.getPredixPreference(),
                 );
             });
-        }
-
-        if (process.env.CONSTANT_BOT === 'True') {
-            //
         }
     }
 
