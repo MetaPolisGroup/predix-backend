@@ -30,6 +30,13 @@ export class FaucetService implements OnApplicationBootstrap {
         this.contractAddr = await this.contract.getContractAddress();
     }
 
+    async drip(address: string) {
+        const hash = await this.contract.executeContract('drip', address);
+        const status = await this.contract.waitForTransaction(hash);
+
+        return status;
+    }
+
     async faucetEthByPrivateKeyAndWait(wallet: Wallet) {
         if (!(await this.nativeToken.isEnoughEth(this.contractAddr, constant.BOT.FAKEBOT.DEFAULT_ETH_BUDGET))) {
             this.logger.warn('Faucet contract ETH balance insufficient !');

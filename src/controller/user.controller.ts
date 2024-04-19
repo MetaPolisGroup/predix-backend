@@ -4,6 +4,7 @@ import { ContractFactoryAbstract } from 'src/core/abstract/contract-factory/cont
 import { FaucetDto } from 'src/core/dtos/user/faucet.dto';
 import { CreateUserDto } from 'src/core/dtos/user/user.dto';
 import { User } from 'src/core/entity/user.enity';
+import { FaucetService } from 'src/use-case/faucet/faucet.service';
 import { HelperService } from 'src/use-case/helper/helper.service';
 import { UserAuthenService } from 'src/use-case/user/user-authen.service';
 import { UserService } from 'src/use-case/user/user.service';
@@ -12,6 +13,7 @@ import { UserService } from 'src/use-case/user/user.service';
 export class UserController {
     constructor(
         private readonly userAuthService: UserAuthenService,
+        private readonly faucet: FaucetService,
         private readonly helper: HelperService,
         private readonly userService: UserService,
         private readonly factory: ContractFactoryAbstract,
@@ -22,19 +24,12 @@ export class UserController {
         return this.userAuthService.create(dto, req);
     }
 
-    // @Post('/faucet')
-    // async faucet(@Body() dto: FaucetDto) {
-    //     await this.helper.executeContract(
-    //         this.factory.faucetContract,
-    //         'drip',
-    //         undefined,
-    //         undefined,
-    //         undefined,
-    //         undefined,
-    //         undefined,
-    //         undefined,
-    //         dto.address,
-    //     );
-    //     return true;
-    // }
+    @Post('/faucet')
+    async userFaucet(@Body() dto: FaucetDto) {
+        const status = await this.faucet.drip(dto.address);
+        if (status === 1) {
+            return true;
+        }
+        return false;
+    }
 }
