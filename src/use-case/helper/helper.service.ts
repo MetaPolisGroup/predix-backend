@@ -49,17 +49,27 @@ export class HelperService {
     }
 
     randomNumber(from: number, to: number): number {
-        // Ensure `from` is smaller than or equal to `to`
         if (from > to) {
-            throw Error("'from' value must be smaller than or equal to 'to' value");
+            return;
         }
-        const d = 1 + 1;
-        // Generate a random integer between `from` and `to`
+
         return Math.round(Math.random() * (to - from + 1)) + from;
     }
 
+    getToDayTimestampAtHourInSeconds(hour: number) {
+        const today = new Date();
+
+        // Set the time to the specified hour
+        today.setHours(hour, 0, 0, 0); // Set minutes, seconds, and milliseconds to zero
+
+        // Get the timestamp of the updated Date object
+        const timestamp = today.getTime() / 1000;
+
+        return timestamp;
+    }
+
     getRandomDateFromNowTo(to: number) {
-        const now = new Date().getTime() / 1000;
+        const now = this.getNowTimeStampsSeconds();
         const randomTimestamp = this.randomNumber(now, to);
         const date = new Date(randomTimestamp * 1000);
 
