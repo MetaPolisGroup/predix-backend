@@ -12,6 +12,8 @@ export class Preferences extends Generic {
     genesis_end?: boolean;
 
     paused: boolean;
+
+    manual_paused?: boolean;
 }
 
 export class BotPreferences extends Generic {

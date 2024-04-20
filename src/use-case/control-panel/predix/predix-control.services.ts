@@ -11,7 +11,7 @@ export class PredixControlService {
 
     async PredixEnable() {
         const d = await this.preference.getPredixPreference();
-        return !d.paused;
+        return !d.manual_paused;
     }
 
     InPlayTime(from: number, to: number) {

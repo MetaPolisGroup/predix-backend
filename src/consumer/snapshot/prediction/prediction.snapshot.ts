@@ -40,54 +40,50 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
         this.logger = this.logFactory.predictionLogger;
     }
 
-    onApplicationBootstrap() {
-        if (this.predixControl.PredixEnable()) {
-            this.newRoundSnapshot(async change => {
-                if (change.type !== 'added') {
-                    return;
-                }
+    onApplicationBootstrap() {}
 
-                // schedule execute round
-                await this.predixScheduler.newRoundHandler(change.doc);
+    predixSnapshot() {
+        return this.newRoundSnapshot(async change => {
+            if (change.type !== 'added') {
+                return;
+            }
 
-                // Check Prophecy
-                const prophecy = await this.predixStatistic.statisticCheck();
-                if (prophecy) {
-                    this.predixManipulateUsecase.createManipulateionRecord(change.doc, prophecy);
-                }
+            // schedule execute round
+            await this.predixScheduler.newRoundHandler(change.doc);
 
-                // Run Bots
-                if (this.predixBotControl.PredixBotEnable()) {
-                    this.predixFakeBotService.runFakeBots(change.doc, 2);
-                    this.predixFakeBotService.FakeUserBet(change.doc);
-                }
-            });
+            // Check Prophecy
+            const prophecy = await this.predixStatistic.statisticCheck();
+            if (prophecy) {
+                this.predixManipulateUsecase.createManipulateionRecord(change.doc, prophecy);
+            }
 
-            this.roundLockSnapshot(async change => {
-                const bets = await this.predixBet.updateBetsWhenRoundIsLocked(
-                    await this.predixBet.getBetsByEpoch(change.doc.epoch),
-                    change.doc,
-                );
+            // Run Bots
+            if (this.predixBotControl.PredixBotEnable()) {
+                this.predixFakeBotService.runFakeBots(change.doc, 2);
+                this.predixFakeBotService.FakeUserBet(change.doc);
+            }
+        });
 
-                await this.predixRound.includeRoundCheckToCalculateVolume(
-                    bets,
-                    change.doc.epoch,
-                    change.doc.total_amount,
-                );
-            });
+        this.roundLockSnapshot(async change => {
+            const bets = await this.predixBet.updateBetsWhenRoundIsLocked(
+                await this.predixBet.getBetsByEpoch(change.doc.epoch),
+                change.doc,
+            );
 
-            this.includeRoundLockSnapshot(async change => {
-                await this.predixStatistic.calculateVolumeAndUpdate(change.doc);
-            });
+            await this.predixRound.includeRoundCheckToCalculateVolume(bets, change.doc.epoch, change.doc.total_amount);
+        });
 
-            this.roundEndSnapshot(async change => {
-                await this.predixBet.updateBetsWhenRoundIsEnded(
-                    await this.predixBet.getBetsByEpoch(change.doc.epoch),
-                    change.doc,
-                    await this.preference.getPredixPreference(),
-                );
-            });
-        }
+        this.includeRoundLockSnapshot(async change => {
+            await this.predixStatistic.calculateVolumeAndUpdate(change.doc);
+        });
+
+        this.roundEndSnapshot(async change => {
+            await this.predixBet.updateBetsWhenRoundIsEnded(
+                await this.predixBet.getBetsByEpoch(change.doc.epoch),
+                change.doc,
+                await this.preference.getPredixPreference(),
+            );
+        });
     }
 
     // Round start
