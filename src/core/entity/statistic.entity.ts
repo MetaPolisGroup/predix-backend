@@ -1,4 +1,5 @@
 import { Generic } from './generic.entity';
+import { BotPreferences } from './preferences.entity';
 
 export class Statistic extends Generic {
     min_profit_expected_amount: number;
@@ -14,4 +15,8 @@ export class Statistic extends Generic {
     from: number;
 
     to: number;
+
+    preference: StatisticPreference;
 }
+
+export type StatisticPreference = Pick<BotPreferences, 'max_profit_percent' | 'min_profit_percent'>;

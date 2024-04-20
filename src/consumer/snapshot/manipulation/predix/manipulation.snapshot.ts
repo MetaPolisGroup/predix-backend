@@ -4,7 +4,7 @@ import { DocumentChange } from 'src/core/abstract/data-services/snapshot/Query.a
 import { ILoggerFactory } from 'src/core/abstract/logger/logger-factory.abstract';
 import { ILogger } from 'src/core/abstract/logger/logger.abstract';
 import { PredixStatisticService } from 'src/use-case/statistic/predix/predix-statistic.service';
-import { Manipulation } from 'src/core/entity/manipulation.entity';
+import { Manipulation, ManipulationStatistic } from 'src/core/entity/manipulation.entity';
 import { PredixBetSnapshotService } from '../../bet/predix-bet/predix-bet.snapshot';
 import { ManipulationService } from 'src/use-case/manipulation/manipulation.service';
 import { PredictionSnapshotService } from '../../prediction/prediction.snapshot';
@@ -12,6 +12,8 @@ import { UserService } from 'src/use-case/user/user.service';
 import constant from 'src/configuration';
 import { BetPredictionService } from 'src/use-case/bet/prediction/bet-prediction.service';
 import { ManipulationUsecases } from 'src/use-case/manipulation/manipulation.usecases';
+import { PredictionRoundService } from 'src/use-case/games/prediction/prediction-round.service';
+import { HelperService } from 'src/use-case/helper/helper.service';
 
 @Injectable()
 export class ManipulationSnapshotService implements OnApplicationBootstrap {
@@ -22,10 +24,12 @@ export class ManipulationSnapshotService implements OnApplicationBootstrap {
         private readonly db: IDataServices,
         private readonly predixBetSnapshot: PredixBetSnapshotService,
         private readonly predixRoundSnapshot: PredictionSnapshotService,
+        private readonly predixRound: PredictionRoundService,
         private readonly predixStatistic: PredixStatisticService,
         private readonly predixBet: BetPredictionService,
         private readonly predixManipulation: ManipulationService,
         private readonly predixManipulationUsecases: ManipulationUsecases,
+        private readonly helper: HelperService,
         private readonly userService: UserService,
     ) {
         this.logger = this.logFactory.predictionLogger;
@@ -46,8 +50,8 @@ export class ManipulationSnapshotService implements OnApplicationBootstrap {
                 const manipulation = await this.predixManipulationUsecases.getManipulationByEpoch(change.doc.epoch);
 
                 const botPosition = this.predixManipulation.calculateBotPosition(
-                    await this.predixBet.getBotBetDownsByEpoch(change.doc.epoch),
-                    await this.predixBet.getBotBetUpsByEpoch(change.doc.epoch),
+                    await this.predixBet.getTotalBotBetsUpAmountByEpoch(change.doc.epoch),
+                    await this.predixBet.getTotalBotBetsDownAmountByEpoch(change.doc.epoch),
                 );
 
                 const { manipulated_closed_price, position } = this.predixManipulation.decideWinPosition(
@@ -65,9 +69,30 @@ export class ManipulationSnapshotService implements OnApplicationBootstrap {
                 roundLockUnsub();
             });
 
-            const roundEndUnsub = this.predixRoundSnapshot.roundEndSnapshotByEpoch(change.doc.epoch, change => {
+            const roundEndUnsub = this.predixRoundSnapshot.roundEndSnapshotByEpoch(change.doc.epoch, async change => {
+                const total_volume = await this.predixRound.getTotalAmountIncludedRoundFromTo(
+                    this.helper.getTimestampAtBeginningOfDayInSeconds(),
+                    change.doc.created_at,
+                );
+
+                const current_profit = await this.predixBet.getTotalFinishedBotBetsNetOfIncludedRoundFromTo(
+                    this.helper.getTimestampAtBeginningOfDayInSeconds(),
+                    change.doc.created_at,
+                );
+
+                const { preference } = await this.predixStatistic.getCurrentStatistic();
+
+                const statistic: ManipulationStatistic = {
+                    total_volume,
+                    current_profit,
+                    current_profit_percent: (current_profit / total_volume) * 100,
+                    min_profit_expected_amount: (preference.min_profit_percent / 100) * total_volume,
+                    max_profit_expected_amount: (preference.max_profit_percent / 100) * total_volume,
+                };
+
                 this.predixManipulationUsecases.upsertManipulation(change.doc.epoch, {
                     round: change.doc,
+                    statistic,
                 });
 
                 roundEndUnsub();

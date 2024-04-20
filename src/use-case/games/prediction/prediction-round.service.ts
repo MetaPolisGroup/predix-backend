@@ -205,6 +205,51 @@ export class PredictionRoundService implements OnApplicationBootstrap {
         return currentRound;
     }
 
+    async getTotalAmountIncludedRoundFrom(from: number) {
+        const total = await this.db.predictionRepo.getSumByConditions(
+            [
+                {
+                    field: 'created_at',
+                    operator: '>=',
+                    value: from,
+                },
+                {
+                    field: 'include',
+                    operator: '==',
+                    value: true,
+                },
+            ],
+            'total_amount',
+        );
+
+        return total ?? 0;
+    }
+
+    async getTotalAmountIncludedRoundFromTo(from: number, to: number) {
+        const total = await this.db.predictionRepo.getSumByConditions(
+            [
+                {
+                    field: 'created_at',
+                    operator: '>=',
+                    value: from,
+                },
+                {
+                    field: 'created_at',
+                    operator: '<=',
+                    value: to,
+                },
+                {
+                    field: 'include',
+                    operator: '==',
+                    value: true,
+                },
+            ],
+            'total_amount',
+        );
+
+        return total ?? 0;
+    }
+
     async getRoundByEpoch(epoch: number) {
         const round = await this._getRoundByEpoch(epoch);
         const roundOnChain = await this.predixOperator.getRound(epoch);

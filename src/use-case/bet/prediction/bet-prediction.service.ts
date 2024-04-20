@@ -159,6 +159,121 @@ export class BetPredictionService implements OnApplicationBootstrap {
         return bet;
     }
 
+    async getTotalBotBetsDownAmountByEpoch(epoch: number) {
+        const total = await this.db.betRepo.getSumByConditions(
+            [
+                {
+                    field: 'epoch',
+                    operator: '==',
+                    value: epoch,
+                },
+                {
+                    field: 'position',
+                    operator: '==',
+                    value: constant.BET.POS.DOWN,
+                },
+                {
+                    field: 'user.type',
+                    operator: '==',
+                    value: constant.USER.TYPE.BOT,
+                },
+            ],
+            'after_refund_amount',
+        );
+
+        return total ?? 0;
+    }
+
+    async getTotalBotBetsUpAmountByEpoch(epoch: number) {
+        const total = await this.db.betRepo.getSumByConditions(
+            [
+                {
+                    field: 'epoch',
+                    operator: '==',
+                    value: epoch,
+                },
+                {
+                    field: 'position',
+                    operator: '==',
+                    value: constant.BET.POS.UP,
+                },
+                {
+                    field: 'user.type',
+                    operator: '==',
+                    value: constant.USER.TYPE.BOT,
+                },
+            ],
+            'after_refund_amount',
+        );
+
+        return total ?? 0;
+    }
+
+    async getTotalFinishedBotBetsNetOfIncludedRoundFromTo(from: number, to: number) {
+        const total = await this.db.betRepo.getSumByConditions(
+            [
+                {
+                    field: 'round.include',
+                    operator: '==',
+                    value: true,
+                },
+                {
+                    field: 'user.type',
+                    operator: '==',
+                    value: constant.USER.TYPE.BOT,
+                },
+                {
+                    field: 'round.created_at',
+                    operator: '>=',
+                    value: from,
+                },
+                {
+                    field: 'round.created_at',
+                    operator: '<=',
+                    value: to,
+                },
+            ],
+            'net',
+        );
+
+        return total ?? 0;
+    }
+
+    async getTotalBotBetsDownAmountByEpochFromTo(epoch: number, from: number, to: number) {
+        const total = await this.db.betRepo.getSumByConditions(
+            [
+                {
+                    field: 'epoch',
+                    operator: '==',
+                    value: epoch,
+                },
+                {
+                    field: 'position',
+                    operator: '==',
+                    value: constant.BET.POS.DOWN,
+                },
+                {
+                    field: 'user.type',
+                    operator: '==',
+                    value: constant.USER.TYPE.BOT,
+                },
+                {
+                    field: 'round.created_at',
+                    operator: '>=',
+                    value: from,
+                },
+                {
+                    field: 'round.created_at',
+                    operator: '<=',
+                    value: to,
+                },
+            ],
+            'after_refund_amount',
+        );
+
+        return total ?? 0;
+    }
+
     async getBetsByEpoch(epoch: number) {
         const bets = await this.db.betRepo.getCollectionDataByConditions([
             {
@@ -224,6 +339,28 @@ export class BetPredictionService implements OnApplicationBootstrap {
                 value: constant.BET.POS.DOWN,
             },
         ]);
+    }
+
+    async getTotalFinishedBetsNetOfIncludedRoundFrom(from: number) {
+        const total = await this.db.betRepo.getSumByConditions(
+            [
+                {
+                    field: 'round.include',
+                    operator: '==',
+                    value: true,
+                },
+                {
+                    field: 'user.type',
+                    operator: '==',
+                    value: constant.USER.TYPE.BOT,
+                },
+                { field: 'status', operator: '!=', value: constant.BET.STATUS.WAITING },
+                { field: 'created_at', operator: '>=', value: from },
+            ],
+            'net',
+        );
+
+        return total ?? 0;
     }
 
     async getBotBetsHasResultOfIncludedRoundFrom(from: number) {

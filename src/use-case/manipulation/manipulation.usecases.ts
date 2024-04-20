@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Position } from 'src/configuration/type';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 import { Bet } from 'src/core/entity/bet.entity';
-import { Prophecy, Manipulation } from 'src/core/entity/manipulation.entity';
+import { Prophecy, Manipulation, ManipulationStatistic } from 'src/core/entity/manipulation.entity';
 import { Prediction } from 'src/core/entity/prediction.enity';
 import { HelperService } from '../helper/helper.service';
 import { ExecuteData } from 'src/core/entity/chainlink.entity';
@@ -91,6 +91,7 @@ export class ManipulationUsecases {
 
     private async _createManipulationRecord(round: Prediction, prophecy_result: Prophecy) {
         const manipulation: Manipulation = {
+            statistic: null,
             epoch: round.epoch,
             chart_structure: null,
             created_at: this.helper.getNowTimeStampsSeconds(),
@@ -104,7 +105,6 @@ export class ManipulationUsecases {
             total_user_bet_down: 0,
             total_user_bet_up: 0,
             round,
-            statistic: null,
             chainlink_price: null,
             manipulated_closed_price: null,
             prophecy_result,

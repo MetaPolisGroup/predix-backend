@@ -27,7 +27,7 @@ export abstract class IGenericRepository<T> {
     abstract getSumByConditions<E extends Fields<T, keyof T>>(
         conditions: ConditionArray<T, NoInfer<E>>[],
         sumField: NoInfer<OnlyNumber<T, E>>,
-    );
+    ): Promise<number>;
 
     abstract getCountByConditions<E extends Fields<T, keyof T>>(conditions: ConditionArray<T, NoInfer<E>>[]);
 

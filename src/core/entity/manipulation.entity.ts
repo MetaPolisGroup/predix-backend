@@ -32,8 +32,17 @@ export class Manipulation extends Generic {
 
     round: Prediction;
 
-    statistic: Statistic;
+    statistic?: ManipulationStatistic;
 }
+
+export type ManipulationStatistic = Pick<
+    Statistic,
+    | 'current_profit'
+    | 'current_profit_percent'
+    | 'max_profit_expected_amount'
+    | 'min_profit_expected_amount'
+    | 'total_volume'
+>;
 
 export class ChartStructure {
     [time: string]: number;

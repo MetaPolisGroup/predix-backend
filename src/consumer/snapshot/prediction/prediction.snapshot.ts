@@ -51,10 +51,14 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
                 await this.predixScheduler.newRoundHandler(change.doc);
 
                 // Check Prophecy
-                const prophecy = await this.predixStatistic.statisticCheck();
-                if (prophecy) {
-                    this.predixManipulateUsecase.createManipulateionRecord(change.doc, prophecy);
-                }
+                const { current_profit, min_profit_expected_amount, max_profit_expected_amount } =
+                    await this.predixStatistic.getCurrentStatistic();
+                const prophecy = this.predixStatistic.statisticCheck(
+                    current_profit,
+                    min_profit_expected_amount,
+                    max_profit_expected_amount,
+                );
+                if (prophecy) this.predixManipulateUsecase.createManipulateionRecord(change.doc, prophecy);
 
                 // Run Bots
                 if (this.predixBotControl.PredixBotEnable()) {

@@ -4,7 +4,7 @@ import { Bet } from 'src/core/entity/bet.entity';
 import { Prophecy } from 'src/core/entity/manipulation.entity';
 import { Prediction } from 'src/core/entity/prediction.enity';
 import { BotPreferences } from 'src/core/entity/preferences.entity';
-import { Statistic } from 'src/core/entity/statistic.entity';
+import { Statistic, StatisticPreference } from 'src/core/entity/statistic.entity';
 import { BetPredictionService } from 'src/use-case/bet/prediction/bet-prediction.service';
 import { PredictionRoundService } from 'src/use-case/games/prediction/prediction-round.service';
 import { HelperService } from 'src/use-case/helper/helper.service';
@@ -27,14 +27,9 @@ export class PredixStatisticService implements OnApplicationBootstrap {
 
     private async reCalculateVolumeAfterReboot() {
         const preference = await this.preference.getPredixBotProfitPreference();
-        const rounds = await this.predixRound.getIncludeRoundFrom(this.helper.getTimestampAtBeginningOfDayInSeconds());
-        let total_volume = 0;
-
-        if (rounds) {
-            for (const round of rounds) {
-                total_volume += round.total_amount;
-            }
-        }
+        const total_volume = await this.predixRound.getTotalAmountIncludedRoundFrom(
+            this.helper.getTimestampAtBeginningOfDayInSeconds(),
+        );
 
         const currentStatisic = await this.getCurrentStatistic();
 
@@ -46,16 +41,12 @@ export class PredixStatisticService implements OnApplicationBootstrap {
     }
 
     private async reCalculateProfitAfterReboot() {
-        const bets = await this.betPredix.getBotBetsHasResultOfIncludedRoundFrom(
+        const current_profit = await this.betPredix.getTotalFinishedBetsNetOfIncludedRoundFrom(
             this.helper.getTimestampAtBeginningOfDayInSeconds(),
         );
-        let current_profit = 0;
+
         let current_profit_percent = 0;
-        if (bets) {
-            for (const bet of bets) {
-                current_profit += bet.net;
-            }
-        }
+
         const statistic = await this.getCurrentStatistic();
 
         current_profit_percent = (current_profit / statistic.total_volume) * 100;
@@ -63,9 +54,7 @@ export class PredixStatisticService implements OnApplicationBootstrap {
         await this.db.statisticRepo.upsertDocumentData(statistic.id, { current_profit, current_profit_percent });
     }
 
-    async statisticCheck() {
-        const { current_profit, min_profit_expected_amount, max_profit_expected_amount } =
-            await this.getCurrentStatistic();
+    statisticCheck(current_profit: number, min_profit_expected_amount: number, max_profit_expected_amount: number) {
         let prophecy: Prophecy;
         if (current_profit < min_profit_expected_amount) {
             prophecy = 'Win';
@@ -160,12 +149,19 @@ export class PredixStatisticService implements OnApplicationBootstrap {
 
         const { from, to } = this.getTimeStamp(preference.span_unit);
 
-        return this.db.statisticRepo.createDocumentData(this._createStatistic(from, to));
+        return this.db.statisticRepo.createDocumentData(
+            this._createStatistic(from, to, {
+                min_profit_percent: preference.min_profit_percent,
+                max_profit_percent: preference.max_profit_percent,
+            }),
+        );
     }
 
-    private _createStatistic(from: number, to: number) {
+    private _createStatistic(from: number, to: number, preference: StatisticPreference) {
         const s: Statistic = {
+            preference,
             created_at: this.helper.getNowTimeStampsSeconds(),
+            updated_at: this.helper.getNowTimeStampsSeconds(),
             current_profit: 0,
             current_profit_percent: 0,
             deleted: null,
@@ -175,7 +171,6 @@ export class PredixStatisticService implements OnApplicationBootstrap {
             max_profit_expected_amount: 0,
             min_profit_expected_amount: 0,
             total_volume: 0,
-            updated_at: this.helper.getNowTimeStampsSeconds(),
         };
 
         return s;
