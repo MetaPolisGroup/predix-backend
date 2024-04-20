@@ -17,6 +17,7 @@ import { ManipulationModule } from '../../use-case/manipulation/manipulation.mod
 import { UserModule } from '../../use-case/user/user.module';
 import { BetModule } from '../../use-case/bet/bet.module';
 import { ControlPanelModule } from 'src/use-case/control-panel/control-panel.module';
+import { PredixPreferenceSnapshot } from './prediction/preference.snapshot';
 
 @Module({
     providers: [
@@ -37,7 +38,7 @@ import { ControlPanelModule } from 'src/use-case/control-panel/control-panel.mod
         ManipulationSnapshotService,
 
         // Preference
-        // PreferenceSnapshotService,
+        PredixPreferenceSnapshot,
 
         // Dice
         // DiceSnapshotService,

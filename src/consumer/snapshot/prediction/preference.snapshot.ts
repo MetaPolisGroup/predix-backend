@@ -1,42 +1,45 @@
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import constant from 'src/configuration';
+import { PredictionSchedulerService } from 'src/consumer/scheduler/predix/prediction-scheduler.service';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
-import { PredixOperatorContract } from 'src/use-case/contracts/predix/prediction-operator.service';
+import { DocumentChange } from 'src/core/abstract/data-services/snapshot/Query.abstract';
+import { Preferences } from 'src/core/entity/preferences.entity';
+import { PredictionRoundService } from 'src/use-case/games/prediction/prediction-round.service';
 
 @Injectable()
-export class PreferenceSnapshotService implements OnApplicationBootstrap {
-    onApplicationBootstrap() {
-        if (process.env.CONSTANT_ENABLE === 'True') {
-            // this.genesisSnapshot();
-        }
-    }
-
+export class PredixPreferenceSnapshot implements OnApplicationBootstrap {
     constructor(
         private readonly db: IDataServices,
-        private readonly prediction: PredixOperatorContract,
+        private readonly predixScheduler: PredictionSchedulerService,
+        private readonly predixRound: PredictionRoundService,
     ) {}
 
-    // genesisSnapshot() {
-    //   this.db.preferenceRepo.listenToChangesWithConditions(
-    //     [
-    //       {
-    //         field: 'genesis_start',
-    //         operator: '==',
-    //         value: false,
-    //       },
-    //       {
-    //         field: 'genesis_lock',
-    //         operator: '==',
-    //         value: false,
-    //       },
-    //     ],
+    onApplicationBootstrap() {
+        this.genesisSnapshot(async change => {
+            this.predixScheduler.newRoundHandler(await this.predixRound.getCurrentRound());
+        });
+    }
 
-    //     async changes => {
-    //       for (const change of changes) {
-    //         if (change.type === 'modified') {
-    //           await this.prediction.genesisStartRound();
-    //         }
-    //       }
-    //     },
-    //   );
-    // }
+    genesisSnapshot(cb: (change: DocumentChange<Preferences>) => Promise<void> | void) {
+        this.db.preferenceRepo.listenToChangesWithConditions(
+            [
+                {
+                    field: 'paused',
+                    operator: '==',
+                    value: false,
+                },
+                {
+                    field: 'id',
+                    operator: '==',
+                    value: constant.FIREBASE.DOCUMENT.PREFERENCE.PREDICTION,
+                },
+            ],
+
+            async changes => {
+                for (const change of changes) {
+                    await cb?.(change);
+                }
+            },
+        );
+    }
 }

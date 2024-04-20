@@ -41,7 +41,7 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
     }
 
     onApplicationBootstrap() {
-        if (this.predixControl.PredixEnable() && this.predixControl.InPlayTime(9, 23)) {
+        if (this.predixControl.PredixEnable()) {
             this.newRoundSnapshot(async change => {
                 if (change.type !== 'added') {
                     return;

@@ -1,12 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { HelperService } from 'src/use-case/helper/helper.service';
+import { PreferenceService } from 'src/use-case/preference/preference.service';
 
 @Injectable()
 export class PredixControlService {
-    constructor(private readonly helper: HelperService) {}
+    constructor(
+        private readonly helper: HelperService,
+        private readonly preference: PreferenceService,
+    ) {}
 
-    PredixEnable() {
-        return process.env.CONSTANT_ENABLE === 'True';
+    async PredixEnable() {
+        const d = await this.preference.getPredixPreference();
+        return !d.paused;
     }
 
     InPlayTime(from: number, to: number) {

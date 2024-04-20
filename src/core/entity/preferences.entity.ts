@@ -15,6 +15,8 @@ export class Preferences extends Generic {
 }
 
 export class BotPreferences extends Generic {
+    paused: boolean;
+
     min_profit_percent: number;
 
     max_profit_percent: number;
