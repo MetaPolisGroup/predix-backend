@@ -31,6 +31,7 @@ export class PreferenceService {
 
     private async _createPredixBotProfitPreference() {
         const preference: BotPreferences = {
+            paused: false,
             max_profit_percent: 5,
             min_profit_percent: -10,
             span_unit: 'day',

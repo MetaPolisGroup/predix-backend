@@ -8,6 +8,6 @@ export class PredixBotControlService {
     async PredixBotEnable() {
         const preference = await this.preference.getPredixBotProfitPreference();
 
-        return !preference.pause;
+        return !preference.paused;
     }
 }
