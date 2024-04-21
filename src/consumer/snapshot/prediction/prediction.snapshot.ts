@@ -40,10 +40,10 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
         this.logger = this.logFactory.predictionLogger;
     }
 
-    onApplicationBootstrap() {}
+    async onApplicationBootstrap() {}
 
     predixSnapshot() {
-        return this.newRoundSnapshot(async change => {
+        const newRoundUnsub = this.newRoundSnapshot(async change => {
             if (change.type !== 'added') {
                 return;
             }
@@ -62,13 +62,13 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
             if (prophecy) this.predixManipulateUsecase.createManipulateionRecord(change.doc, prophecy);
 
             // Run Bots
-            if (this.predixBotControl.PredixBotEnable()) {
-                this.predixFakeBotService.runFakeBots(change.doc, 2);
+            if (await this.predixBotControl.PredixBotEnable()) {
                 this.predixFakeBotService.FakeUserBet(change.doc);
+                this.predixFakeBotService.runFakeBots(change.doc, 2);
             }
         });
 
-        this.roundLockSnapshot(async change => {
+        const lockRoundUnsub = this.roundLockSnapshot(async change => {
             const bets = await this.predixBet.updateBetsWhenRoundIsLocked(
                 await this.predixBet.getBetsByEpoch(change.doc.epoch),
                 change.doc,
@@ -77,17 +77,23 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
             await this.predixRound.includeRoundCheckToCalculateVolume(bets, change.doc.epoch, change.doc.total_amount);
         });
 
-        this.includeRoundLockSnapshot(async change => {
+        const includedRoundUnsub = this.includeRoundLockSnapshot(async change => {
             await this.predixStatistic.calculateVolumeAndUpdate(change.doc);
         });
 
-        this.roundEndSnapshot(async change => {
+        const roundEndUnsub = this.roundEndSnapshot(async change => {
             await this.predixBet.updateBetsWhenRoundIsEnded(
                 await this.predixBet.getBetsByEpoch(change.doc.epoch),
                 change.doc,
                 await this.preference.getPredixPreference(),
             );
         });
+        return () => {
+            newRoundUnsub();
+            lockRoundUnsub();
+            includedRoundUnsub();
+            roundEndUnsub();
+        };
     }
 
     // Round start
