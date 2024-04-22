@@ -7,7 +7,6 @@ import { User } from 'src/core/entity/user.enity';
 import { FaucetService } from 'src/use-case/faucet/faucet.service';
 import { HelperService } from 'src/use-case/helper/helper.service';
 import { UserAuthenService } from 'src/use-case/user/user-authen.service';
-import { UserService } from 'src/use-case/user/user.service';
 
 @Controller('user')
 export class UserController {
@@ -15,7 +14,6 @@ export class UserController {
         private readonly userAuthService: UserAuthenService,
         private readonly faucet: FaucetService,
         private readonly helper: HelperService,
-        private readonly userService: UserService,
         private readonly factory: ContractFactoryAbstract,
     ) {}
 

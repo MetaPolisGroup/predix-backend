@@ -67,11 +67,11 @@ export abstract class IGenericRepository<T> {
 
     abstract createDocumentData(documentData: T): Promise<T>;
 
-    abstract updateDocumentData(documentId: string, documentData: T | object): Promise<T>;
+    abstract updateDocumentData(documentId: string, documentData: Partial<T>): Promise<T>;
 
-    abstract upsertDocumentData(documentId: string, documentData: T | object): Promise<T>;
+    abstract upsertDocumentData(documentId: string, documentData: Partial<T>): Promise<T>;
 
-    abstract upsertDocumentDataWithResult(documentId: string, documentData: T | object);
+    abstract upsertDocumentDataWithResult(documentId: string, documentData: Partial<T>);
 
     abstract deleteDocumentData(documentId: string): Promise<void>;
 

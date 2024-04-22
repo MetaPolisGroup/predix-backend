@@ -91,7 +91,7 @@ export class EventClaimListener implements OnApplicationBootstrap {
 
         await this.db.betRepo.upsertDocumentData(bet.id, {
             claimed: true,
-            claimed_amount: parseInt(amount.toString()),
+            claim_amount: parseInt(amount.toString()),
         });
 
         this.logger.log(`${sender} claim ${ethers.formatEther(amount)} !`);
@@ -103,7 +103,7 @@ export class EventClaimListener implements OnApplicationBootstrap {
      * @param amount The commission amount being claimed.
      */
     async handleCommissionClaim(sender: string, amount: bigint) {
-        await this.db.userRepo.upsertDocumentData(sender, { point: 0 });
+        await this.db.userRepo.upsertDocumentData(sender, { commission: 0 });
 
         this.logger.log(`${sender} claim ${ethers.formatEther(amount)} commision !`);
     }

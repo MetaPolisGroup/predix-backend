@@ -9,7 +9,7 @@ import { BetPredictionService } from 'src/use-case/bet/prediction/bet-prediction
 import { HelperService } from 'src/use-case/helper/helper.service';
 import { ManipulationService } from 'src/use-case/manipulation/manipulation.service';
 import { PredixStatisticService } from 'src/use-case/statistic/predix/predix-statistic.service';
-import { UserService } from 'src/use-case/user/user.service';
+import { UserUsecaseService } from 'src/use-case/user/user.service';
 
 @Injectable()
 export class PredixBetSnapshotService implements OnApplicationBootstrap {
@@ -18,19 +18,20 @@ export class PredixBetSnapshotService implements OnApplicationBootstrap {
         private readonly helper: HelperService,
         private readonly predixStatistic: PredixStatisticService,
         private readonly predixBet: BetPredictionService,
-        private readonly user: UserService,
+        private readonly user: UserUsecaseService,
     ) {}
 
     onApplicationBootstrap() {
         this.botBetHasResultAndIncludedInVolumeSnapshot(change => {
             this.predixStatistic.calculateCurrentProfitAndUpdate(change.doc);
         });
-        this.betFinishSnapshot(async (change: DocumentChange<Bet>) => {
-            console.log('random');
-            this.predixBet.handleUpdateUserStatistic(
+        this.betFinishSnapshot(async change => {
+            const calculatedUser = this.predixBet.handleUpdateUserStatistic(
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                 await this.user.getUserByAddress(change.doc.user_address),
                 change.doc,
             );
+            this.user.upsertUser(calculatedUser.id, calculatedUser);
         });
     }
 

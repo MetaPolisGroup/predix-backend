@@ -105,7 +105,7 @@ export class FirestoreGenericRepository<T extends Generic> implements IGenericRe
     // Get
     async getCollectionData(): Promise<T[]> {
         const collectionSnapshot = await this.collectionRef.get();
-        if (collectionSnapshot.docs) {
+        if (collectionSnapshot.empty) {
             return null;
         }
 

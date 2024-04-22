@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { UserAuthenService } from './user-authen.service';
 import { UserController } from 'src/controller/user.controller';
-import { UserService } from './user.service';
 import { UserHandleMoney } from './user-handle-money.service';
 import { BotUserService } from './bot/bot-user.service';
 import { FaucetModule } from '../faucet/faucet.module';
+import { UserUsecaseService } from './user.service';
 
 @Module({
     controllers: [UserController],
-    providers: [UserAuthenService, UserService, UserHandleMoney, BotUserService],
+    providers: [UserAuthenService, UserUsecaseService, UserHandleMoney, BotUserService],
     imports: [FaucetModule],
-    exports: [UserAuthenService, UserHandleMoney, BotUserService, UserService],
+    exports: [UserAuthenService, UserHandleMoney, BotUserService, UserUsecaseService],
 })
 export class UserModule {}

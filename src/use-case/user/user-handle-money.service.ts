@@ -33,7 +33,7 @@ export class UserHandleMoney {
                 }
                 const after_point = (amount * revenue_share) / 100 + recommend.commission;
                 await this.db.userRepo.upsertDocumentData(recommend_id, {
-                    point: after_point,
+                    commission: after_point,
                 });
             }
         }
@@ -52,7 +52,7 @@ export class UserHandleMoney {
 
         const after_point = amount * total_revenue_share + admin.commission;
         await this.db.userRepo.upsertDocumentData(admin.id, {
-            point: after_point,
+            commission: after_point,
         });
         return true;
     }

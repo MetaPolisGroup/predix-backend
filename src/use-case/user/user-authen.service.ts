@@ -3,7 +3,7 @@ import { Request } from 'express';
 import constant from 'src/configuration';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 import { CreateUserDto } from 'src/core/dtos/user/user.dto';
-import { User } from 'src/core/entity/user.enity';
+import { User, UserType } from 'src/core/entity/user.enity';
 import { HelperService } from '../helper/helper.service';
 
 @Injectable()
@@ -65,6 +65,57 @@ export class UserAuthenService {
         };
         await this.db.userRepo.upsertDocumentData(user.id, user);
         delete user.id;
+    }
+
+    _createUser(
+        address: string,
+        nickname: string,
+        type: UserType,
+        recommend_id: string,
+        user_tree_belong: string[] = [],
+        user_tree_commissions: string[] = [],
+        ip: string,
+    ) {
+        const user: User = {
+            id: address,
+            address,
+            leaderboard: {
+                net_winnings: 0,
+                round_played: 0,
+                round_winning: 0,
+                win_rate: 0,
+                total_amount: 0,
+            },
+            commission: 0,
+            average_bet_amount: 0,
+            net: 0,
+            total_bets: 0,
+            total_bets_lost: 0,
+            total_bets_amount: 0,
+            total_bets_won: 0,
+            total_betsDown: 0,
+            total_betsDown_amount: 0,
+            total_betsDown_lost: 0,
+            total_betsDown_won: 0,
+            total_betsUp: 0,
+            total_betsUp_lost: 0,
+            total_betsUp_amount: 0,
+            total_betsUp_won: 0,
+            total_claimed_amount: 0,
+            total_claimed_times: 0,
+            total_commission_claimed_amount: 0,
+            total_commission_claimed_times: 0,
+            win_rate: 0,
+            user_tree_belong,
+            user_tree_commissions,
+            ip,
+            type,
+            created_at: this.helper.getNowTimeStampsSeconds(),
+            updated_at: this.helper.getNowTimeStampsSeconds(),
+            nickname: nickname ?? address,
+            ref: recommend_id,
+        };
+        return user;
     }
 
     async memberTreeCommissions(recommend_id: string) {

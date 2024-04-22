@@ -71,7 +71,7 @@ export class EventDiceClaimListener implements OnApplicationBootstrap {
 
         await this.db.betDiceRepo.upsertDocumentData(bet.id, {
             claimed: true,
-            claimed_amount: parseInt(amount.toString()),
+            claim_amount: parseInt(amount.toString()),
         });
 
         this.logger.log(`${sender} claimed ${formatEther(amount)}!`);

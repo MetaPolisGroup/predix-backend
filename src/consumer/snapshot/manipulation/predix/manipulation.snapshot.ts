@@ -8,7 +8,7 @@ import { Manipulation, ManipulationStatistic } from 'src/core/entity/manipulatio
 import { PredixBetSnapshotService } from '../../bet/predix-bet/predix-bet.snapshot';
 import { ManipulationService } from 'src/use-case/manipulation/manipulation.service';
 import { PredictionSnapshotService } from '../../prediction/prediction.snapshot';
-import { UserService } from 'src/use-case/user/user.service';
+import { UserUsecaseService } from 'src/use-case/user/user.service';
 import constant from 'src/configuration';
 import { BetPredictionService } from 'src/use-case/bet/prediction/bet-prediction.service';
 import { ManipulationUsecases } from 'src/use-case/manipulation/manipulation.usecases';
@@ -30,7 +30,7 @@ export class ManipulationSnapshotService implements OnApplicationBootstrap {
         private readonly predixManipulation: ManipulationService,
         private readonly predixManipulationUsecases: ManipulationUsecases,
         private readonly helper: HelperService,
-        private readonly userService: UserService,
+        private readonly UserUsecase: UserUsecaseService,
     ) {
         this.logger = this.logFactory.predictionLogger;
     }

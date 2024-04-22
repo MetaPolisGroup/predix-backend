@@ -9,15 +9,17 @@ import { User } from 'src/core/entity/user.enity';
 import { PredictionRoundService } from 'src/use-case/games/prediction/prediction-round.service';
 import { HelperService } from 'src/use-case/helper/helper.service';
 import { PreferenceService } from 'src/use-case/preference/preference.service';
+import { UserAuthenService } from 'src/use-case/user/user-authen.service';
 import { UserHandleMoney } from 'src/use-case/user/user-handle-money.service';
-import { UserService } from 'src/use-case/user/user.service';
+import { UserUsecaseService } from 'src/use-case/user/user.service';
 
 @Injectable()
 export class BetPredictionService implements OnApplicationBootstrap {
     constructor(
         private readonly db: IDataServices,
         private readonly handleMoney: UserHandleMoney,
-        private readonly userService: UserService,
+        private readonly userUsercase: UserUsecaseService,
+        private readonly userService: UserAuthenService,
         private readonly helper: HelperService,
         private readonly preference: PreferenceService,
         private readonly predixRound: PredictionRoundService,
@@ -59,7 +61,7 @@ export class BetPredictionService implements OnApplicationBootstrap {
 
     private async _createBet(sender: string, epoch: number, betAmount: number, position: Position, hash: string) {
         const round = await this.predixRound.getRoundByEpoch(epoch);
-        const user = await this.userService.getUserByAddress(sender);
+        const user = await this.userUsercase.getUserByAddress(sender);
 
         const bet: Bet = {
             epoch,
@@ -84,6 +86,10 @@ export class BetPredictionService implements OnApplicationBootstrap {
         };
 
         return this.db.betRepo.createDocumentData(bet);
+    }
+
+    async upsertBet(id: string, bet: Bet) {
+        return this.db.betRepo.upsertDocumentData(id, bet);
     }
 
     async userCutBet(epoch: number, sender: string, betAmount: number, refundAmount: number) {
