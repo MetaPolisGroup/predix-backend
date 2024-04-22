@@ -43,14 +43,12 @@ export class BetPredictionService implements OnApplicationBootstrap {
         user.total_bets_lost = user.total_betsDown_lost + user.total_betsUp_lost;
         user.total_bets_amount = user.total_betsDown_amount + user.total_betsUp_amount;
         user.average_bet_amount = Math.round(user.total_bets_amount / user.total_bets);
-        user.win_rate =+(user.total_bets_won / user.total_bets) * 100).toFixed(2);
+        user.win_rate = +((user.total_bets_won / user.total_bets) * 100).toFixed(2);
 
         return user;
     }
 
     async userBetBear(sender: string, epoch: number, betAmount: number, hash: string) {
-        //Const
-
         return this._createBet(sender, epoch, betAmount, constant.BET.POS.DOWN, hash);
     }
 
