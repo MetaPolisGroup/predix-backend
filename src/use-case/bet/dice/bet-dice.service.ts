@@ -211,14 +211,8 @@ export class BetDiceService implements OnApplicationBootstrap {
 
         if ((sum >= 11 && sum <= 18 && bet.position === 'UP') || (sum >= 3 && sum <= 10 && bet.position === 'DOWN')) {
             result = 'Win';
-            if (bet.refund > 0) {
-                result = 'Winning Refund';
-            }
         } else {
             result = 'Lose';
-            if (bet.refund > 0) {
-                result = 'Losing Refund';
-            }
         }
 
         return result;

@@ -1,10 +1,11 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import constant from 'src/configuration';
-import { BetStatus, Position } from 'src/configuration/type';
+import { DrawStatus, LoseStatus, Position, WinStatus } from 'src/configuration/type';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 import { Bet } from 'src/core/entity/bet.entity';
 import { Prediction } from 'src/core/entity/prediction.enity';
 import { Preferences } from 'src/core/entity/preferences.entity';
+import { User } from 'src/core/entity/user.enity';
 import { PredictionRoundService } from 'src/use-case/games/prediction/prediction-round.service';
 import { HelperService } from 'src/use-case/helper/helper.service';
 import { PreferenceService } from 'src/use-case/preference/preference.service';
@@ -13,8 +14,6 @@ import { UserService } from 'src/use-case/user/user.service';
 
 @Injectable()
 export class BetPredictionService implements OnApplicationBootstrap {
-    async onApplicationBootstrap() {}
-
     constructor(
         private readonly db: IDataServices,
         private readonly handleMoney: UserHandleMoney,
@@ -23,6 +22,31 @@ export class BetPredictionService implements OnApplicationBootstrap {
         private readonly preference: PreferenceService,
         private readonly predixRound: PredictionRoundService,
     ) {}
+
+    async onApplicationBootstrap() {}
+
+    handleUpdateUserStatistic(user: User, bet: Bet) {
+        switch (bet.position) {
+            case 'DOWN':
+                user.total_betsDown_amount += bet.after_refund_amount;
+                bet.status == 'Win' ? user.total_betsDown_won++ : user.total_betsDown_lost++;
+                user.total_betsDown = user.total_betsDown_lost + user.total_betsDown_won;
+                break;
+            case 'UP':
+                user.total_betsUp_amount += bet.after_refund_amount;
+                bet.status == 'Win' ? user.total_betsUp_won++ : user.total_betsUp_lost++;
+                user.total_betsUp = user.total_betsUp_lost + user.total_betsUp_won;
+                break;
+        }
+        user.total_bets = user.total_betsUp + user.total_betsDown;
+        user.total_bets_won = user.total_betsDown_won + user.total_betsUp_won;
+        user.total_bets_lost = user.total_betsDown_lost + user.total_betsUp_lost;
+        user.total_bets_amount = user.total_betsDown_amount + user.total_betsUp_amount;
+        user.average_bet_amount = Math.round(user.total_bets_amount / user.total_bets);
+        user.win_rate =+(user.total_bets_won / user.total_bets) * 100).toFixed(2);
+
+        return user;
+    }
 
     async userBetBear(sender: string, epoch: number, betAmount: number, hash: string) {
         //Const
@@ -114,12 +138,12 @@ export class BetPredictionService implements OnApplicationBootstrap {
                 claim_amount += after_refund_amount;
                 net = after_refund_amount;
                 net_after_fee = calculatedWinAmount;
-                status = refund > 0 ? 'Winning Refund' : 'Win';
+                status = 'Win';
                 break;
             case false:
                 net = -after_refund_amount;
                 net_after_fee = -calculatedWinAmount;
-                status = refund > 0 ? 'Losing Refund' : 'Lose';
+                status = 'Lose';
                 break;
 
             default:

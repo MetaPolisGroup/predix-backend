@@ -29,16 +29,10 @@ export class LeaderboardService {
                 round_played += 1;
                 total_amount += betslip.amount;
 
-                if (
-                    betslip.status === constant.BET.STATUS.WIN ||
-                    betslip.status === constant.BET.STATUS.WINNING_REFUND
-                ) {
+                if (betslip.status === constant.BET.STATUS.WIN) {
                     round_winning += 1;
                     net_winnings += betslip.winning_amount;
-                } else if (
-                    betslip.status === constant.BET.STATUS.LOSE ||
-                    betslip.status === constant.BET.STATUS.LOSING_REFUND
-                ) {
+                } else if (betslip.status === constant.BET.STATUS.LOSE) {
                     net_winnings -= betslip.amount;
                 }
 

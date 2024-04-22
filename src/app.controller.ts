@@ -71,16 +71,17 @@ export class AppController implements OnApplicationBootstrap {
         }
     }
 
-    @Get('addWhitelist')
-    async tim() {
-        const wallets = await this.walletService.getAllWallets();
-        const walletList: string[] = [];
-        for (const wallet of wallets) {
-            walletList.push(wallet.address);
-        }
-        await this.faucetService.addWhitelistAndWait(walletList);
+    @Get('getBet/:epoch')
+    async getBetsByEpoch(@Param('epoch') epoch: number) {
+        const bets = await this.db.betRepo.getCollectionDataByConditions([
+            {
+                field: 'round.epoch',
+                operator: '==',
+                value: epoch,
+            },
+        ]);
 
-        return 'ok';
+        return bets;
     }
 
     @Get('bot')
@@ -114,12 +115,5 @@ export class AppController implements OnApplicationBootstrap {
     @Get('mani/:epoch')
     async getManipulation(@Param('epoch') epoch: number) {
         return this.predixManipulateUsecase.getManipulationByEpoch(epoch);
-    }
-
-    @Get('price')
-    async price() {
-        const chainLinkPrice = await this.factory.aggregatorContract.readContract('latestRoundData');
-        const price = this.helper.toEtherNumber(chainLinkPrice[1] as bigint);
-        return price.toFixed(2);
     }
 }

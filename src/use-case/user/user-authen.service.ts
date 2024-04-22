@@ -4,10 +4,14 @@ import constant from 'src/configuration';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 import { CreateUserDto } from 'src/core/dtos/user/user.dto';
 import { User } from 'src/core/entity/user.enity';
+import { HelperService } from '../helper/helper.service';
 
 @Injectable()
 export class UserAuthenService {
-    constructor(private readonly db: IDataServices) {}
+    constructor(
+        private readonly db: IDataServices,
+        private readonly helper: HelperService,
+    ) {}
 
     async create(dto: CreateUserDto, req: Request): Promise<User> {
         let user_tree_belong = [];
@@ -35,7 +39,7 @@ export class UserAuthenService {
             net: 0,
             total_bets: 0,
             total_bets_lost: 0,
-            total_bets_mmount: 0,
+            total_bets_amount: 0,
             total_bets_won: 0,
             total_betsDown: 0,
             total_betsDown_amount: 0,
@@ -43,7 +47,7 @@ export class UserAuthenService {
             total_betsDown_won: 0,
             total_betsUp: 0,
             total_betsUp_lost: 0,
-            total_betsUp_mmount: 0,
+            total_betsUp_amount: 0,
             total_betsUp_won: 0,
             total_claimed_amount: 0,
             total_claimed_times: 0,
@@ -54,8 +58,8 @@ export class UserAuthenService {
             user_tree_commissions,
             ip: req.ip,
             type: constant.USER.TYPE.NORMAL,
-            created_at: new Date().getTime(),
-            updated_at: new Date().getTime(),
+            created_at: this.helper.getNowTimeStampsSeconds(),
+            updated_at: this.helper.getNowTimeStampsSeconds(),
             nickname: dto.nickname ?? dto.user_address,
             ref: `${dto.recommend_id}`,
         };
@@ -81,11 +85,9 @@ export class UserAuthenService {
     }
 
     async memberTreeBelong(recommend_id: string) {
-        const member_tree = [];
+        const member_tree: string[] = [];
         const recommender = await this.db.userRepo.getDocumentData(recommend_id);
-        if (!recommender) {
-            return [];
-        }
+        if (!recommender) return member_tree;
         member_tree.push(recommend_id);
         if (recommender.user_tree_belong) {
             for (let i = 0; i < recommender.user_tree_belong.length; i++) {

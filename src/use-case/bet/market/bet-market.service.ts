@@ -198,14 +198,8 @@ export class BetMarketService implements OnApplicationBootstrap {
 
         if ((round.result === 'Up' && bet.position === 'UP') || (round.result === 'Down ' && bet.position === 'DOWN')) {
             result = 'Win';
-            if (bet.refund > 0) {
-                result = 'Winning Refund';
-            }
         } else {
             result = 'Lose';
-            if (bet.refund > 0) {
-                result = 'Losing Refund';
-            }
         }
 
         return result;

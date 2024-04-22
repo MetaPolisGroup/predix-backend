@@ -3,22 +3,26 @@ import { Generic } from './generic.entity';
 export class User extends Generic {
     address: string;
 
+    // total
+
     total_bets: number;
 
     total_bets_won: number;
 
     total_bets_lost: number;
 
-    total_bets_mmount: number;
+    total_bets_amount: number;
 
+    // bet up
     total_betsUp: number;
 
     total_betsUp_won: number;
 
     total_betsUp_lost: number;
 
-    total_betsUp_mmount: number;
+    total_betsUp_amount: number;
 
+    // bet down
     total_betsDown: number;
 
     total_betsDown_won: number;
@@ -27,16 +31,19 @@ export class User extends Generic {
 
     total_betsDown_amount: number;
 
+    // claim
     total_claimed_times: number;
 
     total_claimed_amount: number;
 
+    // commission
     commission: number;
 
     total_commission_claimed_times: number;
 
     total_commission_claimed_amount: number;
 
+    // others
     win_rate: number;
 
     average_bet_amount: number;
@@ -57,7 +64,6 @@ export class User extends Generic {
 
     ref: string;
 }
-
 export interface IUserToken {
     nickname: string;
     id: string;

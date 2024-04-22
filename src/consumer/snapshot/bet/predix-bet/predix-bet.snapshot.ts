@@ -5,9 +5,11 @@ import { IDataServices } from 'src/core/abstract/data-services/data-service.abst
 import { DocumentChange } from 'src/core/abstract/data-services/snapshot/Query.abstract';
 import { Bet } from 'src/core/entity/bet.entity';
 import { UserType } from 'src/core/entity/user.enity';
+import { BetPredictionService } from 'src/use-case/bet/prediction/bet-prediction.service';
 import { HelperService } from 'src/use-case/helper/helper.service';
 import { ManipulationService } from 'src/use-case/manipulation/manipulation.service';
 import { PredixStatisticService } from 'src/use-case/statistic/predix/predix-statistic.service';
+import { UserService } from 'src/use-case/user/user.service';
 
 @Injectable()
 export class PredixBetSnapshotService implements OnApplicationBootstrap {
@@ -15,12 +17,20 @@ export class PredixBetSnapshotService implements OnApplicationBootstrap {
         private readonly db: IDataServices,
         private readonly helper: HelperService,
         private readonly predixStatistic: PredixStatisticService,
-        private readonly predixManipulation: ManipulationService,
+        private readonly predixBet: BetPredictionService,
+        private readonly user: UserService,
     ) {}
 
     onApplicationBootstrap() {
         this.botBetHasResultAndIncludedInVolumeSnapshot(change => {
             this.predixStatistic.calculateCurrentProfitAndUpdate(change.doc);
+        });
+        this.betFinishSnapshot(async (change: DocumentChange<Bet>) => {
+            console.log('random');
+            this.predixBet.handleUpdateUserStatistic(
+                await this.user.getUserByAddress(change.doc.user_address),
+                change.doc,
+            );
         });
     }
 
@@ -31,6 +41,24 @@ export class PredixBetSnapshotService implements OnApplicationBootstrap {
                     field: 'epoch',
                     operator: '==',
                     value: epoch,
+                },
+                { field: 'created_at', operator: '>=', value: this.helper.getNowTimeStampsSeconds() },
+            ],
+            async changes => {
+                for (const change of changes) {
+                    await callBack?.(change);
+                }
+            },
+        );
+    }
+
+    betFinishSnapshot(callBack: (change: DocumentChange<Bet>) => Promise<void> | void) {
+        return this.db.betRepo.listenToChangesWithConditions(
+            [
+                {
+                    field: 'status',
+                    operator: 'not-in',
+                    value: [constant.BET.STATUS.WAITING, constant.BET.STATUS.REFUND],
                 },
                 { field: 'created_at', operator: '>=', value: this.helper.getNowTimeStampsSeconds() },
             ],
