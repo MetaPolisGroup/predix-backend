@@ -38,11 +38,9 @@ export class AppController implements OnApplicationBootstrap {
         private readonly db: IDataServices,
     ) {}
 
-    async onApplicationBootstrap() {
-        // await this.clearBetsToday();
-        // await this.clearRoundsToday();
-    }
+    onApplicationBootstrap() {}
 
+    @Get('clearBet')
     async clearBetsToday() {
         const bets = await this.db.betRepo.getCollectionDataByConditions([
             {
@@ -57,6 +55,7 @@ export class AppController implements OnApplicationBootstrap {
         }
     }
 
+    @Get('clearRound')
     async clearRoundsToday() {
         const rounds = await this.db.predictionRepo.getCollectionDataByConditions([
             {
