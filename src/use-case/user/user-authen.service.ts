@@ -86,8 +86,8 @@ export class UserAuthenService implements OnApplicationBootstrap {
             total_bets_lost: 0,
             total_bets_amount: 0,
             total_bets_won: 0,
-            total_bets_lost_amount: 0,
-            total_bets_won_amount: 0,
+            total_lost_amount: 0,
+            total_won_amount: 0,
 
             // down
             total_betsDown: 0,
