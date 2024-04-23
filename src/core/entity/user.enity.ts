@@ -11,6 +11,10 @@ export class User extends Generic {
 
     total_bets_lost: number;
 
+    total_won_amount: number;
+
+    total_lost_amount: number;
+
     total_bets_amount: number;
 
     // bet up
@@ -19,6 +23,10 @@ export class User extends Generic {
     total_betsUp_won: number;
 
     total_betsUp_lost: number;
+
+    total_betsUp_lost_amount: number;
+
+    total_betsUp_won_amount: number;
 
     total_betsUp_amount: number;
 
@@ -29,9 +37,13 @@ export class User extends Generic {
 
     total_betsDown_lost: number;
 
+    total_betsDown_lost_amount: number;
+
+    total_betsDown_won_amount: number;
+
     total_betsDown_amount: number;
 
-    // claim
+    // claim bet
     total_claimed_times: number;
 
     total_claimed_amount: number;
@@ -66,6 +78,7 @@ export class User extends Generic {
 }
 export interface IUserToken {
     nickname: string;
+
     id: string;
 }
 
