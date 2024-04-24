@@ -68,9 +68,9 @@ export class User extends Generic {
 
     leaderboard?: LeaderBoardUser;
 
-    user_tree_belong?: string[];
+    user_tree_belong: string[];
 
-    user_tree_commissions?: string[];
+    user_tree_commissions: string[];
 
     type: UserType;
 

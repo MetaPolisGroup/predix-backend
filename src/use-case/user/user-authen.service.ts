@@ -13,7 +13,9 @@ export class UserAuthenService implements OnApplicationBootstrap {
         private readonly helper: HelperService,
     ) {}
 
-    async onApplicationBootstrap() {}
+    async onApplicationBootstrap() {
+        // await this.reConstructData();
+    }
 
     async reConstructData() {
         const users = await this.db.userRepo.getCollectionData();
@@ -83,11 +85,13 @@ export class UserAuthenService implements OnApplicationBootstrap {
             net: 0,
             // total
             total_bets: 0,
-            total_bets_lost: 0,
             total_bets_amount: 0,
+
             total_bets_won: 0,
-            total_lost_amount: 0,
             total_won_amount: 0,
+
+            total_bets_lost: 0,
+            total_lost_amount: 0,
 
             // down
             total_betsDown: 0,
@@ -125,11 +129,12 @@ export class UserAuthenService implements OnApplicationBootstrap {
     }
 
     async memberTreeCommissions(recommend_id: string) {
-        const member_tree = [];
+        const member_tree: string[] = [];
         const recommender = await this.db.userRepo.getDocumentData(recommend_id);
         if (!recommender) {
-            return [];
+            return member_tree;
         }
+        member_tree;
         member_tree.push(recommend_id);
         if (recommender.user_tree_belong) {
             for (let i = 0; i < recommender.user_tree_belong.length; i++) {

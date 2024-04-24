@@ -2,6 +2,7 @@ import { collectionsName } from 'src/configuration/type/firebase/firebase.type';
 
 export const collectionNames = {
     USERS: 'users' as collectionsName,
+    COMMISSION_RECORDS: 'commission_records' as collectionsName,
     PRODUCTS: 'products' as collectionsName,
     PREDICTIONS: 'predictions' as collectionsName,
     POINT_HISTORIES: 'point_histories' as collectionsName,

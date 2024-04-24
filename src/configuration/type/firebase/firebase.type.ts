@@ -1,5 +1,6 @@
 export type collectionsName =
     | 'users'
+    | 'commission_records'
     | 'predictions'
     | 'products'
     | 'point_histories'

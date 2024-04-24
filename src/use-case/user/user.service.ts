@@ -12,8 +12,12 @@ export class UserUsecaseService implements OnApplicationBootstrap {
 
     onApplicationBootstrap() {}
 
-    async upsertUser(id: string, user: User) {
+    async upsertUser(id: string, user: Partial<User>) {
         return this.db.userRepo.upsertDocumentData(id, { ...user, updated_at: this.helper.getNowTimeStampsSeconds() });
+    }
+
+    async updateIncrement(id: string, fields: Partial<Record<keyof User, number>>) {
+        return this.db.userRepo.updateDocumentIncrement(id, fields);
     }
 
     async create(id: string, user: User) {

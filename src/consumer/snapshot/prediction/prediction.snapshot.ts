@@ -16,6 +16,8 @@ import { ManipulationService } from 'src/use-case/manipulation/manipulation.serv
 import { ManipulationUsecases } from 'src/use-case/manipulation/manipulation.usecases';
 import { PredixBotControlService } from 'src/use-case/control-panel/predix/predix-bot-control.service';
 import { PredixControlService } from 'src/use-case/control-panel/predix/predix-control.services';
+import { UserUsecaseService } from 'src/use-case/user/user.service';
+import { CommissionService } from 'src/use-case/commission/commission.service';
 
 @Injectable()
 export class PredictionSnapshotService implements OnApplicationBootstrap {
@@ -34,15 +36,19 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
         private readonly predixStatistic: PredixStatisticService,
         private readonly predixBet: BetPredictionService,
         private readonly preference: PreferenceService,
+        private readonly commissionService: CommissionService,
+        private readonly userService: UserUsecaseService,
+
         private readonly predixControl: PredixControlService,
         private readonly predixBotControl: PredixBotControlService,
     ) {
         this.logger = this.logFactory.predictionLogger;
     }
 
-    async onApplicationBootstrap() {}
+    onApplicationBootstrap() {}
 
     predixSnapshot() {
+        // New Round snapshot
         const newRoundUnsub = this.newRoundSnapshot(async change => {
             if (change.type !== 'added') {
                 return;
@@ -68,19 +74,45 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
             }
         });
 
+        // Lock round snapshot
         const lockRoundUnsub = this.roundLockSnapshot(async change => {
+            // Update round
             const bets = await this.predixBet.updateBetsWhenRoundIsLocked(
                 await this.predixBet.getBetsByEpoch(change.doc.epoch),
                 change.doc,
             );
 
+            // Calculate commission
+            if (bets && bets.length > 0) {
+                for (const bet of bets) {
+                    if (bet.after_refund_amount <= 0) return;
+
+                    this.commissionService.calculateCommission(
+                        (await this.userService.getUserByAddress(bet.user_address)).user_tree_belong,
+                        bet.after_refund_amount,
+                        async compObj => {
+                            const commission = this.commissionService.commissionRecieve(
+                                compObj.commission,
+                                await this.userService.getUserByAddress(bet.user_address),
+                                await this.userService.getUserByAddress(compObj.user_address),
+                            );
+                            this.commissionService.create(commission);
+                            this.userService.upsertUser(compObj.user_address, { commission: compObj.commission });
+                        },
+                    );
+                }
+            }
+
+            // check if round is included in total volume
             await this.predixRound.includeRoundCheckToCalculateVolume(bets, change.doc.epoch, change.doc.total_amount);
         });
 
+        // Included round snapshot
         const includedRoundUnsub = this.includeRoundLockSnapshot(async change => {
             await this.predixStatistic.calculateVolumeAndUpdate(change.doc);
         });
 
+        // Round end snapshot
         const roundEndUnsub = this.roundEndSnapshot(async change => {
             await this.predixBet.updateBetsWhenRoundIsEnded(
                 await this.predixBet.getBetsByEpoch(change.doc.epoch),

@@ -1,14 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import constant from 'src/configuration';
 import { BetStatus } from 'src/configuration/type';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 import { Bet } from 'src/core/entity/bet.entity';
 import { Dice } from 'src/core/entity/dice.entity';
-import { Prediction } from 'src/core/entity/prediction.enity';
 import { HelperService } from 'src/use-case/helper/helper.service';
-import { UserHandleMoney } from 'src/use-case/user/user-handle-money.service';
 
 @Injectable()
 export class BetDiceService implements OnApplicationBootstrap {
@@ -17,7 +13,6 @@ export class BetDiceService implements OnApplicationBootstrap {
     constructor(
         private readonly db: IDataServices,
         private readonly helper: HelperService,
-        private readonly handleMoney: UserHandleMoney,
     ) {}
 
     async userBetBear(sender: string, epoch: bigint, amount: bigint) {
@@ -200,7 +195,7 @@ export class BetDiceService implements OnApplicationBootstrap {
                 await this.db.betDiceRepo.upsertDocumentData(bet.id, bet);
 
                 // Handle commission
-                await this.handleMoney.handlePoint(bet.amount, bet.user_address);
+                // await this.handleMoney.handlePoint(bet.amount, bet.user_address);
             }
         }
     }

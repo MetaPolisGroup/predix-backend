@@ -7,6 +7,7 @@ import {
     AggregateField,
     CollectionReference,
     DocumentData,
+    FieldValue,
     Firestore,
     Query,
     QueryDocumentSnapshot,
@@ -242,6 +243,21 @@ export class FirestoreGenericRepository<T extends Generic> implements IGenericRe
         await documentRef.update(documentData as UpdateData<T>).then(() => ({ id: documentId, ...documentData }) as T);
         const result: T = { id: documentId, ...documentData };
         return result;
+    }
+
+    async updateDocumentIncrement(
+        documentId: string,
+        documentData: {
+            [id in keyof T]: number;
+        },
+    ): Promise<void> {
+        const updateData: Record<string, FieldValue> = {}; // Record to store update data
+        for (const key in documentData) {
+            updateData[key] = FieldValue.increment(documentData[key]);
+        }
+
+        const documentRef = this.collectionRef.doc(documentId);
+        await documentRef.update(updateData);
     }
 
     async upsertDocumentData(documentId: string, documentData: T | object): Promise<T> {

@@ -3,8 +3,10 @@ import { ethers } from 'ethers';
 import { IDataServices } from 'src/core/abstract/data-services/data-service.abstract';
 import { ILoggerFactory } from 'src/core/abstract/logger/logger-factory.abstract';
 import { ILogger } from 'src/core/abstract/logger/logger.abstract';
+import { CommissionService } from 'src/use-case/commission/commission.service';
 import { PredixOperatorContract } from 'src/use-case/contracts/predix/prediction-operator.service';
 import { HelperService } from 'src/use-case/helper/helper.service';
+import { UserUsecaseService } from 'src/use-case/user/user.service';
 
 @Injectable()
 export class EventClaimListener implements OnApplicationBootstrap {
@@ -18,7 +20,9 @@ export class EventClaimListener implements OnApplicationBootstrap {
 
     constructor(
         private readonly db: IDataServices,
+        private readonly userService: UserUsecaseService,
         private readonly helper: HelperService,
+        private readonly commission: CommissionService,
         private readonly logFactory: ILoggerFactory,
         private readonly predixOperator: PredixOperatorContract,
     ) {
@@ -103,8 +107,9 @@ export class EventClaimListener implements OnApplicationBootstrap {
      * @param amount The commission amount being claimed.
      */
     async handleCommissionClaim(sender: string, amount: bigint) {
-        await this.db.userRepo.upsertDocumentData(sender, { commission: 0 });
-
+        const commision = this.commission.commissionWithdraw(await this.userService.getUserByAddress(sender));
+        this.commission.create(commision);
+        this.userService.upsertUser(sender, { commission: 0 });
         this.logger.log(`${sender} claim ${ethers.formatEther(amount)} commision !`);
     }
 }

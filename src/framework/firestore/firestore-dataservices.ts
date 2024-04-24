@@ -20,6 +20,7 @@ import { Dice } from 'src/core/entity/dice.entity';
 import { Wallet } from 'src/core/entity/wallet.entity';
 import { Statistic } from 'src/core/entity/statistic.entity';
 import { Manipulation } from 'src/core/entity/manipulation.entity';
+import { CommissionRecord } from 'src/core/entity/commission-record.entity';
 
 @Injectable()
 export class FirestoreDataServices implements IDataServices, OnModuleInit {
@@ -27,6 +28,8 @@ export class FirestoreDataServices implements IDataServices, OnModuleInit {
     firestore: Firestore;
 
     userRepo: FirestoreGenericRepository<User>;
+
+    commissionRecordRepo: FirestoreGenericRepository<CommissionRecord>;
 
     chartRepo: FirestoreGenericRepository<Chart>;
 
@@ -87,6 +90,11 @@ export class FirestoreDataServices implements IDataServices, OnModuleInit {
 
         // Repositories
         this.userRepo = new FirestoreGenericRepository<User>(firestore, constant.FIREBASE.COLLECTIONS.USERS);
+
+        this.commissionRecordRepo = new FirestoreGenericRepository<CommissionRecord>(
+            firestore,
+            constant.FIREBASE.COLLECTIONS.COMMISSION_RECORDS,
+        );
 
         this.cashHistoryRepoRepo = new FirestoreGenericRepository<CashHistory>(
             firestore,

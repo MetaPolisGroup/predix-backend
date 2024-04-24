@@ -7,7 +7,6 @@ import { Bet } from 'src/core/entity/bet.entity';
 import { UserType } from 'src/core/entity/user.enity';
 import { BetPredictionService } from 'src/use-case/bet/prediction/bet-prediction.service';
 import { HelperService } from 'src/use-case/helper/helper.service';
-import { ManipulationService } from 'src/use-case/manipulation/manipulation.service';
 import { PredixStatisticService } from 'src/use-case/statistic/predix/predix-statistic.service';
 import { UserUsecaseService } from 'src/use-case/user/user.service';
 
@@ -27,10 +26,10 @@ export class PredixBetSnapshotService implements OnApplicationBootstrap {
         });
         this.betFinishSnapshot(async change => {
             const calculatedUser = this.predixBet.handleUpdateUserStatistic(
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                 await this.user.getUserByAddress(change.doc.user_address),
                 change.doc,
             );
+
             this.user.upsertUser(calculatedUser.id, calculatedUser);
         });
     }

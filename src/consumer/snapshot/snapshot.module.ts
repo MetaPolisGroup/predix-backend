@@ -18,6 +18,7 @@ import { UserModule } from '../../use-case/user/user.module';
 import { BetModule } from '../../use-case/bet/bet.module';
 import { ControlPanelModule } from 'src/use-case/control-panel/control-panel.module';
 import { PredixPreferenceSnapshot } from './prediction/preference.snapshot';
+import { CommissionModule } from 'src/use-case/commission/commission.module';
 
 @Module({
     providers: [
@@ -54,6 +55,7 @@ import { PredixPreferenceSnapshot } from './prediction/preference.snapshot';
         TokenModule,
         WalletModule,
         StatisticModule,
+        CommissionModule,
         FaucetModule,
         ManipulationModule,
         UserModule,

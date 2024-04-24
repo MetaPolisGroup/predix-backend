@@ -69,6 +69,13 @@ export abstract class IGenericRepository<T> {
 
     abstract updateDocumentData(documentId: string, documentData: Partial<T>): Promise<T>;
 
+    abstract updateDocumentIncrement(
+        documentId: string,
+        documentData: {
+            [id in keyof T]?: number;
+        },
+    ): Promise<void>;
+
     abstract upsertDocumentData(documentId: string, documentData: Partial<T>): Promise<T>;
 
     abstract upsertDocumentDataWithResult(documentId: string, documentData: Partial<T>);
