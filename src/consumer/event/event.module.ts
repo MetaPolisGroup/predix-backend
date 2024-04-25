@@ -19,6 +19,7 @@ import { DiceModule } from 'src/use-case/games/dice/dice.module';
 import { MarketModule } from 'src/use-case/games/market/market.module';
 import { PredictionModule } from 'src/use-case/games/prediction/prediction.module';
 import { StatisticModule } from 'src/use-case/statistic/statistic.module';
+import { CommissionModule } from 'src/use-case/commission/commission.module';
 
 @Module({
     providers: [
@@ -41,7 +42,7 @@ import { StatisticModule } from 'src/use-case/statistic/statistic.module';
         EventDiceSetListener,
     ],
     controllers: [],
-    imports: [PredictionModule, UserModule, BetModule, MarketModule, DiceModule, StatisticModule],
+    imports: [PredictionModule, UserModule, BetModule, MarketModule, DiceModule, StatisticModule, CommissionModule],
     exports: [],
 })
 export class EventListenerModule {}
