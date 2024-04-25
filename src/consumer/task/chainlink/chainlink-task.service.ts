@@ -1,4 +1,5 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import { ILoggerFactory } from 'src/core/abstract/logger/logger-factory.abstract';
 import { ILogger } from 'src/core/abstract/logger/logger.abstract';
 import { Chart } from 'src/core/entity/chart.entity';
@@ -19,12 +20,13 @@ export class ChainlinkTaskService implements OnApplicationBootstrap {
         this.logger = this.logFactory.chainlinkLogger;
     }
 
-    // @Cron('*/5 * * * * *')
+    @Cron('*/5 * * * * *')
     async updatePriceFromChainlinkChart() {
         const chainlinkPrice = await this.chainlink.getChainlinkLatestData();
 
         const chart: Chart = {
             created_at: chainlinkPrice.started_at,
+
             price: chainlinkPrice.answer,
         };
 
