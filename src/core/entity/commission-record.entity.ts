@@ -13,6 +13,8 @@ export type CommissionRecord = {
     after_amount: number;
 
     type: CommissionType;
+
+    epoch?: number;
 } & Generic;
 
 export type CommissionType = 'Withdraw' | 'Indirect' | 'Direct';

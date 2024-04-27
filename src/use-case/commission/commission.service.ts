@@ -11,7 +11,7 @@ export class CommissionService {
         private readonly helper: HelperService,
     ) {}
 
-    commissionDirect(amount: number, sender: User, receiver: User) {
+    commissionDirect(amount: number, epoch: number, sender: User, receiver: User) {
         const commissionRecord: CommissionRecord = this.createRecord(
             amount,
             receiver.commission,
@@ -19,11 +19,12 @@ export class CommissionService {
             'Direct',
             sender,
             receiver,
+            epoch,
         );
         return commissionRecord;
     }
 
-    commissionIndirect(amount: number, sender: User, receiver: User) {
+    commissionIndirect(amount: number, epoch: number, sender: User, receiver: User) {
         const commissionRecord: CommissionRecord = this.createRecord(
             amount,
             receiver.commission,
@@ -31,6 +32,7 @@ export class CommissionService {
             'Indirect',
             sender,
             receiver,
+            epoch,
         );
         return commissionRecord;
     }
@@ -68,6 +70,7 @@ export class CommissionService {
         type: CommissionType,
         sender: User,
         receiver: User,
+        epoch = null,
     ) {
         const record: CommissionRecord = {
             deleted: false,
@@ -83,6 +86,7 @@ export class CommissionService {
                 address: receiver.address,
                 type: receiver.type,
             },
+            epoch,
         };
         return record;
     }
