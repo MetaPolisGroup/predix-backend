@@ -11,12 +11,24 @@ export class CommissionService {
         private readonly helper: HelperService,
     ) {}
 
-    commissionRecieve(amount: number, sender: User, receiver: User) {
+    commissionDirect(amount: number, sender: User, receiver: User) {
         const commissionRecord: CommissionRecord = this.createRecord(
             amount,
             receiver.commission,
             receiver.commission + amount,
-            'Recieve',
+            'Direct',
+            sender,
+            receiver,
+        );
+        return commissionRecord;
+    }
+
+    commissionIndirect(amount: number, sender: User, receiver: User) {
+        const commissionRecord: CommissionRecord = this.createRecord(
+            amount,
+            receiver.commission,
+            receiver.commission + amount,
+            'Indirect',
             sender,
             receiver,
         );
@@ -75,7 +87,12 @@ export class CommissionService {
         return record;
     }
 
-    async calculateCommission(
+    calculateDirectCommisson(amount: number) {
+        const comp = (amount * 0.8) / 100;
+        return comp;
+    }
+
+    async calculateIndirectCommission(
         user_tree_belong: string[],
         betAmount: number,
         callBack: (s: { commission: number; user_address: string }) => Promise<void> | void,
@@ -86,7 +103,7 @@ export class CommissionService {
             if (recommend_id) {
                 switch (i) {
                     case 0:
-                        revenue_share = 1.2;
+                        revenue_share = 0.4;
                         break;
                     case 1:
                         revenue_share = 0.2;

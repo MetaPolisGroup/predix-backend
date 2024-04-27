@@ -15,4 +15,4 @@ export type CommissionRecord = {
     type: CommissionType;
 } & Generic;
 
-export type CommissionType = 'Withdraw' | 'Recieve';
+export type CommissionType = 'Withdraw' | 'Indirect' | 'Direct';

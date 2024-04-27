@@ -87,19 +87,33 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
                 for (const bet of bets) {
                     if (bet.after_refund_amount <= 0) return;
 
-                    this.commissionService.calculateCommission(
-                        (await this.userService.getUserByAddress(bet.user_address)).user_tree_belong,
+                    const user = await this.userService.getUserByAddress(bet.user_address);
+                    // indirect comp
+                    this.commissionService.calculateIndirectCommission(
+                        user.user_tree_belong,
                         bet.after_refund_amount,
                         async compObj => {
-                            const commission = this.commissionService.commissionRecieve(
+                            const commission = this.commissionService.commissionIndirect(
                                 compObj.commission,
                                 await this.userService.getUserByAddress(bet.user_address),
                                 await this.userService.getUserByAddress(compObj.user_address),
                             );
                             this.commissionService.create(commission);
-                            this.userService.upsertUser(compObj.user_address, { commission: compObj.commission });
+                            this.userService.updateIncrement(compObj.user_address, { commission: compObj.commission });
                         },
                     );
+
+                    // direct comp
+                    const directCompAmount = this.commissionService.calculateDirectCommisson(bet.after_refund_amount);
+                    const directCompRecord = this.commissionService.commissionDirect(
+                        directCompAmount,
+                        user,
+                        await this.userService.getUserByAddress(user.ref),
+                    );
+                    this.commissionService.create(directCompRecord);
+                    this.userService.updateIncrement(user.ref, {
+                        commission: directCompAmount,
+                    });
                 }
             }
 
