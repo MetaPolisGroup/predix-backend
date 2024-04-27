@@ -115,6 +115,8 @@ export class UserAuthenService implements OnApplicationBootstrap {
             total_commission_claimed_amount: 0,
             total_commission_claimed_times: 0,
 
+            // others
+            best_round: null,
             win_rate: 0,
             user_tree_belong,
             user_tree_commissions,

@@ -60,6 +60,7 @@ export class BetPredictionService implements OnApplicationBootstrap {
         user.average_bet_amount = Math.round(user.total_bets_amount / user.total_bets);
         user.win_rate = +((user.total_bets_won / user.total_bets) * 100).toFixed(2);
         user.net += bet.net;
+        user.best_round = user.best_round.net < bet.net ? { epoch: bet.epoch, net: bet.net } : user.best_round;
         return user;
     }
 

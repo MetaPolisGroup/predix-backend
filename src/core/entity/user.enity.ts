@@ -1,3 +1,4 @@
+import { Bet } from './bet.entity';
 import { Generic } from './generic.entity';
 
 export class User extends Generic {
@@ -56,6 +57,9 @@ export class User extends Generic {
     total_commission_claimed_amount: number;
 
     // others
+
+    best_round: Pick<Bet, 'epoch' | 'net'>;
+
     win_rate: number;
 
     average_bet_amount: number;
