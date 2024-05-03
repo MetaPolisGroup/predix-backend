@@ -7,6 +7,7 @@ import { CommissionService } from 'src/use-case/commission/commission.service';
 import { PredixOperatorContract } from 'src/use-case/contracts/predix/prediction-operator.service';
 import { HelperService } from 'src/use-case/helper/helper.service';
 import { UserUsecaseService } from 'src/use-case/user/user.service';
+import { animals } from 'unique-names-generator';
 
 @Injectable()
 export class EventClaimListener implements OnApplicationBootstrap {
@@ -95,7 +96,7 @@ export class EventClaimListener implements OnApplicationBootstrap {
 
         await this.db.betRepo.upsertDocumentData(bet.id, {
             claimed: true,
-            claim_amount: parseInt(amount.toString()),
+            claim_amount: parseInt(this.helper.toEtherNumber(amount).toString()),
         });
 
         this.logger.log(`${sender} claim ${ethers.formatEther(amount)} !`);

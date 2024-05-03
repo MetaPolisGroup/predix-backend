@@ -95,6 +95,7 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
                         async compObj => {
                             const commission = this.commissionService.commissionIndirect(
                                 compObj.commission,
+                                bet.epoch,
                                 await this.userService.getUserByAddress(bet.user_address),
                                 await this.userService.getUserByAddress(compObj.user_address),
                             );
@@ -107,6 +108,7 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
                     const directCompAmount = this.commissionService.calculateDirectCommisson(bet.after_refund_amount);
                     const directCompRecord = this.commissionService.commissionDirect(
                         directCompAmount,
+                        bet.epoch,
                         user,
                         await this.userService.getUserByAddress(user.ref),
                     );
