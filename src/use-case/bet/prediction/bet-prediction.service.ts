@@ -26,6 +26,7 @@ export class BetPredictionService implements OnApplicationBootstrap {
     async onApplicationBootstrap() {}
 
     handleUpdateUserStatistic(user: User, bet: Bet) {
+        if (!user || !bet) return;
         switch (bet.position) {
             case 'DOWN':
                 bet.status == 'Win' ? user.total_betsDown_won++ : user.total_betsDown_lost++;

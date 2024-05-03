@@ -19,6 +19,7 @@ import { BetModule } from '../../use-case/bet/bet.module';
 import { ControlPanelModule } from 'src/use-case/control-panel/control-panel.module';
 import { PredixPreferenceSnapshot } from './prediction/preference.snapshot';
 import { CommissionModule } from 'src/use-case/commission/commission.module';
+import { CommissionConsumerModule } from '../commission/commission-consumer.module';
 
 @Module({
     providers: [
@@ -56,6 +57,7 @@ import { CommissionModule } from 'src/use-case/commission/commission.module';
         WalletModule,
         StatisticModule,
         CommissionModule,
+        CommissionConsumerModule,
         FaucetModule,
         ManipulationModule,
         UserModule,

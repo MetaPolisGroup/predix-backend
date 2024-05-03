@@ -18,6 +18,7 @@ import { PredixBotControlService } from 'src/use-case/control-panel/predix/predi
 import { PredixControlService } from 'src/use-case/control-panel/predix/predix-control.services';
 import { UserUsecaseService } from 'src/use-case/user/user.service';
 import { CommissionService } from 'src/use-case/commission/commission.service';
+import { CommssionConsumer } from 'src/consumer/commission/commisson.consumer';
 
 @Injectable()
 export class PredictionSnapshotService implements OnApplicationBootstrap {
@@ -41,6 +42,7 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
 
         private readonly predixControl: PredixControlService,
         private readonly predixBotControl: PredixBotControlService,
+        private readonly commissionConsumer: CommssionConsumer,
     ) {
         this.logger = this.logFactory.predictionLogger;
     }
@@ -92,30 +94,13 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
                     this.commissionService.calculateIndirectCommission(
                         user.user_tree_belong,
                         bet.after_refund_amount,
-                        async compObj => {
-                            const commission = this.commissionService.commissionIndirect(
-                                compObj.commission,
-                                bet.epoch,
-                                await this.userService.getUserByAddress(bet.user_address),
-                                await this.userService.getUserByAddress(compObj.user_address),
-                            );
-                            this.commissionService.create(commission);
-                            this.userService.updateIncrement(compObj.user_address, { commission: compObj.commission });
+                        compObj => {
+                            this.commissionConsumer.handleIndirectComp(bet, compObj.commission, compObj.user_address);
                         },
                     );
 
                     // direct comp
-                    const directCompAmount = this.commissionService.calculateDirectCommisson(bet.after_refund_amount);
-                    const directCompRecord = this.commissionService.commissionDirect(
-                        directCompAmount,
-                        bet.epoch,
-                        user,
-                        await this.userService.getUserByAddress(user.ref),
-                    );
-                    this.commissionService.create(directCompRecord);
-                    this.userService.updateIncrement(user.ref, {
-                        commission: directCompAmount,
-                    });
+                    this.commissionConsumer.handleDirectComp(bet);
                 }
             }
 
