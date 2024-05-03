@@ -17,6 +17,14 @@ export class UserAuthenService implements OnApplicationBootstrap {
         // await this.reConstructData();
     }
 
+    async reConstrucDataById(id: string) {
+        const { address, nickname, type, user_tree_belong, user_tree_commissions, ip, ref } =
+            await this.db.userRepo.getDocumentData(id);
+        const newUser = this._createUser(address, nickname, type, ref, user_tree_belong, user_tree_commissions, ip);
+        await this.db.userRepo.deleteDocumentData(id);
+        await this.db.userRepo.upsertDocumentData(id, newUser);
+    }
+
     async reConstructData() {
         const users = await this.db.userRepo.getCollectionData();
         if (users) {
@@ -116,7 +124,10 @@ export class UserAuthenService implements OnApplicationBootstrap {
             total_commission_claimed_times: 0,
 
             // others
-            best_round: null,
+            best_round: {
+                epoch: null,
+                net: 0,
+            },
             win_rate: 0,
             user_tree_belong,
             user_tree_commissions,
