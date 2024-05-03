@@ -30,7 +30,7 @@ export class PredixBetSnapshotService implements OnApplicationBootstrap {
                 change.doc,
             );
 
-            this.user.upsertUser(calculatedUser.id, calculatedUser);
+            this.user.upsertUser(calculatedUser.address, calculatedUser);
         });
     }
 
