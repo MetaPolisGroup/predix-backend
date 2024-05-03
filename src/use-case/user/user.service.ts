@@ -32,6 +32,7 @@ export class UserUsecaseService implements OnApplicationBootstrap {
     }
 
     async getUserByAddress(address: string) {
+        if (!address) return;
         const user = await this.db.userRepo.getDocumentData(address);
         return user;
     }
