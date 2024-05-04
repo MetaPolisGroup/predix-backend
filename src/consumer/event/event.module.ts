@@ -24,10 +24,10 @@ import { CommissionModule } from 'src/use-case/commission/commission.module';
 @Module({
     providers: [
         // Predix
-        EventBetListener,
-        EventRoundListener,
-        EventClaimListener,
-        EventSetListener,
+        // EventBetListener,
+        // EventRoundListener,
+        // EventClaimListener,
+        // EventSetListener,
 
         // Market
         EventMarketBetListener,

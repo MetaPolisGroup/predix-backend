@@ -16,14 +16,14 @@ export class PredixPreferenceSnapshot implements OnApplicationBootstrap {
 
     async onApplicationBootstrap() {
         await this.predixRound.updateState();
-        let predixUnsub: () => void;
-        this.unpauseSnapshot(() => {
-            predixUnsub = this.predixSnapshot.predixSnapshot();
-        });
-        this.pauseSnapshot(() => {
-            predixUnsub?.();
-            predixUnsub = null;
-        });
+        // let predixUnsub: () => void;
+        // this.unpauseSnapshot(() => {
+        //     predixUnsub = this.predixSnapshot.predixSnapshot();
+        // });
+        // this.pauseSnapshot(() => {
+        //     predixUnsub?.();
+        //     predixUnsub = null;
+        // });
     }
 
     unpauseSnapshot(cb: (change: DocumentChange<Preferences>) => Promise<void> | void) {
