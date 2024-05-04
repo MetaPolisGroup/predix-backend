@@ -115,16 +115,12 @@ export class PredixFakeBotService implements OnApplicationBootstrap {
     }
 
     schedulesBet(wallet: Wallet, betAmount: number, betDate: Date, epoch: number) {
-        this.cronJobsBet[wallet.address] = this.helper.createCronJob(
-            () =>
-                this.logger.log(
-                    `Fake bot Predix for round ${epoch} have been scheduled at ${betDate.getHours()}:${betDate.getMinutes()}:${betDate.getSeconds()}`,
-                ),
-            betDate,
-            async () => {
-                await this.processBet(wallet, epoch, betAmount);
-                this.cronJobsBet[wallet.address].running = false;
-            },
+        this.cronJobsBet[wallet.address] = this.helper.createCronJob(betDate, async () => {
+            await this.processBet(wallet, epoch, betAmount);
+            this.cronJobsBet[wallet.address].running = false;
+        });
+        this.logger.log(
+            `Fake bot Predix for round ${epoch} have been scheduled at ${betDate.getHours()}:${betDate.getMinutes()}:${betDate.getSeconds()}`,
         );
     }
 

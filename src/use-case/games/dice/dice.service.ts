@@ -50,32 +50,22 @@ export class DiceService implements OnApplicationBootstrap {
 
     private schedulesGenesisEndRoundWithRandomValue({ closeTimestamp, epoch }: Dice) {
         const date = new Date((closeTimestamp + 2) * 1000);
-        this.cronJobs[epoch] = this.helper.createCronJob(
-            () =>
-                this.logger.log(
-                    `Cronjob execute round ${epoch} have been set at ${date.getHours()}:${date.getMinutes()}`,
-                ),
-            date,
-            async () => {
-                await this.genesisEndRoundWithRandomValue();
-                this.cronJobs[epoch] = null;
-            },
-        );
+        this.cronJobs[epoch] = this.helper.createCronJob(date, async () => {
+            await this.genesisEndRoundWithRandomValue();
+            this.cronJobs[epoch] = null;
+        });
+
+        this.logger.log(`Cronjob execute round ${epoch} have been set at ${date.getHours()}:${date.getMinutes()}`);
     }
 
     private schedulesExecuteRoundWithRandomValue({ closeTimestamp, epoch }: Dice) {
         const date = new Date((closeTimestamp + 2) * 1000);
-        this.cronJobs[epoch] = this.helper.createCronJob(
-            () =>
-                this.logger.log(
-                    `Cronjob execute round ${epoch} have been set at ${date.getHours()}:${date.getMinutes()}`,
-                ),
-            date,
-            async () => {
-                await this.executeRoundWithRandomValue();
-                this.cronJobs[epoch] = null;
-            },
-        );
+        this.cronJobs[epoch] = this.helper.createCronJob(date, async () => {
+            await this.executeRoundWithRandomValue();
+            this.cronJobs[epoch] = null;
+        });
+
+        this.logger.log(`Cronjob execute round ${epoch} have been set at ${date.getHours()}:${date.getMinutes()}`);
     }
 
     private async genesisEndRoundWithRandomValue() {

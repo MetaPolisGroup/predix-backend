@@ -62,31 +62,23 @@ export class PredictionSchedulerService {
     // Normal
     private schedulesExecuteRound({ lockTimestamp, epoch }: Prediction) {
         const date = new Date((lockTimestamp + 2) * 1000);
-        this.roundCronJobs[epoch] = this.helper.createCronJob(
-            () =>
-                this.logger.log(
-                    `Cronjob execute round ${epoch} have been set at ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`,
-                ),
-            date,
-            async () => {
-                await this.executeRound();
-                this.roundCronJobs[epoch] = null;
-            },
+        this.roundCronJobs[epoch] = this.helper.createCronJob(date, async () => {
+            await this.executeRound();
+            this.roundCronJobs[epoch] = null;
+        });
+        this.logger.log(
+            `Cronjob execute round ${epoch} have been set at ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`,
         );
     }
 
     private schedulesGenesisLock({ lockTimestamp, epoch }: Prediction) {
         const date = new Date(lockTimestamp * 1000);
-        this.roundCronJobs[epoch] = this.helper.createCronJob(
-            () =>
-                this.logger.log(
-                    `Cronjob Genesis lock round ${epoch} have been set at ${date.getHours()}:${date.getSeconds()}:${date.getSeconds()}`,
-                ),
-            date,
-            async () => {
-                await this.genesisLockRound();
-                this.roundCronJobs[epoch] = null;
-            },
+        this.roundCronJobs[epoch] = this.helper.createCronJob(date, async () => {
+            await this.genesisLockRound();
+            this.roundCronJobs[epoch] = null;
+        });
+        this.logger.log(
+            `Cronjob Genesis lock round ${epoch} have been set at ${date.getHours()}:${date.getSeconds()}:${date.getSeconds()}`,
         );
     }
 

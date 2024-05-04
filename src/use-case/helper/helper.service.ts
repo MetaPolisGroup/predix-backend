@@ -8,13 +8,10 @@ import { IDataServices } from 'src/core/abstract/data-services/data-service.abst
 
 @Injectable()
 export class HelperService {
-    constructor(
-        private readonly factory: ContractFactoryAbstract,
-        private readonly db: IDataServices,
-    ) {}
+    constructor() {}
 
-    createCronJob(log: () => void, date: Date, cb?: () => Promise<void> | void): MyCronjob {
-        const cronjob = new CronJob(
+    createCronJob(date: Date, cb?: () => Promise<void> | void): MyCronjob {
+        new CronJob(
             date,
             async function () {
                 await cb?.();
@@ -22,8 +19,6 @@ export class HelperService {
             null,
             true,
         );
-
-        log();
 
         const myCronjob: MyCronjob = {
             date,
