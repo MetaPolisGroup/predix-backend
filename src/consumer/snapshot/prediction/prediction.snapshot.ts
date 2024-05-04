@@ -62,6 +62,7 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
             // Check Prophecy
             const { current_profit, min_profit_expected_amount, max_profit_expected_amount } =
                 await this.predixStatistic.getCurrentStatistic();
+
             const prophecy = this.predixStatistic.statisticCheck(
                 current_profit,
                 min_profit_expected_amount,
@@ -87,7 +88,7 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
             // Calculate commission
             if (bets && bets.length > 0) {
                 for (const bet of bets) {
-                    if (bet.after_refund_amount <= 0 || bet.user.type === 'Bot') return;
+                    if (bet.after_refund_amount <= 0 || bet.user.type === 'Bot') continue;
 
                     const user = await this.userService.getUserByAddress(bet.user_address);
                     // indirect comp

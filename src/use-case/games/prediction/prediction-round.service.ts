@@ -23,11 +23,11 @@ export class PredictionRoundService implements OnApplicationBootstrap {
         this.logger = this.logFactory.predictionLogger;
     }
 
-    async onApplicationBootstrap() {
-        if (process.env.CONSTANT_ENABLE === 'True') {
-            await this.updateContractState();
-            await this.updateThreeLatestRounds(await this.predixOperator.getCurrentEpoch());
-        }
+    async onApplicationBootstrap() {}
+
+    async updateState() {
+        await this.updateContractState();
+        await this.updateThreeLatestRounds(await this.predixOperator.getCurrentEpoch());
     }
 
     private async updateContractState() {

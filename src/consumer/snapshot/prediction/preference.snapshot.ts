@@ -4,23 +4,26 @@ import { IDataServices } from 'src/core/abstract/data-services/data-service.abst
 import { DocumentChange } from 'src/core/abstract/data-services/snapshot/Query.abstract';
 import { Preferences } from 'src/core/entity/preferences.entity';
 import { PredictionSnapshotService } from './prediction.snapshot';
+import { PredictionRoundService } from 'src/use-case/games/prediction/prediction-round.service';
 
 @Injectable()
 export class PredixPreferenceSnapshot implements OnApplicationBootstrap {
     constructor(
         private readonly db: IDataServices,
         private readonly predixSnapshot: PredictionSnapshotService,
+        private readonly predixRound: PredictionRoundService,
     ) {}
 
-    onApplicationBootstrap() {
-        // let predixUnsub: () => void;
-        // this.unpauseSnapshot(() => {
-        //     predixUnsub = this.predixSnapshot.predixSnapshot();
-        // });
-        // this.pauseSnapshot(() => {
-        //     predixUnsub?.();
-        //     predixUnsub = null;
-        // });
+    async onApplicationBootstrap() {
+        await this.predixRound.updateState();
+        let predixUnsub: () => void;
+        this.unpauseSnapshot(() => {
+            predixUnsub = this.predixSnapshot.predixSnapshot();
+        });
+        this.pauseSnapshot(() => {
+            predixUnsub?.();
+            predixUnsub = null;
+        });
     }
 
     unpauseSnapshot(cb: (change: DocumentChange<Preferences>) => Promise<void> | void) {
