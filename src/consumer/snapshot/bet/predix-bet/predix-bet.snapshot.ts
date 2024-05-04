@@ -20,19 +20,7 @@ export class PredixBetSnapshotService implements OnApplicationBootstrap {
         private readonly user: UserUsecaseService,
     ) {}
 
-    onApplicationBootstrap() {
-        this.botBetHasResultAndIncludedInVolumeSnapshot(change => {
-            this.predixStatistic.calculateCurrentProfitAndUpdate(change.doc);
-        });
-        this.betFinishSnapshot(async change => {
-            const calculatedUser = this.predixBet.handleUpdateUserStatistic(
-                await this.user.getUserByAddress(change.doc.user_address),
-                change.doc,
-            );
-
-            this.user.upsertUser(calculatedUser.address, calculatedUser);
-        });
-    }
+    onApplicationBootstrap() {}
 
     betSnapshotByEpoch(epoch: number, callBack: (change: DocumentChange<Bet>) => Promise<void> | void) {
         return this.db.betRepo.listenToChangesWithConditions(

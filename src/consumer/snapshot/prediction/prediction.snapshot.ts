@@ -116,7 +116,7 @@ export class PredictionSnapshotService implements OnApplicationBootstrap {
 
         // Round end snapshot
         const roundEndUnsub = this.roundEndSnapshot(async change => {
-            await this.predixBet.updateBetsWhenRoundIsEnded(
+            this.predixBet.updateBetsWhenRoundIsEnded(
                 await this.predixBet.getBetsByEpoch(change.doc.epoch),
                 change.doc,
                 await this.preference.getPredixPreference(),
